@@ -15,4 +15,3 @@ jobs:
           run: npm install
         - name: Run ESlint
           run: npx nx affected --base=origin/${{ github.base_ref }} --target=lint
-          
