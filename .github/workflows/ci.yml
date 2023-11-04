@@ -3,15 +3,15 @@ on:
   push:
     branches: ['develop', 'release-*']
 jobs:
-  ci:
-    linter: 
-      name: Linter
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3
-          name: Checkout [Default Branch]
-          with: {fetch-depth: 0}
-        - name: Install modules
-          run: npm install
-        - name: Run ESlint
-          run: npx nx affected --base=origin/${{ github.base_ref }} --target=lint
+  linter: 
+    name: Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout [Default Branch]
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install modules
+        run: npm install
+      - name: Run ESlint
+        run: npx nx affected --base=origin/${{ github.base_ref }} --target=lint
