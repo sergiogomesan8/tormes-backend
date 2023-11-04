@@ -15,4 +15,4 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Run ESlint
-        run: npx eslint .
+        run: npm run lint:changes
