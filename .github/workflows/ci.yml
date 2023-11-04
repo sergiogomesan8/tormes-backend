@@ -1,4 +1,5 @@
 name: Backend CI - Linter and Sonarcloud
+run-name: ${{ github.actor }} run Backend CI 🚀
 on:
   push:
     branches: ['develop', 'release-*']
@@ -14,4 +15,4 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Run ESlint
-        run: npx nx affected --base=origin/${{ github.base_ref }} --target=lint
+        run: npx eslint .
