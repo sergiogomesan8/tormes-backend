@@ -1,0 +1,61 @@
+{
+  "name": "tormes-backend",
+  "root": ".",
+  "sourceRoot": "src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "options": {
+        "buildTarget": "tormes-backend:build"
+      },
+      "configurations": {
+        "debug": {
+          "inspect": "inspect"
+        }
+      }
+    },
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/tormes-backend",
+        "main": "src\\main",
+        "tsConfig": "tsconfig.build.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "src/**/*.ts",
+          "test/**/*.ts"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/tormes-backend"
+      ],
+      "options": {
+        "passWithNoTests": true,
+        "jestConfig": "jest.config.ts"
+      }
+    },
+    "e2e": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "passWithNoTests": true,
+        "jestConfig": "jest.e2e-config.ts"
+      }
+    }
+  },
+  "tags": [],
+  "$schema": "node_modules/nx/schemas/project-schema.json"
+}
