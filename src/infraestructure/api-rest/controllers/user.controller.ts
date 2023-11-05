@@ -18,7 +18,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { UserDto, UserPassDto } from '../dtos/user.dto';
-import { User } from 'src/core/domain/models/user';
 import { UserService } from 'src/core/domain/services/user.service';
 
 @ApiTags('user')
@@ -50,28 +49,17 @@ export class UserController {
   async registerWithEmailAndPassword(
     @Body() userPassDto: UserPassDto,
   ): Promise<UserDto> {
-    const authUID = 'sadf';
-
     if (!userPassDto) {
       throw new BadRequestException(
         'Bad request. Invalid data provided: user object is null',
       );
     }
-    const newUser: User = {
-      id: authUID,
-      email: userPassDto.email,
-      name: {
-        name: userPassDto.name.name,
-        lastName: userPassDto.name.lastName,
-      },
-      gender: userPassDto.gender,
-      birthdate: userPassDto.birthdate,
-    };
-
-    const result = await this.userService.createUser(newUser).catch((error) => {
-      console.error(error);
-      throw new InternalServerErrorException('Internal Server Error');
-    });
+    const result = await this.userService
+      .createUser(userPassDto)
+      .catch((error) => {
+        console.error(error);
+        throw new InternalServerErrorException('Internal Server Error');
+      });
 
     return result;
   }

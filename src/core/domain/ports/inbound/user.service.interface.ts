@@ -1,5 +1,5 @@
-import { User } from '../../models/user';
+import { UserPassDto } from 'src/infraestructure/api-rest/dtos/user.dto';
 
 export interface IUserService {
-  createUser(user: User);
+  createUser(user: UserPassDto);
 }
