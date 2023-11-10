@@ -22,10 +22,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Show SonarQube Variables
-        run: |
-          echo "SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}"
-          echo "SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}"
       - uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -33,4 +29,13 @@ jobs:
       #- uses: sonarsource/sonarqube-quality-gate-action@master
       #  timeout-minutes: 5
       #  env:
-      #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Debug Networking
+        run: |
+          ip addr
+          ip route
+          ping -c 5 192.168.1.128
+          nc -zv 192.168.1.128 9000
+      
+      - name: Build and run SonarQube analysis
+        run: |
+          sonar-scanner -Dsonar.host.url=http://192.168.1.128:9000
