@@ -29,13 +29,14 @@ jobs:
       #- uses: sonarsource/sonarqube-quality-gate-action@master
       #  timeout-minutes: 5
       #  env:
-      - name: Debug Networking
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: SonarQube Analysis
         run: |
-          ip addr
-          ip route
-          ping -c 5 192.168.1.128
-          nc -zv 192.168.1.128 9000
-      
-      - name: Build and run SonarQube analysis
-        run: |
-          sonar-scanner -Dsonar.host.url=http://192.168.1.128:9000
+          sonar-scanner -Dsonar.host.url=https://632b-2a0c-5a82-e200-200-39c7-ebd-669d-cc37.ngrok.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
