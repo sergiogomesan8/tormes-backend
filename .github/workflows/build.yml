@@ -35,6 +35,13 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
+      - name: Install SonarScanner
+        run: |
+          sudo apt-get install unzip
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.1.41808-linux.zip
+          unzip sonar-scanner-cli-4.7.1.41808-linux.zip
+          export PATH="$PATH:$(pwd)/sonar-scanner-cli-4.7.1.41808-linux/bin"
+
       - name: SonarQube Analysis
         run: |
           sonar-scanner -Dsonar.host.url=https://632b-2a0c-5a82-e200-200-39c7-ebd-669d-cc37.ngrok.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
