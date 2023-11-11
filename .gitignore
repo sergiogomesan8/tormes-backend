@@ -35,3 +35,9 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .nx/cache
+
+#Environment variables
+.env
+
+#Sonar
+sonar.js
