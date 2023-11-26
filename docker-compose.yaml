@@ -31,6 +31,7 @@ services:
 
   postgres-database:
     image: postgres:13
+    restart: always
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -38,9 +39,17 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
-volumes:
-  postgresql-volume:
-    external: true
-
+      - ./docker-data/postgres_data:/var/lib/postgresql/data
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - '80:80'
+    volumes:
+      - ./docker-data/pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres-database
 #docker exec -it tormes-backend-postgres-database-1 psql -U sergio -d my_db
