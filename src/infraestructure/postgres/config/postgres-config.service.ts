@@ -20,6 +20,7 @@ export class PostgreConfigService implements TypeOrmOptionsFactory {
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: true,
+      autoLoadEntities: true,
       namingStrategy: new SnakeNamingStrategy(),
     };
   }
