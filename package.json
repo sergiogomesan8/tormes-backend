@@ -9,6 +9,7 @@
     "build": "nx build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nx serve",
+    "start:dev": "nest start --watch",
     "start:debug": "nx serve --configuration=debug",
     "start:prod": "node dist/main",
     "lint": "nx lint",
