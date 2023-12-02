@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -9,9 +9,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UserService } from 'src/core/domain/services/user.service';
-import { UserEntity } from 'src/infraestructure/postgres/entities/user.entity';
+import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { CreateUserDto } from '../dtos/user.dto';
+import { UserService } from '../../../core/domain/services/user.service';
 
 @ApiTags('user')
 @ApiBearerAuth()
@@ -33,8 +33,10 @@ export class UserController {
   create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
     return this.userService.create(createUserDto);
   }
-  @Get(':id')
-  findOneBy(@Param('id') id: string): Promise<UserEntity | null> {
-    return this.userService.findOneBy(id);
-  }
+
+  //TODO: Implementar los siguientes métodos:
+  // @Get(':id')
+  // findOneBy(@Param('id') id: string): Promise<UserEntity | null> {
+  //   return this.userService.findOneBy(id);
+  // }
 }
