@@ -3,34 +3,21 @@ import {
   IsString,
   IsEmail,
   IsOptional,
-  IsObject,
-  ValidateNested,
   IsNotEmpty,
   IsNumber,
+  IsEnum,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
-export class NameDto {
-  @ApiProperty({
-    description: 'Given name',
-    example: 'John',
-  })
-  @IsString()
-  @IsNotEmpty()
-  name: string;
+export enum UserType {
+  customer = 1,
+  employee = 2,
+  manager = 3,
+}
 
-  @ApiProperty({
-    description: 'Middle name',
-    example: 'Doe',
-  })
-  @IsString()
-  @IsNotEmpty()
-  lastName: string;
-
-  constructor(name: string, lastName: string) {
-    this.name = name;
-    this.lastName = lastName;
-  }
+enum Gender {
+  man = 1,
+  women = 2,
+  other = 3,
 }
 
 export class UserDto {
@@ -51,21 +38,27 @@ export class UserDto {
   email: string;
 
   @ApiProperty({
-    description: 'User name',
-    type: NameDto,
+    description: 'Given name',
+    example: 'John',
   })
-  @IsObject()
+  @IsString()
   @IsNotEmpty()
-  @ValidateNested()
-  name: NameDto;
+  name: string;
+
+  @ApiProperty({
+    description: 'Middle name',
+    example: 'Doe',
+  })
+  @IsString()
+  @IsNotEmpty()
+  lastName: string;
 
   @ApiProperty({
     description: 'Gender',
     example: 'Women',
   })
-  @IsString()
-  @IsNotEmpty()
-  gender: string;
+  @IsEnum(Gender)
+  gender: Gender;
 
   @ApiProperty({
     description: 'birthdate date',
@@ -84,23 +77,21 @@ export class UserDto {
   createdAt?: number;
 
   constructor(
-    id: string,
     email: string,
-    name: NameDto,
-    gender: string,
+    name: string,
+    lastName: string,
+    gender: Gender,
     birthdate: number,
-    createdAt?: number,
   ) {
-    this.id = id;
-    this.name = name;
     this.email = email;
+    this.name = name;
+    this.lastName = lastName;
     this.gender = gender;
     this.birthdate = birthdate;
-    this.createdAt = createdAt;
   }
 }
 
-export class UserPassDto {
+export class CreateUserDto {
   @ApiProperty({
     description: 'User email',
     example: 'user@example.com',
@@ -110,30 +101,35 @@ export class UserPassDto {
   email: string;
 
   @ApiProperty({
-    description: 'User password',
-    example: 'password123',
+    description: 'Given name',
+    example: 'John',
   })
   @IsString()
   @IsNotEmpty()
-  password: string;
+  name: string;
 
   @ApiProperty({
-    description: 'User name',
-    type: NameDto,
+    description: 'Middle name',
+    example: 'Doe',
   })
-  @IsObject()
+  @IsString()
   @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => NameDto)
-  name: NameDto;
+  lastName: string;
+
+  @ApiProperty({
+    description: 'User phone number',
+    example: '123456789',
+  })
+  @IsOptional()
+  @IsNumber()
+  phoneNumber?: number;
 
   @ApiProperty({
     description: 'Gender',
-    example: 'Women',
+    example: 1,
   })
-  @IsString()
-  @IsNotEmpty()
-  gender: string;
+  @IsEnum(Gender)
+  gender: Gender;
 
   @ApiProperty({
     description: 'birthdate date',
@@ -143,17 +139,30 @@ export class UserPassDto {
   @IsNotEmpty()
   birthdate: number;
 
+  @ApiProperty({
+    description: 'User type',
+    enum: UserType,
+    example: UserType.customer,
+  })
+  @IsOptional()
+  @IsEnum(UserType)
+  userType?: UserType;
+
   constructor(
     email: string,
-    name: NameDto,
-    password: string,
-    gender: string,
+    name: string,
+    lastName: string,
+    phoneNumber: number,
+    gender: Gender,
     birthdate: number,
+    userType: UserType,
   ) {
-    this.name = name;
     this.email = email;
-    this.password = password;
+    this.name = name;
+    this.lastName = lastName;
+    this.phoneNumber = phoneNumber;
     this.gender = gender;
     this.birthdate = birthdate;
+    this.userType = userType;
   }
 }
