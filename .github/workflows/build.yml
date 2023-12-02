@@ -3,8 +3,11 @@ run-name: ${{ github.actor }} run Backend CI 🚀
 on:
   push:
     branches: ['master', 'develop', 'release-*']
+  pull_request:
+    branches:
+      - main
 jobs:
-  linter: 
+  linter:
     name: Linter
     runs-on: ubuntu-latest
     steps:
@@ -22,9 +25,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Unit & Integration Tests
+        run: npm run test
+
+      - name: Get branch name
+        id: branch
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          target-branch: ${{ steps.branch.outputs.branch }}
