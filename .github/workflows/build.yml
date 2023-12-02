@@ -2,7 +2,7 @@ name: Backend CI - Linter and Sonarcloud
 run-name: ${{ github.actor }} run Backend CI 🚀
 on:
   push:
-    branches: ['master', develop', 'release-*']
+    branches: ['master', 'develop', 'release-*']
 jobs:
   linter: 
     name: Linter
