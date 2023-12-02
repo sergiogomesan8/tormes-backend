@@ -1,24 +1,17 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  InternalServerErrorException,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
-  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UserDto, UserPassDto } from '../dtos/user.dto';
 import { UserService } from 'src/core/domain/services/user.service';
+import { UserEntity } from 'src/infraestructure/postgres/entities/user.entity';
+import { CreateUserDto } from '../dtos/user.dto';
 
 @ApiTags('user')
 @ApiBearerAuth()
@@ -36,31 +29,12 @@ import { UserService } from 'src/core/domain/services/user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('/register')
-  @ApiOperation({
-    summary: 'Register a new user',
-    description: 'Endpoint to register a new user.',
-  })
-  @ApiCreatedResponse({
-    description: 'User registered successfully.',
-    type: UserPassDto,
-  })
-  //@Guards.Public()
-  async registerWithEmailAndPassword(
-    @Body() userPassDto: UserPassDto,
-  ): Promise<UserDto> {
-    if (!userPassDto) {
-      throw new BadRequestException(
-        'Bad request. Invalid data provided: user object is null',
-      );
-    }
-    const result = await this.userService
-      .createUser(userPassDto)
-      .catch((error) => {
-        console.error(error);
-        throw new InternalServerErrorException('Internal Server Error');
-      });
-
-    return result;
+  @Post()
+  create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+    return this.userService.create(createUserDto);
+  }
+  @Get(':id')
+  findOneBy(@Param('id') id: string): Promise<UserEntity | null> {
+    return this.userService.findOneBy(id);
   }
 }
