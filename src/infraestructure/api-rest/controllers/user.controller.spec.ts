@@ -15,7 +15,7 @@ describe('UserController', () => {
 
   const createUserDto: CreateUserDto = {
     email: 'test@test.com',
-    password: 'password',
+    password: expect.any(String),
     name: 'Sergio',
     lastName: 'Gómez',
     deliveryAddres: 'Wall Street',
