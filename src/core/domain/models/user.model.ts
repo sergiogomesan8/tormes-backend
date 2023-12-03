@@ -14,6 +14,7 @@ export interface User {
 
   deliveryAddres?: string;
   billingAddres?: string;
+  postalCode: number;
 
   createdAt?: number;
   lastLogin?: number;
