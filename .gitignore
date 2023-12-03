@@ -42,5 +42,8 @@ lerna-debug.log*
 #Sonar
 sonar.js
 
+#Scanner
+.scannerwork
+
 #Docker
 /docker-data
