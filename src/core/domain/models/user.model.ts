@@ -1,3 +1,5 @@
+import { Exclude } from 'class-transformer';
+
 export interface User {
   id: string;
 
@@ -23,6 +25,41 @@ export interface User {
   gender?: Gender;
 
   userType?: UserType;
+}
+
+export class SerializedUser {
+  id: string;
+
+  email: string;
+
+  @Exclude()
+  password?: string;
+
+  name: string;
+  lastName: string;
+
+  phoneNumber?: number;
+  notificationPreference?: NotificationPreference;
+  verifiedEmail?: boolean;
+  verifiedPhoneNumber?: boolean;
+
+  deliveryAddres?: string;
+  billingAddres?: string;
+  postalCode?: number;
+
+  @Exclude()
+  createdAt?: number;
+  @Exclude()
+  lastLogin?: number;
+
+  birthdate?: number;
+  gender?: Gender;
+
+  userType?: UserType;
+
+  constructor(partial: Partial<SerializedUser>) {
+    Object.assign(this, partial);
+  }
 }
 
 export enum UserType {
