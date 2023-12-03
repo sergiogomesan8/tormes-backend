@@ -30,6 +30,9 @@ jobs:
 
       - name: Unit & Integration Tests
         run: npm run test
+      
+      - name: Coverage
+        run: npm run coverage
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
