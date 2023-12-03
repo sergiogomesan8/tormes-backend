@@ -7,8 +7,9 @@ import {
   Gender,
   UserType,
 } from '../dtos/user.dto';
-import { User } from '../../../core/domain/models/user.model';
+import { SerializedUser, User } from '../../../core/domain/models/user.model';
 import { HttpException } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -49,13 +50,13 @@ describe('AuthController', () => {
   describe('register', () => {
     it('should return user and token on successful registration', async () => {
       const expectedResponse = {
-        user,
+        user_info: plainToClass(SerializedUser, user),
         token: 'token',
       };
 
       jest.spyOn(authService, 'register').mockResolvedValue(expectedResponse);
 
-      expect(await authController.register(createUserDto)).toBe(
+      expect(await authController.register(createUserDto)).toEqual(
         expectedResponse,
       );
     });

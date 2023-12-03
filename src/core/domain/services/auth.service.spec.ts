@@ -60,7 +60,7 @@ describe('AuthService', () => {
       jest.spyOn(jwtService, 'sign').mockImplementation(() => token);
 
       expect(await authService.register(createUserDto)).toEqual({
-        user,
+        user_info: user,
         token,
       });
     });
