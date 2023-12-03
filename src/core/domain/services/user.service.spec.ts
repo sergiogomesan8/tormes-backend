@@ -5,7 +5,9 @@ import { UserEntity } from '../../../infraestructure/postgres/entities/user.enti
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {
   CreateUserDto,
+  CreateUserDtoBuilder,
   Gender,
+  UserType,
 } from '../../../infraestructure/api-rest/dtos/user.dto';
 
 describe('UserService', () => {
@@ -29,17 +31,19 @@ describe('UserService', () => {
     );
   });
 
-  const createUserDto: CreateUserDto = {
-    email: 'test@test.com',
-    password: expect.any(String),
-    name: 'Sergio',
-    lastName: 'Gómez',
-    deliveryAddres: 'Wall Street',
-    billingAddres: 'Calle Falsa 123',
-    postalCode: 0,
-    gender: Gender.man,
-    birthdate: 0,
-  };
+  const createUserDto: CreateUserDto = new CreateUserDtoBuilder()
+    .setEmail('test@test.com')
+    .setPassword('Password123*')
+    .setName('Sergio')
+    .setLastName('Gómez')
+    .setPhoneNumber(1234567890)
+    .setDeliveryAddres('Wall Street')
+    .setBillingAddres('Calle Falsa 123')
+    .setPostalCode(12345)
+    .setGender(Gender.man)
+    .setBirthdate(0)
+    .setUserType(UserType.customer)
+    .build();
 
   describe('create', () => {
     it('should create a user', async () => {
