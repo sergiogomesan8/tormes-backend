@@ -108,7 +108,7 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty({
-    description: 'Given name',
+    description: 'Name',
     example: 'John',
   })
   @IsString()
@@ -116,7 +116,7 @@ export class CreateUserDto {
   name: string;
 
   @ApiProperty({
-    description: 'Middle name',
+    description: 'Last name',
     example: 'Doe',
   })
   @IsString()
@@ -132,6 +132,30 @@ export class CreateUserDto {
   phoneNumber?: number;
 
   @ApiProperty({
+    description: 'Delivery Address',
+    example: 'Las Vegas, Boulevard',
+  })
+  @IsString()
+  @IsNotEmpty()
+  deliveryAddres: string;
+
+  @ApiProperty({
+    description: 'Billing Address',
+    example: 'Wall Street',
+  })
+  @IsString()
+  @IsNotEmpty()
+  billingAddres: string;
+
+  @ApiProperty({
+    description: 'Postal Code',
+    example: 28029,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  postalCode: number;
+
+  @ApiProperty({
     description: 'Gender',
     example: 1,
   })
@@ -139,8 +163,8 @@ export class CreateUserDto {
   gender: Gender;
 
   @ApiProperty({
-    description: 'birthdate date',
-    type: Number,
+    description: 'Birthdate date',
+    example: 903957992,
   })
   @IsNumber()
   @IsNotEmpty()
@@ -161,6 +185,9 @@ export class CreateUserDto {
     name: string,
     lastName: string,
     phoneNumber: number,
+    deliveryAddres: string,
+    billingAddres: string,
+    postalCode: number,
     gender: Gender,
     birthdate: number,
     userType: UserType,
@@ -170,6 +197,9 @@ export class CreateUserDto {
     this.name = name;
     this.lastName = lastName;
     this.phoneNumber = phoneNumber;
+    this.deliveryAddres = deliveryAddres;
+    this.billingAddres = billingAddres;
+    this.postalCode = postalCode;
     this.gender = gender;
     this.birthdate = birthdate;
     this.userType = userType;
