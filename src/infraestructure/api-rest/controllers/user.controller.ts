@@ -15,7 +15,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { CreateUserDto } from '../dtos/user.dto';
 import { UserService } from '../../../core/domain/services/user.service';
 
@@ -36,7 +35,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+  async create(@Body() createUserDto: CreateUserDto) {
     try {
       return await this.userService.create(createUserDto);
     } catch (error) {
