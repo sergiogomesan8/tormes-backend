@@ -104,57 +104,57 @@ export class CreateUserDtoBuilder {
   birthdate: number;
   userType: UserType;
 
-  setEmail(email: string): CreateUserDtoBuilder {
+  setEmail(email: string): this {
     this.email = email;
     return this;
   }
 
-  setPassword(password: string): CreateUserDtoBuilder {
+  setPassword(password: string): this {
     this.password = password;
     return this;
   }
 
-  setName(name: string): CreateUserDtoBuilder {
+  setName(name: string): this {
     this.name = name;
     return this;
   }
 
-  setLastName(lastName: string): CreateUserDtoBuilder {
+  setLastName(lastName: string): this {
     this.lastName = lastName;
     return this;
   }
 
-  setPhoneNumber(phoneNumber: number): CreateUserDtoBuilder {
+  setPhoneNumber(phoneNumber: number): this {
     this.phoneNumber = phoneNumber;
     return this;
   }
 
-  setDeliveryAddres(deliveryAddres: string): CreateUserDtoBuilder {
+  setDeliveryAddres(deliveryAddres: string): this {
     this.deliveryAddres = deliveryAddres;
     return this;
   }
 
-  setBillingAddres(billingAddres: string): CreateUserDtoBuilder {
+  setBillingAddres(billingAddres: string): this {
     this.billingAddres = billingAddres;
     return this;
   }
 
-  setPostalCode(postalCode: number): CreateUserDtoBuilder {
+  setPostalCode(postalCode: number): this {
     this.postalCode = postalCode;
     return this;
   }
 
-  setGender(gender: Gender): CreateUserDtoBuilder {
+  setGender(gender: Gender): this {
     this.gender = gender;
     return this;
   }
 
-  setBirthdate(birthdate: number): CreateUserDtoBuilder {
+  setBirthdate(birthdate: number): this {
     this.birthdate = birthdate;
     return this;
   }
 
-  setUserType(userType: UserType): CreateUserDtoBuilder {
+  setUserType(userType: UserType): this {
     this.userType = userType;
     return this;
   }
