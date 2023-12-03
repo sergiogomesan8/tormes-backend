@@ -22,18 +22,26 @@ describe('UserDto', () => {
 describe('CreateUserDto', () => {
   it('should create a CreateUserDto object', () => {
     const email = 'user@example.com';
+    const password = 'password';
     const name = 'John';
     const lastName = 'Doe';
     const phoneNumber = 123456789;
+    const deliveryAddres = 'Wall Street';
+    const billingAddres = 'Calle Falsa 123';
+    const postalCode = 0;
     const gender = Gender.man;
     const birthdate = 20000101;
     const userType = UserType.customer;
 
     const createUserDto = new CreateUserDto(
       email,
+      password,
       name,
       lastName,
       phoneNumber,
+      deliveryAddres,
+      billingAddres,
+      postalCode,
       gender,
       birthdate,
       userType,
