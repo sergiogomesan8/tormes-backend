@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from '../../../core/domain/services/auth.service';
 import { CreateUserDto } from '../dtos/user.dto';
-import { User } from '../../../core/domain/models/user.model';
+import { SerializedAuthModel } from '../../../core/domain/models/auth.model';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -51,9 +51,14 @@ export class AuthController {
   @UseInterceptors(ClassSerializerInterceptor)
   async register(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<{ user: User; token: string }> {
+  ): Promise<SerializedAuthModel> {
     try {
-      return await this.authService.register(createUserDto);
+      const authUser = await this.authService.register(createUserDto);
+      if (authUser) {
+        const serializedAuthUser = new SerializedAuthModel(authUser);
+        console.log('serializedAuthUser: ', serializedAuthUser);
+        return serializedAuthUser;
+      }
     } catch (error) {
       console.error(error);
       throw new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR);

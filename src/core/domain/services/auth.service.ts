@@ -4,7 +4,7 @@ import { JwtPayload } from './jwt-config/jwt-playload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
 import { UserService } from './user.service';
-import { User } from '../models/user.model';
+import { AuthModel } from '../models/auth.model';
 // import { LoginUserDto } from '../../../infraestructure/api-rest/dtos/auth.dto';
 
 @Injectable()
@@ -14,16 +14,14 @@ export class AuthService implements IAuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(
-    createUserDto: CreateUserDto,
-  ): Promise<{ user: User; token: string }> {
+  async register(createUserDto: CreateUserDto): Promise<AuthModel> {
     try {
       const user = await this.userService.create(createUserDto);
 
       const token = this.jwtService.sign({ email: user.email });
 
       return {
-        user,
+        user_info: user,
         token,
       };
     } catch (error) {
