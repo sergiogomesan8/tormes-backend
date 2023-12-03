@@ -14,13 +14,13 @@ export interface User {
 
   deliveryAddres?: string;
   billingAddres?: string;
-  postalCode: number;
+  postalCode?: number;
 
   createdAt?: number;
   lastLogin?: number;
 
   birthdate?: number;
-  gender?: string;
+  gender?: Gender;
 
   userType?: UserType;
 }

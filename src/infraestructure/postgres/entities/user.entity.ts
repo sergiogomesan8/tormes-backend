@@ -1,26 +1,14 @@
 import {
+  Gender,
+  NotificationPreference,
+  UserType,
+} from '../../../core/domain/models/user.model';
+import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
 } from 'typeorm';
-
-export enum UserType {
-  customer = 1,
-  employee = 2,
-  manager = 3,
-}
-
-export enum NotificationPreference {
-  email = 1,
-  sms = 2,
-}
-
-export enum Gender {
-  man = 1,
-  women = 2,
-  other = 3,
-}
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -60,6 +48,9 @@ export class UserEntity {
 
   @Column({ nullable: true })
   billingAddress?: string;
+
+  @Column({ nullable: true })
+  postalCode?: number;
 
   @CreateDateColumn()
   createdAt?: number;
