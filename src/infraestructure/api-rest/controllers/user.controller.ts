@@ -36,9 +36,9 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
     try {
-      return this.userService.create(createUserDto);
+      return await this.userService.create(createUserDto);
     } catch (error) {
       console.error(error);
       throw new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR);

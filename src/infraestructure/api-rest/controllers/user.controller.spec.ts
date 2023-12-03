@@ -48,12 +48,14 @@ describe('UserController', () => {
         new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR),
       );
 
-      try {
-        await userController.create(createUserDto);
-      } catch (error) {
-        expect(error).toBeInstanceOf(HttpException);
-        expect(error.getStatus()).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-      }
+      await expect(userController.create(createUserDto)).rejects.toBeInstanceOf(
+        HttpException,
+      );
+
+      await expect(userController.create(createUserDto)).rejects.toHaveProperty(
+        'status',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     });
   });
 });
