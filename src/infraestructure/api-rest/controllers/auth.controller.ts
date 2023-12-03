@@ -1,9 +1,11 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   HttpException,
   HttpStatus,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -14,9 +16,12 @@ import {
   ApiNotFoundResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiOperation,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { AuthService } from '../../../core/domain/services/auth.service';
 import { CreateUserDto } from '../dtos/user.dto';
+import { User } from '../../../core/domain/models/user.model';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -34,8 +39,19 @@ import { CreateUserDto } from '../dtos/user.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  async register(@Body() createUserDto: CreateUserDto) {
+  @Post('register')
+  @ApiOperation({
+    summary: 'Register a new user',
+    description: 'Endpoint to register a new user.',
+  })
+  @ApiCreatedResponse({
+    description: 'User registered successfully.',
+    type: CreateUserDto,
+  })
+  @UseInterceptors(ClassSerializerInterceptor)
+  async register(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<{ user: User; token: string }> {
     try {
       return await this.authService.register(createUserDto);
     } catch (error) {
