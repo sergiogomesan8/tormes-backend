@@ -3,7 +3,10 @@ import { UserService } from './user.service';
 import { Repository } from 'typeorm/repository/Repository';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
+import {
+  CreateUserDto,
+  Gender,
+} from '../../../infraestructure/api-rest/dtos/user.dto';
 
 describe('UserService', () => {
   let service: UserService;
@@ -26,18 +29,21 @@ describe('UserService', () => {
     );
   });
 
+  const createUserDto: CreateUserDto = {
+    email: 'test@test.com',
+    password: 'password',
+    name: 'Sergio',
+    lastName: 'Gómez',
+    deliveryAddres: 'Wall Street',
+    billingAddres: 'Calle Falsa 123',
+    postalCode: 0,
+    gender: Gender.man,
+    birthdate: 0,
+  };
+
   describe('create', () => {
     it('should create a user', async () => {
       const user = { name: 'Test User' };
-      const createUserDto: CreateUserDto = {
-        email: 'test@example.com',
-        name: 'John',
-        lastName: 'Doe',
-        phoneNumber: 1234567890,
-        gender: 1,
-        birthdate: 1234567890,
-        userType: 1,
-      };
       jest
         .spyOn(userRepository, 'create')
         .mockImplementation(() => user as any);
@@ -49,15 +55,6 @@ describe('UserService', () => {
     });
 
     it('should throw an error if creation fails', async () => {
-      const createUserDto: CreateUserDto = {
-        email: 'test@example.com',
-        name: 'John',
-        lastName: 'Doe',
-        phoneNumber: 1234567890,
-        gender: 1,
-        birthdate: 1234567890,
-        userType: 1,
-      };
       jest.spyOn(userRepository, 'create').mockImplementation(() => {
         throw new Error('Create error');
       });
@@ -72,15 +69,6 @@ describe('UserService', () => {
 
     it('should throw an error if save fails', async () => {
       const user = { name: 'Test User' };
-      const createUserDto: CreateUserDto = {
-        email: 'test@example.com',
-        name: 'John',
-        lastName: 'Doe',
-        phoneNumber: 1234567890,
-        gender: 1,
-        birthdate: 1234567890,
-        userType: 1,
-      };
       jest
         .spyOn(userRepository, 'create')
         .mockImplementation(() => user as any);
