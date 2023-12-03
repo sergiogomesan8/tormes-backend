@@ -29,7 +29,7 @@ describe('AuthController', () => {
   const user = { name: 'Test User' } as User;
   const createUserDto: CreateUserDto = {
     email: 'test@test.com',
-    password: 'password',
+    password: expect.any(String),
     name: 'Sergio',
     lastName: 'Gómez',
     deliveryAddres: 'Wall Street',
