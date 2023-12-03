@@ -101,6 +101,13 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty({
+    description: 'User Password',
+    example: 'Password123*',
+  })
+  @IsNotEmpty()
+  password: string;
+
+  @ApiProperty({
     description: 'Given name',
     example: 'John',
   })
@@ -150,6 +157,7 @@ export class CreateUserDto {
 
   constructor(
     email: string,
+    password: string,
     name: string,
     lastName: string,
     phoneNumber: number,
@@ -158,6 +166,7 @@ export class CreateUserDto {
     userType: UserType,
   ) {
     this.email = email;
+    this.password = password;
     this.name = name;
     this.lastName = lastName;
     this.phoneNumber = phoneNumber;
