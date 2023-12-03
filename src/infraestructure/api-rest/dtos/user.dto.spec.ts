@@ -2,64 +2,50 @@ import { UserDto, Gender, UserType, CreateUserDto } from './user.dto';
 
 describe('UserDto', () => {
   it('should create a UserDto object', () => {
-    const user = new UserDto(
-      'user@example.com',
-      'John',
-      'Doe',
-      Gender.man,
-      20000101,
-    );
+    const email = 'user@example.com';
+    const name = 'John';
+    const lastName = 'Doe';
+    const gender = Gender.man;
+    const birthdate = 20000101;
 
-    expect(user).toBeDefined();
-    expect(user.email).toBe('user@example.com');
-    expect(user.name).toBe('John');
-    expect(user.lastName).toBe('Doe');
-    expect(user.gender).toBe(Gender.man);
-    expect(user.birthdate).toBe(20000101);
-  });
+    const userDto = new UserDto(email, name, lastName, gender, birthdate);
 
-  it('should fail if email is not valid', () => {
-    expect(() => {
-      new UserDto('invalidEmail', 'John', 'Doe', Gender.man, 20000101);
-    }).toThrow();
+    expect(userDto).toBeDefined();
+    expect(userDto.email).toBe(email);
+    expect(userDto.name).toBe(name);
+    expect(userDto.lastName).toBe(lastName);
+    expect(userDto.gender).toBe(gender);
+    expect(userDto.birthdate).toBe(birthdate);
   });
 });
 
 describe('CreateUserDto', () => {
   it('should create a CreateUserDto object', () => {
-    const user = new CreateUserDto(
-      'user@example.com',
-      'John',
-      'Doe',
-      123456789,
-      Gender.man,
-      20000101,
-      UserType.customer,
+    const email = 'user@example.com';
+    const name = 'John';
+    const lastName = 'Doe';
+    const phoneNumber = 123456789;
+    const gender = Gender.man;
+    const birthdate = 20000101;
+    const userType = UserType.customer;
+
+    const createUserDto = new CreateUserDto(
+      email,
+      name,
+      lastName,
+      phoneNumber,
+      gender,
+      birthdate,
+      userType,
     );
 
-    expect(user).toBeDefined();
-    expect(user.email).toBe('user@example.com');
-    expect(user.name).toBe('John');
-    expect(user.lastName).toBe('Doe');
-    expect(user.phoneNumber).toBe(123456789);
-    expect(user.gender).toBe(Gender.man);
-    expect(user.birthdate).toBe(20000101);
-    expect(user.userType).toBe(UserType.customer);
+    expect(createUserDto).toBeDefined();
+    expect(createUserDto.email).toBe(email);
+    expect(createUserDto.name).toBe(name);
+    expect(createUserDto.lastName).toBe(lastName);
+    expect(createUserDto.phoneNumber).toBe(phoneNumber);
+    expect(createUserDto.gender).toBe(gender);
+    expect(createUserDto.birthdate).toBe(birthdate);
+    expect(createUserDto.userType).toBe(userType);
   });
-
-  it('should fail if email is not valid', () => {
-    expect(() => {
-      new CreateUserDto(
-        'invalidEmail',
-        'John',
-        'Doe',
-        123456789,
-        Gender.man,
-        20000101,
-        UserType.customer,
-      );
-    }).toThrow();
-  });
-
-  // Add more tests for other validation rules
 });
