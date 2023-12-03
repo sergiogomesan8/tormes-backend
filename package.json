@@ -14,6 +14,7 @@
     "start:prod": "node dist/main",
     "lint": "nx lint",
     "test": "nx test",
+    "coverage": "nx test --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "e2e": "nx e2e",
     "lint:all": "eslint 'src/**/*.{ts,tsx}'",
