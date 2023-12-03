@@ -3,7 +3,6 @@ export default {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  collectCoverage: true,
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: './coverage/tormes-backend',
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
