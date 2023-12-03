@@ -1,59 +1,55 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IAuthService } from '../ports/inbound/auth.service.interface';
 import { JwtPayload } from './jwt-config/jwt-playload.interface';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
-import { Repository } from 'typeorm';
 import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
-import * as bcrypt from 'bcrypt';
-import { LoginUserDto } from '../../../infraestructure/api-rest/dtos/auth.dto';
+import { UserService } from './user.service';
+import { User } from '../models/user.model';
+// import { LoginUserDto } from '../../../infraestructure/api-rest/dtos/auth.dto';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
-  async register(createUserDto: CreateUserDto) {
+
+  async register(
+    createUserDto: CreateUserDto,
+  ): Promise<{ user: User; token: string }> {
     try {
-      const { password, ...userData } = createUserDto;
+      const user = await this.userService.create(createUserDto);
 
-      const user = this.userRepository.create({
-        ...userData,
-        password: bcrypt.hashSync(password, 10),
-      });
-
-      await this.userRepository.save(user);
-      delete user.password;
+      const token = this.jwtService.sign({ email: user.email });
 
       return {
-        ...user,
-        token: this.getJwtToken({ email: user.email }),
+        user,
+        token,
       };
     } catch (error) {
       throw new Error(error);
     }
   }
-  login(loginUserDto: LoginUserDto) {
-    const { email } = loginUserDto;
 
-    const user = this.userRepository.findOne({
-      where: { email },
-      select: { email: true, password: true },
-    });
+  //TODO
+  // login(loginUserDto: LoginUserDto) {
+  //   const { email } = loginUserDto;
 
-    if (!user)
-      throw new UnauthorizedException('Credential are not valid (email)');
-    // if (!bcrypt.compareSync(password, user.password))
-    //   throw new UnauthorizedException('Credential are not valid (email)');
+  //   const user = this.userRepository.findOne({
+  //     where: { email },
+  //     select: { email: true, password: true },
+  //   });
 
-    return {
-      ...user,
-      token: this.getJwtToken({ email: email }),
-    };
-  }
+  //   if (!user)
+  //     throw new UnauthorizedException('Credential are not valid (email)');
+  //   // if (!bcrypt.compareSync(password, user.password))
+  //   //   throw new UnauthorizedException('Credential are not valid (email)');
+
+  //   return {
+  //     ...user,
+  //     token: this.getJwtToken({ email: email }),
+  //   };
+  // }
 
   private getJwtToken(payload: JwtPayload) {
     return this.jwtService.sign(payload);
