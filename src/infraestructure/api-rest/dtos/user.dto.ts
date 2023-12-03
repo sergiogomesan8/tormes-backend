@@ -165,17 +165,92 @@ export class CreateUserDtoBuilder {
 }
 
 export class CreateUserDto {
+  @ApiProperty({
+    description: 'User email',
+    example: 'user@example.com',
+  })
+  @IsEmail()
+  @IsNotEmpty()
   email: string;
+
+  @ApiProperty({
+    description: 'User Password',
+    example: 'Password123*',
+  })
+  @IsNotEmpty()
   password: string;
+
+  @ApiProperty({
+    description: 'Name',
+    example: 'John',
+  })
+  @IsString()
+  @IsNotEmpty()
   name: string;
+
+  @ApiProperty({
+    description: 'Last name',
+    example: 'Doe',
+  })
+  @IsString()
+  @IsNotEmpty()
   lastName: string;
-  phoneNumber: number;
+
+  @ApiProperty({
+    description: 'User phone number',
+    example: '123456789',
+  })
+  @IsOptional()
+  @IsNumber()
+  phoneNumber?: number;
+
+  @ApiProperty({
+    description: 'Delivery Address',
+    example: 'Las Vegas, Boulevard',
+  })
+  @IsString()
+  @IsNotEmpty()
   deliveryAddres: string;
+
+  @ApiProperty({
+    description: 'Billing Address',
+    example: 'Wall Street',
+  })
+  @IsString()
+  @IsNotEmpty()
   billingAddres: string;
+
+  @ApiProperty({
+    description: 'Postal Code',
+    example: 28029,
+  })
+  @IsNumber()
+  @IsNotEmpty()
   postalCode: number;
+
+  @ApiProperty({
+    description: 'Gender',
+    example: 1,
+  })
+  @IsEnum(Gender)
   gender: Gender;
+
+  @ApiProperty({
+    description: 'Birthdate date',
+    example: 903957992,
+  })
+  @IsNumber()
+  @IsNotEmpty()
   birthdate: number;
-  userType: UserType;
+
+  @ApiProperty({
+    description: 'User type',
+    enum: UserType,
+    example: UserType.customer,
+  })
+  @IsOptional()
+  @IsEnum(UserType)
+  userType?: UserType;
 
   constructor(builder: CreateUserDtoBuilder) {
     this.email = builder.email;
