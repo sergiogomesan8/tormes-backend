@@ -1,18 +1,41 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { PostgreConfigService } from './postgres-config.service';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
-describe('PostgreconfigService', () => {
+describe('PostgreConfigService', () => {
   let service: PostgreConfigService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [PostgreConfigService],
+    const moduleRef = await Test.createTestingModule({
+      providers: [
+        PostgreConfigService,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockImplementation((key: string) => key),
+          },
+        },
+      ],
     }).compile();
 
-    service = module.get<PostgreConfigService>(PostgreConfigService);
+    service = moduleRef.get<PostgreConfigService>(PostgreConfigService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('should return correct TypeOrmModuleOptions', async () => {
+    const result = await service.createTypeOrmOptions();
+    expect(result).toEqual({
+      type: 'postgres',
+      host: 'POSTGRES_HOST',
+      port: 'POSTGRES_PORT',
+      username: 'POSTGRES_USER',
+      password: 'POSTGRES_PASSWORD',
+      database: 'POSTGRES_DB',
+      entities: [expect.any(String)],
+      synchronize: true,
+      logging: true,
+      autoLoadEntities: true,
+      namingStrategy: expect.any(SnakeNamingStrategy),
+    });
   });
 });

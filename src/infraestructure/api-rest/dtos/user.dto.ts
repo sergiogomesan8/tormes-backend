@@ -14,7 +14,7 @@ export enum UserType {
   manager = 3,
 }
 
-enum Gender {
+export enum Gender {
   man = 1,
   women = 2,
   other = 3,

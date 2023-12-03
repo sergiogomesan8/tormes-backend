@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { IUserService } from '../ports/inbound/user.service.interface';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/infraestructure/postgres/entities/user.entity';
-import { User } from '../models/user.model';
-import { CreateUserDto } from 'src/infraestructure/api-rest/dtos/user.dto';
+import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
+import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -25,21 +24,8 @@ export class UserService implements IUserService {
     }
   }
 
-  update(user: User): User {
-    console.log(user);
-    throw new Error('Method not implemented.');
-  }
-
-  delete(id: string): User {
-    console.log(id);
-    throw new Error('Method not implemented.');
-  }
-
-  findOneBy(id: string): Promise<UserEntity | null> {
-    return this.userRepository.findOneBy({ id });
-  }
-
-  findAll(): User[] {
-    throw new Error('Method not implemented.');
-  }
+  //TODO: Implementar los siguientes métodos:
+  // findOneBy(id: string): Promise<UserEntity | null> {
+  //   return this.userRepository.findOneBy({ id });
+  // }
 }
