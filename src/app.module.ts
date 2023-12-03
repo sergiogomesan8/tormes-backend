@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PostgresConfigModule } from './infraestructure/postgres/config/postgres-config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostgreConfigService } from './infraestructure/postgres/config/postgres-config.service';
+import { AuthModule } from './core/application/auth.module';
 import { UserModule } from './core/application/user.module';
 
 @Module({
@@ -15,6 +16,7 @@ import { UserModule } from './core/application/user.module';
       useClass: PostgreConfigService,
       inject: [PostgreConfigService],
     }),
+    AuthModule,
     UserModule,
   ],
   controllers: [AppController],

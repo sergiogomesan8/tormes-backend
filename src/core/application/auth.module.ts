@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from '../domain/services/auth.service';
-import { UserEntity } from 'src/infraestructure/postgres/entities/user.entity';
+import { UserEntity } from '../../infraestructure/postgres/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from '../domain/services/jwt-config/jwt.strategy';
+import { AuthController } from '../../infraestructure/api-rest/controllers/auth.controller';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { JwtStrategy } from '../domain/services/jwt-config/jwt.strategy';
     }),
     ConfigModule,
   ],
-  controllers: [],
+  controllers: [AuthController],
   providers: [AuthService, JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}
