@@ -166,6 +166,14 @@ export class CreateUserDtoBuilder {
 
 export class CreateUserDto {
   @ApiProperty({
+    description: 'Name',
+    example: 'John',
+  })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty({
     description: 'User email',
     example: 'user@example.com',
   })
@@ -180,89 +188,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 
-  @ApiProperty({
-    description: 'Name',
-    example: 'John',
-  })
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @ApiProperty({
-    description: 'Last name',
-    example: 'Doe',
-  })
-  @IsString()
-  @IsNotEmpty()
-  lastName: string;
-
-  @ApiProperty({
-    description: 'User phone number',
-    example: '123456789',
-  })
-  @IsOptional()
-  @IsNumber()
-  phoneNumber?: number;
-
-  @ApiProperty({
-    description: 'Delivery Address',
-    example: 'Las Vegas, Boulevard',
-  })
-  @IsString()
-  @IsNotEmpty()
-  deliveryAddres: string;
-
-  @ApiProperty({
-    description: 'Billing Address',
-    example: 'Wall Street',
-  })
-  @IsString()
-  @IsNotEmpty()
-  billingAddres: string;
-
-  @ApiProperty({
-    description: 'Postal Code',
-    example: 28029,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  postalCode: number;
-
-  @ApiProperty({
-    description: 'Gender',
-    example: 1,
-  })
-  @IsEnum(Gender)
-  gender: Gender;
-
-  @ApiProperty({
-    description: 'Birthdate date',
-    example: 903957992,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  birthdate: number;
-
-  @ApiProperty({
-    description: 'User type',
-    enum: UserType,
-    example: UserType.customer,
-  })
-  @IsOptional()
-  @IsEnum(UserType)
-  userType?: UserType;
-
   constructor(builder: CreateUserDtoBuilder) {
+    this.name = builder.name;
     this.email = builder.email;
     this.password = builder.password;
-    this.name = builder.name;
-    this.lastName = builder.lastName;
-    this.phoneNumber = builder.phoneNumber;
-    this.deliveryAddres = builder.deliveryAddres;
-    this.billingAddres = builder.billingAddres;
-    this.postalCode = builder.postalCode;
-    this.gender = builder.gender;
-    this.birthdate = builder.birthdate;
-    this.userType = builder.userType;
   }
 }

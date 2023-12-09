@@ -18,7 +18,7 @@ export class AuthService implements IAuthService {
     try {
       const user = await this.userService.create(createUserDto);
 
-      const token = this.jwtService.sign({ email: user.email });
+      const token = this.getJwtToken({ email: user.email });
 
       return {
         user_info: user,
