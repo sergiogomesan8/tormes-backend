@@ -1,12 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from '../../../core/domain/services/auth.service';
-import {
-  CreateUserDto,
-  CreateUserDtoBuilder,
-  Gender,
-  UserType,
-} from '../dtos/user.dto';
+import { CreateUserDto } from '../dtos/user.dto';
 import { SerializedUser, User } from '../../../core/domain/models/user.model';
 import { HttpException } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
@@ -33,19 +28,12 @@ describe('AuthController', () => {
   });
 
   const user = { name: 'Test User' } as User;
-  const createUserDto: CreateUserDto = new CreateUserDtoBuilder()
-    .setEmail('test@test.com')
-    .setPassword('Password123*')
-    .setName('Sergio')
-    .setLastName('Gómez')
-    .setPhoneNumber(1234567890)
-    .setDeliveryAddres('Wall Street')
-    .setBillingAddres('Calle Falsa 123')
-    .setPostalCode(12345)
-    .setGender(Gender.man)
-    .setBirthdate(0)
-    .setUserType(UserType.customer)
-    .build();
+
+  const email = 'user@example.com';
+  const password = expect.any(String);
+  const name = 'John';
+
+  const createUserDto = new CreateUserDto(name, email, password);
 
   describe('register', () => {
     it('should return user and token on successful registration', async () => {

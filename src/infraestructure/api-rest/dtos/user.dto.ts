@@ -91,79 +91,6 @@ export class UserDto {
   }
 }
 
-export class CreateUserDtoBuilder {
-  email: string;
-  password: string;
-  name: string;
-  lastName: string;
-  phoneNumber: number;
-  deliveryAddres: string;
-  billingAddres: string;
-  postalCode: number;
-  gender: Gender;
-  birthdate: number;
-  userType: UserType;
-
-  setEmail(email: string): this {
-    this.email = email;
-    return this;
-  }
-
-  setPassword(password: string): this {
-    this.password = password;
-    return this;
-  }
-
-  setName(name: string): this {
-    this.name = name;
-    return this;
-  }
-
-  setLastName(lastName: string): this {
-    this.lastName = lastName;
-    return this;
-  }
-
-  setPhoneNumber(phoneNumber: number): this {
-    this.phoneNumber = phoneNumber;
-    return this;
-  }
-
-  setDeliveryAddres(deliveryAddres: string): this {
-    this.deliveryAddres = deliveryAddres;
-    return this;
-  }
-
-  setBillingAddres(billingAddres: string): this {
-    this.billingAddres = billingAddres;
-    return this;
-  }
-
-  setPostalCode(postalCode: number): this {
-    this.postalCode = postalCode;
-    return this;
-  }
-
-  setGender(gender: Gender): this {
-    this.gender = gender;
-    return this;
-  }
-
-  setBirthdate(birthdate: number): this {
-    this.birthdate = birthdate;
-    return this;
-  }
-
-  setUserType(userType: UserType): this {
-    this.userType = userType;
-    return this;
-  }
-
-  build(): CreateUserDto {
-    return new CreateUserDto(this);
-  }
-}
-
 export class CreateUserDto {
   @ApiProperty({
     description: 'Name',
@@ -188,9 +115,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 
-  constructor(builder: CreateUserDtoBuilder) {
-    this.name = builder.name;
-    this.email = builder.email;
-    this.password = builder.password;
+  constructor(name: string, email: string, password: string) {
+    this.name = name;
+    this.email = email;
+    this.password = password;
   }
 }

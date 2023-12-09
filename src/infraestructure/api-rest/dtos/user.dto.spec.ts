@@ -1,10 +1,4 @@
-import {
-  UserDto,
-  Gender,
-  UserType,
-  CreateUserDto,
-  CreateUserDtoBuilder,
-} from './user.dto';
+import { UserDto, Gender, CreateUserDto } from './user.dto';
 
 describe('UserDto', () => {
   it('should create a UserDto object', () => {
@@ -30,40 +24,12 @@ describe('CreateUserDto', () => {
     const email = 'user@example.com';
     const password = expect.any(String);
     const name = 'John';
-    const lastName = 'Doe';
-    const phoneNumber = 123456789;
-    const deliveryAddres = 'Wall Street';
-    const billingAddres = 'Calle Falsa 123';
-    const postalCode = 0;
-    const gender = Gender.man;
-    const birthdate = 20000101;
-    const userType = UserType.customer;
 
-    const createUserDto: CreateUserDto = new CreateUserDtoBuilder()
-      .setEmail(email)
-      .setPassword(password)
-      .setName(name)
-      .setLastName(lastName)
-      .setPhoneNumber(phoneNumber)
-      .setDeliveryAddres(deliveryAddres)
-      .setBillingAddres(billingAddres)
-      .setPostalCode(postalCode)
-      .setGender(gender)
-      .setBirthdate(birthdate)
-      .setUserType(userType)
-      .build();
+    const createUserDto = new CreateUserDto(name, email, password);
 
     expect(createUserDto).toBeDefined();
     expect(createUserDto.email).toBe(email);
     expect(createUserDto.password).toBe(password);
     expect(createUserDto.name).toBe(name);
-    expect(createUserDto.lastName).toBe(lastName);
-    expect(createUserDto.phoneNumber).toBe(phoneNumber);
-    expect(createUserDto.deliveryAddres).toBe(deliveryAddres);
-    expect(createUserDto.billingAddres).toBe(billingAddres);
-    expect(createUserDto.postalCode).toBe(postalCode);
-    expect(createUserDto.gender).toBe(gender);
-    expect(createUserDto.birthdate).toBe(birthdate);
-    expect(createUserDto.userType).toBe(userType);
   });
 });
