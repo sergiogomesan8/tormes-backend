@@ -3,8 +3,10 @@ import { AuthController } from './auth.controller';
 import { AuthService } from '../../../core/domain/services/auth.service';
 import { CreateUserDto } from '../dtos/user.dto';
 import { SerializedUser, User } from '../../../core/domain/models/user.model';
-import { HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
+import { LoginUserDto } from '../dtos/auth.dto';
+import { SerializedAuthModel } from '../../../core/domain/models/auth.model';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -18,6 +20,7 @@ describe('AuthController', () => {
           provide: AuthService,
           useValue: {
             register: jest.fn(),
+            login: jest.fn(),
           },
         },
       ],
@@ -34,6 +37,7 @@ describe('AuthController', () => {
   const name = 'John';
 
   const createUserDto = new CreateUserDto(name, email, password);
+  const loginUserDto = new LoginUserDto(email, password);
 
   describe('register', () => {
     it('should return user and token on successful registration', async () => {
@@ -57,6 +61,30 @@ describe('AuthController', () => {
       await expect(authController.register(createUserDto)).rejects.toThrow(
         HttpException,
       );
+    });
+  });
+
+  describe('login', () => {
+    it('should return user and token on successful registration', async () => {
+      const expectedResponse = {
+        user_info: plainToClass(SerializedUser, user),
+        token: 'token',
+      };
+      jest.spyOn(authService, 'login').mockResolvedValue(expectedResponse);
+      expect(await authController.login(loginUserDto)).toEqual(
+        new SerializedAuthModel(expectedResponse),
+      );
+      expect(authService.login).toHaveBeenCalledWith(loginUserDto);
+    });
+    it('should throw an error on failed login', async () => {
+      jest.spyOn(authService, 'login').mockImplementation(() => {
+        throw new Error();
+      });
+
+      await expect(authController.login(loginUserDto)).rejects.toThrow(
+        new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+      expect(authService.login).toHaveBeenCalledWith(loginUserDto);
     });
   });
 });

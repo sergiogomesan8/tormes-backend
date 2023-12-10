@@ -22,6 +22,7 @@ import {
 import { AuthService } from '../../../core/domain/services/auth.service';
 import { CreateUserDto } from '../dtos/user.dto';
 import { SerializedAuthModel } from '../../../core/domain/models/auth.model';
+import { LoginUserDto } from '../dtos/auth.dto';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -56,7 +57,31 @@ export class AuthController {
       const authUser = await this.authService.register(createUserDto);
       if (authUser) {
         const serializedAuthUser = new SerializedAuthModel(authUser);
-        console.log('serializedAuthUser: ', serializedAuthUser);
+        return serializedAuthUser;
+      }
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('login')
+  @ApiOperation({
+    summary: 'Login a user',
+    description: 'Endpoint to login a user.',
+  })
+  @ApiCreatedResponse({
+    description: 'User logged successfully.',
+    type: CreateUserDto,
+  })
+  @UseInterceptors(ClassSerializerInterceptor)
+  async login(
+    @Body() loginUserDto: LoginUserDto,
+  ): Promise<SerializedAuthModel> {
+    try {
+      const authUser = await this.authService.login(loginUserDto);
+      if (authUser) {
+        const serializedAuthUser = new SerializedAuthModel(authUser);
         return serializedAuthUser;
       }
     } catch (error) {

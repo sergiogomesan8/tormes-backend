@@ -25,8 +25,19 @@ export class UserService implements IUserService {
     }
   }
 
-  //TODO: Implementar los siguientes métodos:
   // findOneBy(id: string): Promise<UserEntity | null> {
   //   return this.userRepository.findOneBy({ id });
   // }
+
+  async findOneByEmail(email: string): Promise<User | null> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { email },
+      });
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 }
