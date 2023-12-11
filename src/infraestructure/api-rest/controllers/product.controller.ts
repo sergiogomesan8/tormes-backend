@@ -40,13 +40,11 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('/list')
-  @UseGuards(JwtAuthGuard)
   async findAllProducts(): Promise<Product[]> {
     return await this.productService.findAllProducts();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   async findOneProductById(id: string): Promise<Product> {
     return await this.productService.findProductById(id);
   }
