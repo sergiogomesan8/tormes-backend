@@ -1,10 +1,16 @@
-import { CreateProductDto } from '../../../../infraestructure/api-rest/dtos/product.dto';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+} from '../../../../infraestructure/api-rest/dtos/product.dto';
 import { Product } from '../../models/product.model';
 
 export interface IProductService {
-  findAll(): Promise<Product[]>;
-  findOneById(id: string): Promise<Product | null>;
-  create(createProductDto: CreateProductDto): Product;
-  //update(id: string, updateProductDto: UpdateProductDto): Promise<Product | null>;
-  delete(id: string): Promise<Product | null>;
+  findAllProducts(): Promise<Product[]>;
+  findProductById(id: string): Promise<Product | null>;
+  createProduct(createProductDto: CreateProductDto): Product;
+  updateProduct(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product | null>;
+  deleteProduct(id: string);
 }
