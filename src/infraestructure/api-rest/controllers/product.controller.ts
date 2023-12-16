@@ -60,7 +60,7 @@ export class ProductController {
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
   @Get('/:id')
-  async findOneProductById(
+  async findProductById(
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<Product> {
     return await this.productService.findProductById(id);
