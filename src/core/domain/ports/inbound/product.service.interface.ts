@@ -7,7 +7,7 @@ import { Product } from '../../models/product.model';
 export interface IProductService {
   findAllProducts(): Promise<Product[]>;
   findProductById(id: string): Promise<Product | null>;
-  createProduct(createProductDto: CreateProductDto): Product;
+  createProduct(createProductDto: CreateProductDto): Promise<Product>;
   updateProduct(
     id: string,
     updateProductDto: UpdateProductDto,
