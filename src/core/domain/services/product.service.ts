@@ -73,6 +73,6 @@ export class ProductService implements IProductService {
       throw new NotFoundException('Product not found');
     }
     await this.productRepository.delete(id);
-    return true;
+    return { message: `Product with id ${id} was deleted.` };
   }
 }
