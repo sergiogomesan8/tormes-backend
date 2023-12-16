@@ -1,10 +1,4 @@
-import {
-  Body,
-  Controller,
-  HttpException,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -36,12 +30,7 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    try {
-      return await this.userService.create(createUserDto);
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await this.userService.create(createUserDto);
   }
 
   //TODO: Implementar los siguientes métodos:

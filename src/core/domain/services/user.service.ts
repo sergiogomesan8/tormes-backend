@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { IUserService } from '../ports/inbound/user.service.interface';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
@@ -20,8 +24,9 @@ export class UserService implements IUserService {
 
       return user;
     } catch (error) {
-      console.log(error);
-      throw error;
+      if (error instanceof QueryFailedError) {
+        throw new ConflictException('Users with this email already exists');
+      }
     }
   }
 
@@ -30,14 +35,12 @@ export class UserService implements IUserService {
   // }
 
   async findOneByEmail(email: string): Promise<User | null> {
-    try {
-      const user = await this.userRepository.findOne({
-        where: { email },
-      });
-      return user;
-    } catch (error) {
-      console.log(error);
-      throw error;
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
+    if (!user) {
+      throw new NotFoundException('User Not Found');
     }
+    return user;
   }
 }
