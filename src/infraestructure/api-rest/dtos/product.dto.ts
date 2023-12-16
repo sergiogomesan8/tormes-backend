@@ -170,11 +170,11 @@ export class UpdateProductDto {
   section?: string;
 
   constructor(
-    name: string,
-    description: string,
-    image: string,
-    price: number,
-    section: string,
+    name?: string,
+    description?: string,
+    image?: string,
+    price?: number,
+    section?: string,
   ) {
     this.name = name;
     this.description = description;
