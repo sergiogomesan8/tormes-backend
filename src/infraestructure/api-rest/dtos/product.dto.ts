@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export class ProductDto {
@@ -123,7 +123,7 @@ export class CreateProductDto {
   }
 }
 
-export class UpdateProductDto {
+export class UpdateProductDto extends PartialType(ProductDto) {
   @ApiProperty({
     description: 'Product name',
     example: 'Example Product',
@@ -176,6 +176,7 @@ export class UpdateProductDto {
     price?: number,
     section?: string,
   ) {
+    super();
     this.name = name;
     this.description = description;
     this.image = image;
