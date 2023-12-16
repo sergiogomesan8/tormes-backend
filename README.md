@@ -71,3 +71,11 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+
+## Docker-compose
+docker ps
+docker inspect <Container-ID>
+"IPAddress": "172.21.0.2",
+
+- PgAdmin: 172.21.0.2 -> server addres
