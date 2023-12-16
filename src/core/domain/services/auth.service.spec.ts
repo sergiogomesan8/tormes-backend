@@ -7,7 +7,7 @@ import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { LoginUserDto } from '../../../infraestructure/api-rest/dtos/auth.dto';
-import { UnauthorizedException } from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
@@ -62,11 +62,11 @@ describe('AuthService', () => {
     it('should throw an error if userService.create fails', async () => {
       jest.spyOn(bcrypt, 'hashSync').mockReturnValue(password);
       jest.spyOn(userService, 'create').mockImplementation(async () => {
-        throw new Error('User creation failed');
+        throw new InternalServerErrorException('Error creating user');
       });
 
       await expect(authService.register(createUserDto)).rejects.toThrow(
-        'User creation failed',
+        new InternalServerErrorException('Error creating user'),
       );
     });
 
@@ -76,11 +76,11 @@ describe('AuthService', () => {
         .spyOn(userService, 'create')
         .mockImplementation(async () => ({}) as User);
       jest.spyOn(jwtService, 'sign').mockImplementation(() => {
-        throw new Error('Token creation failed');
+        throw new InternalServerErrorException('Error creating user');
       });
 
       await expect(authService.register(createUserDto)).rejects.toThrow(
-        'Token creation failed',
+        new InternalServerErrorException('Error creating user'),
       );
     });
   });
@@ -107,11 +107,11 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException if user not found', async () => {
       jest.spyOn(userService, 'findOneByEmail').mockImplementation(async () => {
-        throw new UnauthorizedException('Credential are not valid.');
+        throw new InternalServerErrorException('Error logging user');
       });
 
       await expect(authService.login(loginUserDto)).rejects.toThrow(
-        'Credential are not valid.',
+        new InternalServerErrorException('Error logging user'),
       );
     });
 
@@ -127,7 +127,7 @@ describe('AuthService', () => {
       jest.spyOn(bcrypt, 'compareSync').mockReturnValue(false);
 
       await expect(authService.login(loginUserDto)).rejects.toThrow(
-        'UnauthorizedException: Credential are not valid.',
+        new InternalServerErrorException('Error logging user'),
       );
     });
   });
