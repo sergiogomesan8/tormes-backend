@@ -31,10 +31,10 @@ describe('UserService', () => {
   const name = 'John';
 
   const createUserDto = new CreateUserDto(name, email, password);
+  const user = { name: 'Test User' };
 
   describe('create', () => {
     it('should create a user', async () => {
-      const user = { name: 'Test User' };
       jest
         .spyOn(userRepository, 'create')
         .mockImplementation(() => user as any);
@@ -59,7 +59,6 @@ describe('UserService', () => {
     });
 
     it('should throw an error if save fails', async () => {
-      const user = { name: 'Test User' };
       jest
         .spyOn(userRepository, 'create')
         .mockImplementation(() => user as any);
@@ -75,9 +74,8 @@ describe('UserService', () => {
       }
     });
   });
-  describe('create', () => {
+  describe('findOneByEmail', () => {
     it('should return a user if one is found', async () => {
-      const user = { name: 'Test User' };
       jest
         .spyOn(userRepository, 'findOne')
         .mockImplementation(() => user as any);
