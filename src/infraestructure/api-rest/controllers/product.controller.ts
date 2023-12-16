@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -17,11 +19,14 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
+  ApiParam,
+  ApiOperation,
 } from '@nestjs/swagger';
 import { ProductService } from '../../../core/domain/services/product.service';
 import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/jwt-auth.guard';
-import { Product } from 'src/core/domain/models/product.model';
+import { Product } from '../../../core/domain/models/product.model';
 import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto';
+import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
 
 @ApiTags('product')
 @ApiBearerAuth()
@@ -35,28 +40,51 @@ import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto';
   description: 'Not found. The specified ID does not exist.',
 })
 @ApiInternalServerErrorResponse({ description: 'Internet Server Error.' })
+@UseFilters(new HttpExceptionFilter())
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @ApiOperation({
+    summary: 'Retrieve all products',
+    description: 'Endpoint to get a list of all products',
+  })
   @Get('/list')
   async findAllProducts(): Promise<Product[]> {
     return await this.productService.findAllProducts();
   }
 
-  @Get(':id')
-  async findOneProductById(id: string): Promise<Product> {
+  @ApiOperation({
+    summary: 'Retrieve a product by ID',
+    description: 'Endpoint to get a product by ID',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
+  @Get('/:id')
+  async findOneProductById(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<Product> {
     return await this.productService.findProductById(id);
   }
 
-  @Post()
+  @ApiOperation({
+    summary: 'Create a product',
+    description: 'Endpoint to create a product',
+  })
   @UseGuards(JwtAuthGuard)
-  createProduct(@Body() createProductDto: CreateProductDto): Product {
+  @Post()
+  async createProduct(
+    @Body() createProductDto: CreateProductDto,
+  ): Promise<Product> {
     return this.productService.createProduct(createProductDto);
   }
 
-  @Patch(':id')
+  @ApiOperation({
+    summary: 'Update a product by ID',
+    description: 'Endpoint to update a product by ID',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
   @UseGuards(JwtAuthGuard)
+  @Patch('/:id')
   async updateProduct(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
@@ -64,8 +92,14 @@ export class ProductController {
     return await this.productService.updateProduct(id, updateProductDto);
   }
 
-  @Delete(':productId')
-  async deleteProduct(@Param('domainId') domainId: string) {
-    return await this.productService.deleteProduct(domainId);
+  @ApiOperation({
+    summary: 'Delete a product by ID',
+    description: 'Endpoint to delete a product by ID',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
+  @UseGuards(JwtAuthGuard)
+  @Delete('/:id')
+  async deleteProduct(@Param('id') id: string) {
+    return await this.productService.deleteProduct(id);
   }
 }
