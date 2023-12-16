@@ -2,10 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const basePath = process.env.BASE_PATH;
+  app.setGlobalPrefix(basePath);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
   app.enableCors({
     origin: 'http://localhost:4200', // Permite solo este origen
   });
@@ -17,8 +26,9 @@ async function bootstrap() {
     .addBearerAuth()
     .addTag('Tormes')
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api' + '/swagger', app, document);
+  SwaggerModule.setup(basePath + '/swagger', app, document);
 
   await app.listen(3000);
 }
