@@ -3,7 +3,11 @@ import { AuthController } from './auth.controller';
 import { AuthService } from '../../../core/domain/services/auth.service';
 import { CreateUserDto } from '../dtos/user.dto';
 import { SerializedUser, User } from '../../../core/domain/models/user.model';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import {
+  HttpException,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { LoginUserDto } from '../dtos/auth.dto';
 import { SerializedAuthModel } from '../../../core/domain/models/auth.model';
@@ -55,7 +59,7 @@ describe('AuthController', () => {
 
     it('should throw an error when registration fails', async () => {
       jest.spyOn(authService, 'register').mockImplementation(() => {
-        throw new Error();
+        throw new InternalServerErrorException('Error creating user');
       });
 
       await expect(authController.register(createUserDto)).rejects.toThrow(
@@ -76,13 +80,25 @@ describe('AuthController', () => {
       );
       expect(authService.login).toHaveBeenCalledWith(loginUserDto);
     });
-    it('should throw an error on failed login', async () => {
+
+    it('should throw an error on failed login with invalid credentials', async () => {
       jest.spyOn(authService, 'login').mockImplementation(() => {
-        throw new Error();
+        throw new UnauthorizedException('Credential are not valid.');
       });
 
       await expect(authController.login(loginUserDto)).rejects.toThrow(
-        new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR),
+        new UnauthorizedException('Credential are not valid.'),
+      );
+      expect(authService.login).toHaveBeenCalledWith(loginUserDto);
+    });
+
+    it('should throw an error on failed login', async () => {
+      jest.spyOn(authService, 'login').mockImplementation(() => {
+        throw new InternalServerErrorException('Error logging user');
+      });
+
+      await expect(authController.login(loginUserDto)).rejects.toThrow(
+        new InternalServerErrorException('Error logging user'),
       );
       expect(authService.login).toHaveBeenCalledWith(loginUserDto);
     });
