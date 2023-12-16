@@ -99,13 +99,14 @@ describe('ProductService', () => {
       expect(productRepository.findOne).toHaveBeenCalled();
     });
 
-    // it('should return undefined when product does not exists', async () => {
-    //   jest.spyOn(productRepository, 'findOne').mockResolvedValue(undefined);
+    it('should return NotFoundException when product does not exists', async () => {
+      jest.spyOn(productRepository, 'findOne').mockResolvedValue(undefined);
 
-    //   const result = await productService.findProductById(expect.any(String));
-    //   expect(result).toBeUndefined();
-    //   expect(productRepository.findOne).toHaveBeenCalled();
-    // });
+      await expect(
+        productService.findProductById(expect.any(String)),
+      ).rejects.toThrow(NotFoundException);
+      expect(productRepository.findOne).toHaveBeenCalled();
+    });
 
     it('should throw an error if the database query fails', async () => {
       jest
@@ -115,6 +116,15 @@ describe('ProductService', () => {
       await expect(
         productService.findProductById(expect.any(String)),
       ).rejects.toThrow('Database error');
+      expect(productRepository.findOne).toHaveBeenCalled();
+    });
+
+    it('should throw an error when it happens', async () => {
+      jest.spyOn(productRepository, 'findOne').mockRejectedValue(new Error());
+
+      await expect(
+        productService.findProductById(expect.any(String)),
+      ).rejects.toThrow(Error);
       expect(productRepository.findOne).toHaveBeenCalled();
     });
   });
@@ -194,6 +204,26 @@ describe('ProductService', () => {
         new NotFoundException('Error retrieving updated product'),
       );
     });
+
+    it('should throw an error on update method when it happens', async () => {
+      jest.spyOn(productRepository, 'update').mockRejectedValue(new Error());
+      await expect(
+        productService.updateProduct('id', updateProductDto),
+      ).rejects.toThrow(Error);
+      expect(productRepository.update).toHaveBeenCalled();
+    });
+
+    it('should throw an error on findOne method when it happens', async () => {
+      jest
+        .spyOn(productRepository, 'update')
+        .mockResolvedValue({ affected: 1 } as any);
+      jest.spyOn(productRepository, 'findOne').mockRejectedValue(new Error());
+      await expect(
+        productService.updateProduct('id', updateProductDto),
+      ).rejects.toThrow(Error);
+      expect(productRepository.update).toHaveBeenCalled();
+      expect(productRepository.findOne).toHaveBeenCalled();
+    });
   });
 
   describe('deleteProduct', () => {
@@ -219,6 +249,14 @@ describe('ProductService', () => {
       await expect(productService.deleteProduct('product-id')).rejects.toThrow(
         NotFoundException,
       );
+    });
+
+    it('should throw an error on findOne method when it happens', async () => {
+      jest.spyOn(productRepository, 'findOne').mockRejectedValue(new Error());
+      await expect(productService.deleteProduct('product-id')).rejects.toThrow(
+        Error,
+      );
+      expect(productRepository.findOne).toHaveBeenCalled();
     });
 
     it('should throw error when delete method throws an error', async () => {
