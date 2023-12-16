@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { IAuthService } from '../ports/inbound/auth.service.interface';
 import { JwtPayload } from './jwt-config/jwt-playload.interface';
 import { JwtService } from '@nestjs/jwt';
@@ -33,7 +37,7 @@ export class AuthService implements IAuthService {
         token,
       };
     } catch (error) {
-      throw new Error(error);
+      throw new InternalServerErrorException('Error creating user');
     }
   }
 
@@ -52,7 +56,7 @@ export class AuthService implements IAuthService {
         token: this.getJwtToken({ email: email }),
       };
     } catch (error) {
-      throw new Error(error);
+      throw new InternalServerErrorException('Error logging user');
     }
   }
 

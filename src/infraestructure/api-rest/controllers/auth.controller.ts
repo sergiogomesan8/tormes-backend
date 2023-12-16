@@ -2,9 +2,8 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  HttpException,
-  HttpStatus,
   Post,
+  UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -23,6 +22,7 @@ import { AuthService } from '../../../core/domain/services/auth.service';
 import { CreateUserDto } from '../dtos/user.dto';
 import { SerializedAuthModel } from '../../../core/domain/models/auth.model';
 import { LoginUserDto } from '../dtos/auth.dto';
+import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
 
 @ApiTags('auth')
 @ApiBearerAuth()
@@ -36,6 +36,7 @@ import { LoginUserDto } from '../dtos/auth.dto';
   description: 'Not found. The specified ID does not exist.',
 })
 @ApiInternalServerErrorResponse({ description: 'Internet Server Error.' })
+@UseFilters(new HttpExceptionFilter())
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -53,15 +54,10 @@ export class AuthController {
   async register(
     @Body() createUserDto: CreateUserDto,
   ): Promise<SerializedAuthModel> {
-    try {
-      const authUser = await this.authService.register(createUserDto);
-      if (authUser) {
-        const serializedAuthUser = new SerializedAuthModel(authUser);
-        return serializedAuthUser;
-      }
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR);
+    const authUser = await this.authService.register(createUserDto);
+    if (authUser) {
+      const serializedAuthUser = new SerializedAuthModel(authUser);
+      return serializedAuthUser;
     }
   }
 
@@ -78,15 +74,10 @@ export class AuthController {
   async login(
     @Body() loginUserDto: LoginUserDto,
   ): Promise<SerializedAuthModel> {
-    try {
-      const authUser = await this.authService.login(loginUserDto);
-      if (authUser) {
-        const serializedAuthUser = new SerializedAuthModel(authUser);
-        return serializedAuthUser;
-      }
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('ERROR: ', HttpStatus.INTERNAL_SERVER_ERROR);
+    const authUser = await this.authService.login(loginUserDto);
+    if (authUser) {
+      const serializedAuthUser = new SerializedAuthModel(authUser);
+      return serializedAuthUser;
     }
   }
 }
