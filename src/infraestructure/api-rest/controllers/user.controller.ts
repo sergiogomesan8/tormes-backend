@@ -11,6 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateUserDto } from '../dtos/user.dto';
 import { UserService } from '../../../core/domain/services/user.service';
+import { SerializedUser, User } from '../../../core/domain/models/user.model';
 
 @ApiTags('user')
 @ApiBearerAuth()
@@ -29,8 +30,12 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    const user = await this.userService.createUser(createUserDto);
+    if (user) {
+      const serializedUser = new SerializedUser(user);
+      return serializedUser;
+    }
   }
 
   //TODO: Implementar los siguientes métodos:
