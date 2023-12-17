@@ -5,6 +5,7 @@ import { UserEntity } from '../../../infraestructure/postgres/entities/user.enti
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { QueryFailedError } from 'typeorm';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -46,12 +47,12 @@ describe('UserService', () => {
       expect(await userService.createUser(createUserDto)).toEqual(user);
     });
 
-    it('should throw the original exception when it is not a QueryFailedError', async () => {
+    it('should throw ConflictException when product name already exists', async () => {
       jest
         .spyOn(userRepository, 'create')
         .mockImplementation(() => user as any);
       jest.spyOn(userRepository, 'save').mockImplementation(() => {
-        throw new ConflictException('User with this email already exists');
+        throw new QueryFailedError('query', [], new Error());
       });
 
       try {

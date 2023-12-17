@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from './product.service';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { ProductEntity } from '../../../infraestructure/postgres/entities/product.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {
@@ -145,12 +145,12 @@ describe('ProductService', () => {
       expect(productRepository.save).toHaveBeenCalledWith(product);
     });
 
-    it('should throw the original exception when it is not a QueryFailedError', async () => {
+    it('should throw ConflictException when product name already exists', async () => {
       jest
         .spyOn(productRepository, 'create')
         .mockImplementation(() => product as any);
       jest.spyOn(productRepository, 'save').mockImplementation(() => {
-        throw new ConflictException('Product with this name already exists');
+        throw new QueryFailedError('query', [], new Error());
       });
 
       try {
