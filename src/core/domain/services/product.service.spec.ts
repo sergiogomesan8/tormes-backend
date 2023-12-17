@@ -162,6 +162,35 @@ describe('ProductService', () => {
       expect(productRepository.create).toHaveBeenCalledWith(createProductDto);
       expect(productRepository.save).toHaveBeenCalledWith(product);
     });
+
+    it('should throw an error if creation fails', async () => {
+      jest.spyOn(productRepository, 'create').mockImplementation(() => {
+        throw new Error('Create error');
+      });
+
+      try {
+        await productService.createProduct(createProductDto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e).toHaveProperty('message', 'Create error');
+      }
+    });
+
+    it('should throw an error if save fails', async () => {
+      jest
+        .spyOn(productRepository, 'create')
+        .mockImplementation(() => product as any);
+      jest.spyOn(productRepository, 'save').mockImplementation(() => {
+        throw new Error('Save error');
+      });
+
+      try {
+        await productService.createProduct(createProductDto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e).toHaveProperty('message', 'Save error');
+      }
+    });
   });
 
   describe('updateProduct', () => {
