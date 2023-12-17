@@ -25,7 +25,7 @@ export class AuthService implements IAuthService {
     try {
       const { password } = createUserDto;
       const hashedPassword = bcrypt.hashSync(password, AuthService.SALT_ROUNDS);
-      const user = await this.userService.create({
+      const user = await this.userService.createUser({
         ...createUserDto,
         password: hashedPassword,
       });
@@ -45,7 +45,7 @@ export class AuthService implements IAuthService {
     try {
       const { email, password } = loginUserDto;
 
-      const user = await this.userService.findOneByEmail(email);
+      const user = await this.userService.findUserByEmail(email);
 
       if (!user) throw new UnauthorizedException('Credential are not valid.');
       if (!bcrypt.compareSync(password, user.password))

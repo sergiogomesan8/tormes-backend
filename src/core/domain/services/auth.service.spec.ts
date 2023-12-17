@@ -48,7 +48,7 @@ describe('AuthService', () => {
       const token = 'token';
 
       jest
-        .spyOn(userService, 'create')
+        .spyOn(userService, 'createUser')
         .mockImplementation(async () => user as User);
       jest.spyOn(bcrypt, 'hashSync').mockReturnValue(password);
       jest.spyOn(jwtService, 'sign').mockImplementation(() => token);
@@ -61,7 +61,7 @@ describe('AuthService', () => {
 
     it('should throw an error if userService.create fails', async () => {
       jest.spyOn(bcrypt, 'hashSync').mockReturnValue(password);
-      jest.spyOn(userService, 'create').mockImplementation(async () => {
+      jest.spyOn(userService, 'createUser').mockImplementation(async () => {
         throw new InternalServerErrorException('Error creating user');
       });
 
@@ -73,7 +73,7 @@ describe('AuthService', () => {
     it('should throw an error if jwtService.sign fails', async () => {
       jest.spyOn(bcrypt, 'hashSync').mockReturnValue(password);
       jest
-        .spyOn(userService, 'create')
+        .spyOn(userService, 'createUser')
         .mockImplementation(async () => ({}) as User);
       jest.spyOn(jwtService, 'sign').mockImplementation(() => {
         throw new InternalServerErrorException('Error creating user');
@@ -94,7 +94,7 @@ describe('AuthService', () => {
       const token = 'token';
 
       jest
-        .spyOn(userService, 'findOneByEmail')
+        .spyOn(userService, 'findUserByEmail')
         .mockImplementation(async () => user as User);
       jest.spyOn(bcrypt, 'compareSync').mockReturnValue(true);
       jest.spyOn(jwtService, 'sign').mockImplementation(() => token);
@@ -106,9 +106,11 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
-      jest.spyOn(userService, 'findOneByEmail').mockImplementation(async () => {
-        throw new InternalServerErrorException('Error logging user');
-      });
+      jest
+        .spyOn(userService, 'findUserByEmail')
+        .mockImplementation(async () => {
+          throw new InternalServerErrorException('Error logging user');
+        });
 
       await expect(authService.login(loginUserDto)).rejects.toThrow(
         new InternalServerErrorException('Error logging user'),
@@ -122,7 +124,7 @@ describe('AuthService', () => {
       };
 
       jest
-        .spyOn(userService, 'findOneByEmail')
+        .spyOn(userService, 'findUserByEmail')
         .mockImplementation(async () => user as User);
       jest.spyOn(bcrypt, 'compareSync').mockReturnValue(false);
 
