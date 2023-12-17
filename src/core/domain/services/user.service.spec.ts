@@ -4,6 +4,7 @@ import { Repository } from 'typeorm/repository/Repository';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -42,7 +43,25 @@ describe('UserService', () => {
         .spyOn(userRepository, 'save')
         .mockImplementation(() => Promise.resolve(user as any));
 
-      expect(await userService.create(createUserDto)).toEqual(user);
+      expect(await userService.createUser(createUserDto)).toEqual(user);
+    });
+
+    it('should throw the original exception when it is not a QueryFailedError', async () => {
+      jest
+        .spyOn(userRepository, 'create')
+        .mockImplementation(() => user as any);
+      jest.spyOn(userRepository, 'save').mockImplementation(() => {
+        throw new ConflictException('User with this email already exists');
+      });
+
+      try {
+        await userService.createUser(createUserDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(ConflictException);
+        expect(error.message).toEqual('User with this email already exists');
+      }
+      expect(userRepository.create).toHaveBeenCalledWith(createUserDto);
+      expect(userRepository.save).toHaveBeenCalledWith(user);
     });
 
     it('should throw an error if creation fails', async () => {
@@ -51,7 +70,7 @@ describe('UserService', () => {
       });
 
       try {
-        await userService.create(createUserDto);
+        await userService.createUser(createUserDto);
       } catch (e) {
         expect(e).toBeInstanceOf(Error);
         expect(e).toHaveProperty('message', 'Create error');
@@ -67,20 +86,20 @@ describe('UserService', () => {
       });
 
       try {
-        await userService.create(createUserDto);
+        await userService.createUser(createUserDto);
       } catch (e) {
         expect(e).toBeInstanceOf(Error);
         expect(e).toHaveProperty('message', 'Save error');
       }
     });
   });
-  describe('findOneByEmail', () => {
+  describe('findUserByEmail', () => {
     it('should return a user if one is found', async () => {
       jest
         .spyOn(userRepository, 'findOne')
         .mockImplementation(() => user as any);
 
-      const foundUser = await userService.findOneByEmail('test@example.com');
+      const foundUser = await userService.findUserByEmail('test@example.com');
       expect(foundUser).toEqual(user);
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { email: 'test@example.com' },
@@ -93,11 +112,20 @@ describe('UserService', () => {
         .mockRejectedValue(new Error('Test error'));
 
       await expect(
-        userService.findOneByEmail('test@example.com'),
+        userService.findUserByEmail('test@example.com'),
       ).rejects.toThrow('Test error');
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { email: 'test@example.com' },
       });
+    });
+
+    it('should return NotFoundException when user does not exists', async () => {
+      jest.spyOn(userRepository, 'findOne').mockResolvedValue(undefined);
+
+      await expect(
+        userService.findUserByEmail(expect.any(String)),
+      ).rejects.toThrow(NotFoundException);
+      expect(userRepository.findOne).toHaveBeenCalled();
     });
   });
 });

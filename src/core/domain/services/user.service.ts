@@ -17,7 +17,7 @@ export class UserService implements IUserService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
       const user = this.userRepository.create(createUserDto);
       await this.userRepository.save(user);
@@ -25,7 +25,7 @@ export class UserService implements IUserService {
       return user;
     } catch (error) {
       if (error instanceof QueryFailedError) {
-        throw new ConflictException('Users with this email already exists');
+        throw new ConflictException('User with this email already exists');
       }
     }
   }
@@ -34,7 +34,7 @@ export class UserService implements IUserService {
   //   return this.userRepository.findOneBy({ id });
   // }
 
-  async findOneByEmail(email: string): Promise<User | null> {
+  async findUserByEmail(email: string): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: { email },
     });
