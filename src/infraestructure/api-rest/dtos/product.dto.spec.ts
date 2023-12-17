@@ -1,32 +1,4 @@
-import { CreateProductDto, ProductDto, UpdateProductDto } from './product.dto';
-
-describe('ProductDto', () => {
-  it('should create a ProductDto object', () => {
-    const id = 'product-1';
-    const name = 'Example Product';
-    const description = 'This is an example product.';
-    const image = 'https://example.com/image.jpg';
-    const price = 100;
-    const section = 'Example Section';
-
-    const productDto = new ProductDto(
-      id,
-      name,
-      description,
-      image,
-      price,
-      section,
-    );
-
-    expect(productDto).toBeDefined();
-    expect(productDto.id).toBe(id);
-    expect(productDto.name).toBe(name);
-    expect(productDto.description).toBe(description);
-    expect(productDto.image).toBe(image);
-    expect(productDto.price).toBe(price);
-    expect(productDto.section).toBe(section);
-  });
-});
+import { CreateProductDto, UpdateProductDto } from './product.dto';
 
 describe('ProductDto', () => {
   it('should create a CreateProductDto object', () => {
@@ -36,7 +8,7 @@ describe('ProductDto', () => {
     const price = 100;
     const section = 'Example Section';
 
-    const productDto = new CreateProductDto(
+    const createProductDto = new CreateProductDto(
       name,
       description,
       image,
@@ -44,12 +16,12 @@ describe('ProductDto', () => {
       section,
     );
 
-    expect(productDto).toBeDefined();
-    expect(productDto.name).toBe(name);
-    expect(productDto.description).toBe(description);
-    expect(productDto.image).toBe(image);
-    expect(productDto.price).toBe(price);
-    expect(productDto.section).toBe(section);
+    expect(createProductDto).toBeDefined();
+    expect(createProductDto.name).toBe(name);
+    expect(createProductDto.description).toBe(description);
+    expect(createProductDto.image).toBe(image);
+    expect(createProductDto.price).toBe(price);
+    expect(createProductDto.section).toBe(section);
   });
 });
 
@@ -61,7 +33,7 @@ describe('UpdateProductDto', () => {
     const price = 100;
     const section = 'Example Section';
 
-    const productDto = new UpdateProductDto(
+    const updateProductDto = new UpdateProductDto(
       name,
       description,
       image,
@@ -69,11 +41,11 @@ describe('UpdateProductDto', () => {
       section,
     );
 
-    expect(productDto).toBeDefined();
-    expect(productDto.name).toBe(name);
-    expect(productDto.description).toBe(description);
-    expect(productDto.image).toBe(image);
-    expect(productDto.price).toBe(price);
-    expect(productDto.section).toBe(section);
+    expect(updateProductDto).toBeDefined();
+    expect(updateProductDto.name).toBe(name);
+    expect(updateProductDto.description).toBe(description);
+    expect(updateProductDto.image).toBe(image);
+    expect(updateProductDto.price).toBe(price);
+    expect(updateProductDto.section).toBe(section);
   });
 });
