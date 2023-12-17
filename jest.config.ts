@@ -10,4 +10,11 @@ export default {
   displayName: 'tormes-backend',
   testMatch: ['<rootDir>/src/**/*(*.)@(spec|test).[jt]s?(x)'],
   preset: './jest.preset.js',
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/.nx/',
+    '/docker-data/',
+    '/coverage/',
+  ],
 };
