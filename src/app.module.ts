@@ -8,6 +8,7 @@ import { PostgreConfigService } from './infraestructure/postgres/config/postgres
 import { AuthModule } from './core/application/auth.module';
 import { UserModule } from './core/application/user.module';
 import { ProductModule } from './core/application/product.module';
+import { SectionModule } from './core/application/section.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProductModule } from './core/application/product.module';
     AuthModule,
     UserModule,
     ProductModule,
+    SectionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
