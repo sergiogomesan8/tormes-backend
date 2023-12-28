@@ -14,7 +14,7 @@ export class ProductEntity {
   @Column({ nullable: false })
   image: string;
 
-  @Column({ nullable: false })
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: false })
   price: number;
 
   @Column({ nullable: false })
