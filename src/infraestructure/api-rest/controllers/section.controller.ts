@@ -72,7 +72,7 @@ export class SectionController {
   })
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createProduct(
+  async createSection(
     @Body() createSectionDto: CreateSectionDto,
   ): Promise<Section> {
     return this.sectionService.createSection(createSectionDto);
@@ -85,7 +85,7 @@ export class SectionController {
   @ApiParam({ name: 'id', type: String, description: 'The ID of the section' })
   @UseGuards(JwtAuthGuard)
   @Patch('/:id')
-  async updateProduct(
+  async updateSection(
     @Param('id') id: string,
     @Body() updateSectionDto: UpdateSectionDto,
   ): Promise<Section> {
@@ -99,7 +99,7 @@ export class SectionController {
   @ApiParam({ name: 'id', type: String, description: 'The ID of the section' })
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
-  async deleteProduct(@Param('id') id: string) {
+  async deleteSection(@Param('id') id: string) {
     return await this.sectionService.deleteSection(id);
   }
 }
