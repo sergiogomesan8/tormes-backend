@@ -47,3 +47,6 @@ sonar.js
 
 #Docker
 /docker-data
+
+#Images
+/tormes
