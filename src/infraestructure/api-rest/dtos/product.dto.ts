@@ -1,5 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsNumberString,
+} from 'class-validator';
 
 export class CreateProductDto {
   @ApiProperty({
@@ -18,19 +24,14 @@ export class CreateProductDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({
-    description: 'Product image',
-    example: 'https://example.com/image.jpg',
-  })
-  @IsString()
-  @IsNotEmpty()
-  image: string;
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  file?: any;
 
   @ApiProperty({
     description: 'Product price',
-    example: '100',
+    example: 100.5,
   })
-  @IsNumber()
+  @IsNumberString()
   @IsNotEmpty()
   price: number;
 
@@ -45,13 +46,11 @@ export class CreateProductDto {
   constructor(
     name: string,
     description: string,
-    image: string,
     price: number,
     section: string,
   ) {
     this.name = name;
     this.description = description;
-    this.image = image;
     this.price = price;
     this.section = section;
   }
