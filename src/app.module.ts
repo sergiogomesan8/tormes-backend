@@ -9,6 +9,8 @@ import { AuthModule } from './core/application/auth.module';
 import { UserModule } from './core/application/user.module';
 import { ProductModule } from './core/application/product.module';
 import { SectionModule } from './core/application/section.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -17,6 +19,14 @@ import { SectionModule } from './core/application/section.module';
       imports: [PostgresConfigModule],
       useClass: PostgreConfigService,
       inject: [PostgreConfigService],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'tormes/assets/images/products'),
+      serveRoot: '/tormes/images/products',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'tormes/assets/images/sections'),
+      serveRoot: '/tormes/images/sections',
     }),
     AuthModule,
     UserModule,
