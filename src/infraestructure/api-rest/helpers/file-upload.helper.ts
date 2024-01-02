@@ -5,6 +5,7 @@ import {
   MAX_SIZE_VALIDATOR,
 } from '../models/file-interceptor.model';
 import { extname } from 'path';
+import { randomBytes } from 'crypto';
 
 export function getStorageConfig(destination: string) {
   return {
@@ -12,6 +13,9 @@ export function getStorageConfig(destination: string) {
       destination: destination,
       filename: generateFilename,
     }),
+    limits: {
+      fileSize: MAX_SIZE_VALIDATOR,
+    },
   };
 }
 
@@ -23,10 +27,7 @@ export const generateFilename: FilenameGenerator = (req, file, cb) => {
   if (file.size > MAX_SIZE_VALIDATOR) {
     return cb(null, '');
   }
-  const randomName = Array(32)
-    .fill(null)
-    .map(() => Math.floor(Math.random() * 16).toString(16))
-    .join('');
+  const randomName = randomBytes(16).toString('hex');
   const fileName = `${randomName}${extname(file.originalname)}`;
   return cb(null, fileName);
 };

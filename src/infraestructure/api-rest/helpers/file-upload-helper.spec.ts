@@ -18,6 +18,9 @@ describe('File Upload Helper', () => {
           destination: destination,
           filename: generateFilename,
         }),
+        limits: {
+          fileSize: MAX_SIZE_VALIDATOR,
+        },
       });
     });
   });
