@@ -2,7 +2,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsNumberString,
 } from 'class-validator';
@@ -25,7 +24,7 @@ export class CreateProductDto {
   description: string;
 
   @ApiPropertyOptional({ type: 'string', format: 'binary' })
-  file?: any;
+  image: any;
 
   @ApiProperty({
     description: 'Product price',
@@ -46,11 +45,13 @@ export class CreateProductDto {
   constructor(
     name: string,
     description: string,
+    // image: any,
     price: number,
     section: string,
   ) {
     this.name = name;
     this.description = description;
+    // this.image = image;
     this.price = price;
     this.section = section;
   }
@@ -75,23 +76,18 @@ export class UpdateProductDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({
-    description: 'Product image',
-    example: 'https://example.com/image.jpg',
-    required: false,
-  })
-  @IsString()
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
   @IsOptional()
-  image?: string;
+  image?: any;
 
   @ApiProperty({
     description: 'Product price',
-    example: '100',
+    example: 100.5,
     required: false,
   })
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  price?: number;
+  price: number;
 
   @ApiProperty({
     description: 'Product section',
@@ -105,13 +101,11 @@ export class UpdateProductDto {
   constructor(
     name?: string,
     description?: string,
-    image?: string,
     price?: number,
     section?: string,
   ) {
     this.name = name;
     this.description = description;
-    this.image = image;
     this.price = price;
     this.section = section;
   }
