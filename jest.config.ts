@@ -17,4 +17,11 @@ export default {
     '/docker-data/',
     '/coverage/',
   ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/.nx/',
+    '/docker-data/',
+    '/coverage/',
+  ],
 };

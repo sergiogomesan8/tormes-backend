@@ -7,8 +7,10 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UploadedFile,
   UseFilters,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,12 +23,19 @@ import {
   ApiInternalServerErrorResponse,
   ApiParam,
   ApiOperation,
+  ApiBody,
+  ApiConsumes,
 } from '@nestjs/swagger';
-import { ProductService } from '../../../core/domain/services/product.service';
-import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/jwt-auth.guard';
-import { Product } from '../../../core/domain/models/product.model';
-import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto';
 import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
+import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/jwt-auth.guard';
+import { ProductService } from '../../../core/domain/services/product.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto';
+import { OptionalFilePipe } from '../pipe-builders/uploadFile.pipe.builder';
+import { FileInterceptorSavePath } from '../models/file-interceptor.model';
+import { Product } from '../../../core/domain/models/product.model';
+import { getStorageConfig } from '../helpers/file-upload.helper';
+import * as fs from 'fs';
 
 @ApiTags('product')
 @ApiBearerAuth()
@@ -70,26 +79,67 @@ export class ProductController {
     summary: 'Create a product',
     description: 'Endpoint to create a product',
   })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Product data and image file',
+    type: CreateProductDto,
+  })
+  @UseInterceptors(
+    FileInterceptor(
+      'image',
+      getStorageConfig(FileInterceptorSavePath.PRODUCTS),
+    ),
+  )
   @UseGuards(JwtAuthGuard)
   @Post()
   async createProduct(
+    @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File,
     @Body() createProductDto: CreateProductDto,
   ): Promise<Product> {
-    return this.productService.createProduct(createProductDto);
+    return this.productService.createProduct({
+      ...createProductDto,
+      image: file.filename,
+    });
   }
 
   @ApiOperation({
     summary: 'Update a product by ID',
     description: 'Endpoint to update a product by ID',
   })
+  @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
+  @ApiBody({
+    description: 'Product data and image file',
+    type: UpdateProductDto,
+  })
+  @UseInterceptors(
+    FileInterceptor(
+      'image',
+      getStorageConfig(FileInterceptorSavePath.PRODUCTS),
+    ),
+  )
   @UseGuards(JwtAuthGuard)
   @Patch('/:id')
   async updateProduct(
+    @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File | null,
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    return await this.productService.updateProduct(id, updateProductDto);
+    if (file && file.filename !== '') {
+      const existingProduct = await this.productService.findProductById(id);
+      const existingImage = existingProduct.image;
+      const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+
+      return await this.productService.updateProduct(id, {
+        ...updateProductDto,
+        image: file.filename,
+      });
+    } else {
+      return await this.productService.updateProduct(id, updateProductDto);
+    }
   }
 
   @ApiOperation({
@@ -100,6 +150,14 @@ export class ProductController {
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   async deleteProduct(@Param('id') id: string) {
+    const existingProduct = await this.productService.findProductById(id);
+    const existingImage = existingProduct.image;
+    if (existingImage) {
+      const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
     return await this.productService.deleteProduct(id);
   }
 }

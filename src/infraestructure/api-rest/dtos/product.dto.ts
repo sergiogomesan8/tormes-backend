@@ -1,5 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumberString,
+} from 'class-validator';
 
 export class CreateProductDto {
   @ApiProperty({
@@ -18,19 +23,14 @@ export class CreateProductDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({
-    description: 'Product image',
-    example: 'https://example.com/image.jpg',
-  })
-  @IsString()
-  @IsNotEmpty()
-  image: string;
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  image: any;
 
   @ApiProperty({
     description: 'Product price',
-    example: '100',
+    example: 100.5,
   })
-  @IsNumber()
+  @IsNumberString()
   @IsNotEmpty()
   price: number;
 
@@ -45,15 +45,15 @@ export class CreateProductDto {
   constructor(
     name: string,
     description: string,
-    image: string,
     price: number,
     section: string,
+    image: any,
   ) {
     this.name = name;
     this.description = description;
-    this.image = image;
     this.price = price;
     this.section = section;
+    this.image = image;
   }
 }
 
@@ -77,22 +77,13 @@ export class UpdateProductDto {
   description?: string;
 
   @ApiProperty({
-    description: 'Product image',
-    example: 'https://example.com/image.jpg',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  image?: string;
-
-  @ApiProperty({
     description: 'Product price',
-    example: '100',
+    example: 100.5,
     required: false,
   })
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  price?: number;
+  price: number;
 
   @ApiProperty({
     description: 'Product section',
@@ -103,17 +94,21 @@ export class UpdateProductDto {
   @IsOptional()
   section?: string;
 
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @IsOptional()
+  image?: any;
+
   constructor(
     name?: string,
     description?: string,
-    image?: string,
     price?: number,
     section?: string,
+    image?: any,
   ) {
     this.name = name;
     this.description = description;
-    this.image = image;
     this.price = price;
     this.section = section;
+    this.image = image;
   }
 }
