@@ -35,32 +35,32 @@ describe('ProductController', () => {
   const name = 'Product name';
   const price: number = 100;
   const description = 'Product Description';
-  const image = 'https://example.com/image.jpg';
   const section = 'Product Section';
+  const imageMock = { filename: 'test.jpg' } as Express.Multer.File;
 
   const product = {
     id: expect.any(String),
     name,
     price,
     description,
-    image,
+    image: imageMock.filename,
     section,
   };
 
   const createProductDto = new CreateProductDto(
     name,
     description,
-    image,
     price,
     section,
+    imageMock,
   );
 
   const updateProductDto = new UpdateProductDto(
     name,
     description,
-    image,
     price,
     section,
+    imageMock,
   );
 
   describe('findAllProducts', () => {
@@ -122,58 +122,88 @@ describe('ProductController', () => {
   });
 
   describe('createProduct', () => {
-    it('should create a product', async () => {
+    it('should create a product and should save the file in the correct location', async () => {
       jest.spyOn(productService, 'createProduct').mockResolvedValue(product);
 
-      jest.spyOn(productService, 'createProduct').mockResolvedValue(product);
-      expect(await productController.createProduct(createProductDto)).toBe(
-        product,
-      );
-      expect(productService.createProduct).toHaveBeenCalledWith(
-        createProductDto,
-      );
+      expect(
+        await productController.createProduct(imageMock, createProductDto),
+      ).toBe(product);
+      expect(productService.createProduct).toHaveBeenCalledWith({
+        ...createProductDto,
+        image: imageMock.filename,
+      });
     });
 
     it('should return an Http Exception error when it happens', () => {
       jest
-        .spyOn(productService, 'findProductById')
+        .spyOn(productService, 'createProduct')
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(
-        productController.findProductById(expect.any(String)),
+        productController.createProduct(imageMock, createProductDto),
       ).rejects.toThrow(InternalServerErrorException);
     });
   });
 
   describe('updateProduct', () => {
     it('should update a product', async () => {
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
       jest.spyOn(productService, 'updateProduct').mockResolvedValue(product);
 
       expect(
         await productController.updateProduct(
+          imageMock,
           expect.any(String),
           updateProductDto,
         ),
       ).toBe(product);
       expect(productService.updateProduct).toHaveBeenCalledWith(
         expect.any(String),
-        updateProductDto,
+        {
+          ...updateProductDto,
+          image: imageMock.filename,
+        },
+      );
+    });
+
+    it('should update a product without a file', async () => {
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
+      jest.spyOn(productService, 'updateProduct').mockResolvedValue(product);
+
+      const updateProductDtoWithoutFile = new UpdateProductDto('New name');
+
+      expect(
+        await productController.updateProduct(
+          null,
+          expect.any(String),
+          updateProductDtoWithoutFile,
+        ),
+      ).toBe(product);
+      expect(productService.updateProduct).toHaveBeenCalledWith(
+        expect.any(String),
+        updateProductDtoWithoutFile,
       );
     });
 
     it('should return an Http Exception error when it happens', () => {
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
       jest
         .spyOn(productService, 'updateProduct')
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(
-        productController.updateProduct(expect.any(String), updateProductDto),
+        productController.updateProduct(
+          imageMock,
+          expect.any(String),
+          updateProductDto,
+        ),
       ).rejects.toThrow(InternalServerErrorException);
     });
   });
 
   describe('deleteProduct', () => {
     it('should delete a product', async () => {
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
       jest.spyOn(productService, 'deleteProduct').mockResolvedValue({
         message: `Product with id ${expect.any(String)} was deleted.`,
       });
@@ -189,6 +219,7 @@ describe('ProductController', () => {
     });
 
     it('should return an Http Exception error when it happens', () => {
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
       jest
         .spyOn(productService, 'deleteProduct')
         .mockRejectedValue(new InternalServerErrorException());
