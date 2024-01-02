@@ -48,17 +48,17 @@ describe('ProductService', () => {
   const createProductDto = new CreateProductDto(
     name,
     description,
-    image,
     price,
     section,
+    image,
   );
 
   const updateProductDto = new UpdateProductDto(
     name,
     description,
-    image,
     price,
     section,
+    image,
   );
 
   describe('findAllProducts', () => {
