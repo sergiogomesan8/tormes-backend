@@ -11,9 +11,9 @@ describe('ProductDto', () => {
     const createProductDto = new CreateProductDto(
       name,
       description,
-      image,
       price,
       section,
+      image,
     );
 
     expect(createProductDto).toBeDefined();
@@ -36,9 +36,9 @@ describe('UpdateProductDto', () => {
     const updateProductDto = new UpdateProductDto(
       name,
       description,
-      image,
       price,
       section,
+      image,
     );
 
     expect(updateProductDto).toBeDefined();

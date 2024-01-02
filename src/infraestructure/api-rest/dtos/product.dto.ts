@@ -45,15 +45,15 @@ export class CreateProductDto {
   constructor(
     name: string,
     description: string,
-    // image: any,
     price: number,
     section: string,
+    image: any,
   ) {
     this.name = name;
     this.description = description;
-    // this.image = image;
     this.price = price;
     this.section = section;
+    this.image = image;
   }
 }
 
@@ -76,10 +76,6 @@ export class UpdateProductDto {
   @IsOptional()
   description?: string;
 
-  @ApiPropertyOptional({ type: 'string', format: 'binary' })
-  @IsOptional()
-  image?: any;
-
   @ApiProperty({
     description: 'Product price',
     example: 100.5,
@@ -98,15 +94,21 @@ export class UpdateProductDto {
   @IsOptional()
   section?: string;
 
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @IsOptional()
+  image?: any;
+
   constructor(
     name?: string,
     description?: string,
     price?: number,
     section?: string,
+    image?: any,
   ) {
     this.name = name;
     this.description = description;
     this.price = price;
     this.section = section;
+    this.image = image;
   }
 }
