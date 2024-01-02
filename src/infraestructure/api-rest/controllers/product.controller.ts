@@ -3,9 +3,7 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Param,
-  ParseFilePipeBuilder,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -28,21 +26,16 @@ import {
   ApiBody,
   ApiConsumes,
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
+import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/jwt-auth.guard';
+import { ProductService } from '../../../core/domain/services/product.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto';
 import { OptionalFilePipe } from '../pipe-builders/uploadFile.pipe.builder';
-import {
-  FILE_TYPE_VALIDATOR,
-  FileInterceptorSavePath,
-  MAX_SIZE_VALIDATOR,
-} from '../models/file-interceptor.model';
-import { ProductService } from '../../../core/domain/services/product.service';
+import { FileInterceptorSavePath } from '../models/file-interceptor.model';
 import { Product } from '../../../core/domain/models/product.model';
-import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/jwt-auth.guard';
+import { getStorageConfig } from '../helpers/file-upload.helper';
 import * as fs from 'fs';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 @ApiTags('product')
 @ApiBearerAuth()
@@ -79,8 +72,7 @@ export class ProductController {
   async findProductById(
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<Product> {
-    const product = await this.productService.findProductById(id);
-    return product;
+    return await this.productService.findProductById(id);
   }
 
   @ApiOperation({
@@ -93,37 +85,15 @@ export class ProductController {
     type: CreateProductDto,
   })
   @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: FileInterceptorSavePath.PRODUCTS,
-        filename: (req, file, cb) => {
-          const mime = file.mimetype;
-
-          if (!FILE_TYPE_VALIDATOR.test(mime)) {
-            return cb(null, '');
-          }
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          const fileName = `${randomName}${extname(file.originalname)}`;
-          return cb(null, fileName);
-        },
-      }),
-    }),
+    FileInterceptor(
+      'image',
+      getStorageConfig(FileInterceptorSavePath.PRODUCTS),
+    ),
   )
   @UseGuards(JwtAuthGuard)
   @Post()
   async createProduct(
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: FILE_TYPE_VALIDATOR,
-        })
-        .addMaxSizeValidator({ maxSize: MAX_SIZE_VALIDATOR })
-        .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
-    )
-    file: Express.Multer.File,
+    @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File,
     @Body() createProductDto: CreateProductDto,
   ): Promise<Product> {
     return this.productService.createProduct({
@@ -143,28 +113,10 @@ export class ProductController {
     type: UpdateProductDto,
   })
   @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: FileInterceptorSavePath.PRODUCTS,
-        filename: (req, file, cb) => {
-          if (file) {
-            const mime = file.mimetype;
-
-            if (!FILE_TYPE_VALIDATOR.test(mime)) {
-              return cb(null, '');
-            }
-            const randomName = Array(32)
-              .fill(null)
-              .map(() => Math.round(Math.random() * 16).toString(16))
-              .join('');
-            const fileName = `${randomName}${file.filename}`;
-            return cb(null, fileName);
-          } else {
-            return cb(null, '');
-          }
-        },
-      }),
-    }),
+    FileInterceptor(
+      'image',
+      getStorageConfig(FileInterceptorSavePath.PRODUCTS),
+    ),
   )
   @UseGuards(JwtAuthGuard)
   @Patch('/:id')
@@ -173,7 +125,7 @@ export class ProductController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    if (file.filename !== '') {
+    if (file && file.filename !== '') {
       const existingProduct = await this.productService.findProductById(id);
       const existingImage = existingProduct.image;
       const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;

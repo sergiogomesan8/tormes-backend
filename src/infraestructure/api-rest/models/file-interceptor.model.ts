@@ -6,3 +6,9 @@ export enum FileInterceptorSavePath {
 export const MAX_SIZE_VALIDATOR = 1024 * 1024 * 2;
 
 export const FILE_TYPE_VALIDATOR = /image\/(jpeg|jpg|png)/;
+
+export type FilenameGenerator = (
+  req: any,
+  file: any,
+  cb: (error: any, filename: string) => void,
+) => void;
