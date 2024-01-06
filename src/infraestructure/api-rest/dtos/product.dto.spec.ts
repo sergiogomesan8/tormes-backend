@@ -4,7 +4,6 @@ describe('ProductDto', () => {
   it('should create a CreateProductDto object', () => {
     const name = 'Example Product';
     const description = 'This is an example product.';
-    const image = 'https://example.com/image.jpg';
     const price = 100;
     const section = 'Example Section';
 
@@ -13,13 +12,11 @@ describe('ProductDto', () => {
       description,
       price,
       section,
-      image,
     );
 
     expect(createProductDto).toBeDefined();
     expect(createProductDto.name).toBe(name);
     expect(createProductDto.description).toBe(description);
-    expect(createProductDto.image).toBe(image);
     expect(createProductDto.price).toBe(price);
     expect(createProductDto.section).toBe(section);
   });
