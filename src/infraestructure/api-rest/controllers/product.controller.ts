@@ -36,6 +36,9 @@ import { FileInterceptorSavePath } from '../models/file-interceptor.model';
 import { Product } from '../../../core/domain/models/product.model';
 import { getStorageConfig } from '../helpers/file-upload.helper';
 import * as fs from 'fs';
+import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
+import { UserType } from '../dtos/user.dto';
+import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 
 @ApiTags('product')
 @ApiBearerAuth()
@@ -68,6 +71,7 @@ export class ProductController {
     description: 'Endpoint to get a product by ID',
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
+  @UseGuards(JwtAuthGuard)
   @Get('/:id')
   async findProductById(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -90,7 +94,8 @@ export class ProductController {
       getStorageConfig(FileInterceptorSavePath.PRODUCTS),
     ),
   )
-  @UseGuards(JwtAuthGuard)
+  @UserTypes(UserType.manager, UserType.employee)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   async createProduct(
     @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File,
@@ -118,7 +123,8 @@ export class ProductController {
       getStorageConfig(FileInterceptorSavePath.PRODUCTS),
     ),
   )
-  @UseGuards(JwtAuthGuard)
+  @UserTypes(UserType.manager, UserType.employee)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch('/:id')
   async updateProduct(
     @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File | null,
@@ -147,7 +153,8 @@ export class ProductController {
     description: 'Endpoint to delete a product by ID',
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
-  @UseGuards(JwtAuthGuard)
+  @UserTypes(UserType.manager, UserType.employee)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete('/:id')
   async deleteProduct(@Param('id') id: string) {
     const existingProduct = await this.productService.findProductById(id);
