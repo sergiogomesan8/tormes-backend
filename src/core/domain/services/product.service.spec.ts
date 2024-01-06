@@ -50,7 +50,6 @@ describe('ProductService', () => {
     description,
     price,
     section,
-    image,
   );
 
   const updateProductDto = new UpdateProductDto(

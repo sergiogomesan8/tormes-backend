@@ -52,7 +52,6 @@ describe('ProductController', () => {
     description,
     price,
     section,
-    imageMock,
   );
 
   const updateProductDto = new UpdateProductDto(

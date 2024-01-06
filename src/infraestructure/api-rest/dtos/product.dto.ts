@@ -47,13 +47,11 @@ export class CreateProductDto {
     description: string,
     price: number,
     section: string,
-    image: any,
   ) {
     this.name = name;
     this.description = description;
     this.price = price;
     this.section = section;
-    this.image = image;
   }
 }
 
@@ -83,7 +81,7 @@ export class UpdateProductDto {
   })
   @IsNumberString()
   @IsOptional()
-  price: number;
+  price?: number;
 
   @ApiProperty({
     description: 'Product section',
