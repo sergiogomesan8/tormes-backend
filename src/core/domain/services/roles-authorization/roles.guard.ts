@@ -17,7 +17,7 @@ export class RolesGuard implements CanActivate {
     );
     if (!requiredRoles) {
       console.log('Roles are not defined.', requiredRoles);
-      return true;
+      return false;
     }
 
     const request = context.switchToHttp().getRequest();
@@ -25,6 +25,7 @@ export class RolesGuard implements CanActivate {
 
     if (!user) {
       console.log('User is undefined. Headers:', request.headers);
+      return false;
     }
 
     return requiredRoles.includes(user.userType);
