@@ -7,18 +7,7 @@ import {
   IsNumber,
   IsEnum,
 } from 'class-validator';
-
-export enum UserType {
-  customer = 1,
-  employee = 2,
-  manager = 3,
-}
-
-export enum Gender {
-  man = 1,
-  women = 2,
-  other = 3,
-}
+import { Gender } from '../../../core/domain/models/user.model';
 
 export class UserDto {
   @ApiProperty({

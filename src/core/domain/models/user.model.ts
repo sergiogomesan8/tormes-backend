@@ -63,9 +63,9 @@ export class SerializedUser {
 }
 
 export enum UserType {
-  customer = 1,
-  employee = 2,
-  manager = 3,
+  customer = 'customer',
+  employee = 'employee',
+  manager = 'manager',
 }
 
 export enum NotificationPreference {

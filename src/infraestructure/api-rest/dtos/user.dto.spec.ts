@@ -1,4 +1,5 @@
-import { UserDto, Gender, CreateUserDto } from './user.dto';
+import { Gender } from '../../../core/domain/models/user.model';
+import { UserDto, CreateUserDto } from './user.dto';
 
 describe('UserDto', () => {
   it('should create a UserDto object', () => {

@@ -1,20 +1,26 @@
 import { Test } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
-import { JwtStrategy } from './jwt.strategy';
-import { UserEntity } from '../../../../infraestructure/postgres/entities/user.entity';
+import { UserEntity } from '../../../../../infraestructure/postgres/entities/user.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AccessJwtService } from './access-jwt.service';
+import { JwtAccessTokenStrategy } from './access-jwt.strategy';
+import { JwtPayload } from '../jwt-playload.interface';
+import { UserType } from '../../../../../core/domain/models/user.model';
+import { JwtService } from '@nestjs/jwt';
 
 describe('JwtStrategy', () => {
-  let jwtStrategy: JwtStrategy;
+  let jwtAccessTokenStrategy: JwtAccessTokenStrategy;
   let userRepository: Repository<UserEntity>;
   let configService: ConfigService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        JwtStrategy,
+        AccessJwtService,
+        JwtService,
+        JwtAccessTokenStrategy,
         {
           provide: ConfigService,
           useValue: { get: jest.fn().mockReturnValue('testKey') },
@@ -29,7 +35,9 @@ describe('JwtStrategy', () => {
       imports: [ConfigModule],
     }).compile();
 
-    jwtStrategy = module.get<JwtStrategy>(JwtStrategy);
+    jwtAccessTokenStrategy = module.get<JwtAccessTokenStrategy>(
+      JwtAccessTokenStrategy,
+    );
     userRepository = module.get<Repository<UserEntity>>(
       getRepositoryToken(UserEntity),
     );
@@ -37,26 +45,37 @@ describe('JwtStrategy', () => {
   });
 
   it('validates and returns the user based on JWT payload', async () => {
-    const payload = { email: 'test@test.com' };
+    const payload: JwtPayload = {
+      email: 'test@test.com',
+      id: expect.any(String),
+      name: expect.any(String),
+      userType: UserType.customer,
+    };
+
     const user = new UserEntity();
     user.email = 'test@test.com';
 
     jest.spyOn(userRepository, 'findOneBy').mockResolvedValue(user as any);
     jest.spyOn(configService, 'get').mockReturnValue('testKey');
 
-    const result = await jwtStrategy.validate(payload);
+    const result = await jwtAccessTokenStrategy.validate({ payload });
 
     expect(result).toEqual(user);
   });
 
   it('throws an unauthorized exception as user cannot be found', async () => {
-    const payload = { email: 'test@test.com' };
+    const payload: JwtPayload = {
+      email: 'test@test.com',
+      id: expect.any(String),
+      name: expect.any(String),
+      userType: UserType.customer,
+    };
 
     jest.spyOn(userRepository, 'findOneBy').mockResolvedValue(null);
     jest.spyOn(configService, 'get').mockReturnValue('testKey');
 
     try {
-      await jwtStrategy.validate(payload);
+      await jwtAccessTokenStrategy.validate({ payload });
     } catch (error) {
       expect(error).toBeInstanceOf(UnauthorizedException);
     }

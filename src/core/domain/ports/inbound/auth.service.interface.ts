@@ -5,4 +5,5 @@ import { AuthModel } from '../../models/auth.model';
 export interface IAuthService {
   register(createUserDto: CreateUserDto): Promise<AuthModel>;
   login(loginUserDto: LoginUserDto): Promise<AuthModel>;
+  refreshToken(email): Promise<AuthModel>;
 }
