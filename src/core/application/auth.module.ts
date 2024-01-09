@@ -2,36 +2,19 @@ import { Module } from '@nestjs/common';
 import { AuthService } from '../domain/services/auth.service';
 import { UserEntity } from '../../infraestructure/postgres/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from '../domain/services/jwt-config/jwt.strategy';
 import { AuthController } from '../../infraestructure/api-rest/controllers/auth.controller';
 import { UserService } from '../domain/services/user.service';
 import { RolesGuard } from '../domain/services/roles-authorization/roles.guard';
-import { JwtAuthGuard } from '../domain/services/jwt-config/jwt-auth.guard';
+import { RefreshTokenModule } from '../domain/services/jwt-config/refresh-token/refresth-jwt.module';
+import { AccessTokenModule } from '../domain/services/jwt-config/access-token/access-jwt.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
-    PassportModule.register({
-      defaultStrategy: 'jwt',
-    }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          secret: configService.get('JWT_SECRET'),
-          signOptions: {
-            expiresIn: '1h',
-          },
-        };
-      },
-    }),
-    ConfigModule,
+    AccessTokenModule,
+    RefreshTokenModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserService, JwtStrategy, JwtAuthGuard, RolesGuard],
+  providers: [UserService, AuthService, RolesGuard],
 })
 export class AuthModule {}
