@@ -1,5 +1,8 @@
-export interface JwtPayload {
-  email: string;
+import { UserType } from '../../models/user.model';
 
-  //TODO: add more fields
+export interface JwtPayload {
+  id: string;
+  email: string;
+  name: string;
+  userType: UserType;
 }
