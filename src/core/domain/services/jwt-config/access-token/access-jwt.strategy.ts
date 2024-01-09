@@ -23,7 +23,6 @@ export class JwtAccessTokenStrategy extends PassportStrategy(
     });
   }
   async validate(payloadWrapper: { payload: JwtPayload }): Promise<UserEntity> {
-    console.log('ACCESS validate PAYLOAD: ', payloadWrapper);
     const {
       payload: { id, email, name, userType },
     } = payloadWrapper;
@@ -35,7 +34,6 @@ export class JwtAccessTokenStrategy extends PassportStrategy(
       userType,
     });
 
-    console.log('ACCESS USER:', user);
     if (!user) throw new UnauthorizedException('Token not valid');
 
     return user;

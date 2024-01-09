@@ -98,12 +98,9 @@ export class AuthController {
   @Post('refresh-token')
   async refreshToken(@Req() req: Request): Promise<SerializedAuthModel> {
     const user = req.user;
-    console.log('REFRESH TOKEN 1: ', user);
     const authUser = await this.authService.refreshToken(user['email']);
     if (authUser) {
       const serializedAuthUser = new SerializedAuthModel(authUser);
-      console.log('REFRESH TOKEN 2: ', serializedAuthUser);
-
       return serializedAuthUser;
     }
   }
