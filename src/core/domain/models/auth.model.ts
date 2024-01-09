@@ -3,7 +3,8 @@ import { SerializedUser, User } from './user.model';
 
 export interface AuthModel {
   user_info: User;
-  token: string;
+  access_token: string;
+  refresh_token: string;
 }
 
 export class SerializedAuthModel {
@@ -15,4 +16,9 @@ export class SerializedAuthModel {
   constructor(partial: Partial<SerializedAuthModel>) {
     Object.assign(this, partial);
   }
+}
+
+export interface Tokens {
+  access_token: string;
+  refresh_token: string;
 }
