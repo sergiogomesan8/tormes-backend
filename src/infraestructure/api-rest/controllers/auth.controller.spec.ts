@@ -11,6 +11,7 @@ import {
 import { plainToClass } from 'class-transformer';
 import { LoginUserDto } from '../dtos/auth.dto';
 import { SerializedAuthModel } from '../../../core/domain/models/auth.model';
+import { Request } from 'express';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -25,6 +26,7 @@ describe('AuthController', () => {
           useValue: {
             register: jest.fn(),
             login: jest.fn(),
+            refreshToken: jest.fn(),
           },
         },
       ],
@@ -47,7 +49,8 @@ describe('AuthController', () => {
     it('should return user and token on successful registration', async () => {
       const expectedResponse = {
         user_info: plainToClass(SerializedUser, user),
-        token: 'token',
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
       };
 
       jest.spyOn(authService, 'register').mockResolvedValue(expectedResponse);
@@ -72,7 +75,8 @@ describe('AuthController', () => {
     it('should return user and token on successful registration', async () => {
       const expectedResponse = {
         user_info: plainToClass(SerializedUser, user),
-        token: 'token',
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
       };
       jest.spyOn(authService, 'login').mockResolvedValue(expectedResponse);
       expect(await authController.login(loginUserDto)).toEqual(
@@ -101,6 +105,37 @@ describe('AuthController', () => {
         new InternalServerErrorException('Error logging user'),
       );
       expect(authService.login).toHaveBeenCalledWith(loginUserDto);
+    });
+  });
+  describe('refreshToken', () => {
+    it('should return refreshed token on successful operation', async () => {
+      const expectedResponse = {
+        user_info: plainToClass(SerializedUser, user),
+        access_token: 'new_access_token',
+        refresh_token: 'new_refresh_token',
+      };
+
+      jest
+        .spyOn(authService, 'refreshToken')
+        .mockResolvedValue(expectedResponse);
+
+      const req: Partial<Request> = { user: { email: email } };
+      expect(await authController.refreshToken(req as Request)).toEqual(
+        new SerializedAuthModel(expectedResponse),
+      );
+      expect(authService.refreshToken).toHaveBeenCalledWith(email);
+    });
+
+    it('should throw an error when refreshToken operation fails', async () => {
+      jest.spyOn(authService, 'refreshToken').mockImplementation(() => {
+        throw new InternalServerErrorException('Error refreshing token');
+      });
+
+      const req: Partial<Request> = { user: { email: email } };
+      await expect(authController.refreshToken(req as Request)).rejects.toThrow(
+        new InternalServerErrorException('Error refreshing token'),
+      );
+      expect(authService.refreshToken).toHaveBeenCalledWith(email);
     });
   });
 });
