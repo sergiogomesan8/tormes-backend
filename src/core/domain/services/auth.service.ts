@@ -72,6 +72,9 @@ export class AuthService implements IAuthService {
         refresh_token: tokens.refresh_token,
       };
     } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
       throw new InternalServerErrorException('Error logging user');
     }
   }
@@ -95,6 +98,9 @@ export class AuthService implements IAuthService {
         refresh_token: tokens.refresh_token,
       };
     } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
       throw new InternalServerErrorException('Error refreshing token');
     }
   }

@@ -6,7 +6,10 @@ import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { LoginUserDto } from '../../../infraestructure/api-rest/dtos/auth.dto';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AccessJwtService } from './jwt-config/access-token/access-jwt.service';
 import { RefreshJwtService } from './jwt-config/refresh-token/refresh-jwt.service';
@@ -166,11 +169,11 @@ describe('AuthService', () => {
       jest
         .spyOn(userService, 'findUserByEmail')
         .mockImplementation(async () => {
-          throw new InternalServerErrorException('Error logging user');
+          throw new UnauthorizedException('Credential are not valid.');
         });
 
       await expect(authService.login(loginUserDto)).rejects.toThrow(
-        new InternalServerErrorException('Error logging user'),
+        new UnauthorizedException('Credential are not valid.'),
       );
     });
 
@@ -186,7 +189,67 @@ describe('AuthService', () => {
       jest.spyOn(bcrypt, 'compareSync').mockReturnValue(false);
 
       await expect(authService.login(loginUserDto)).rejects.toThrow(
+        new UnauthorizedException('Credential are not valid.'),
+      );
+    });
+
+    it('should throw InternalServerErrorException if error occurs', async () => {
+      jest
+        .spyOn(accessJwtService, 'getJwtAccessToken')
+        .mockImplementation(async () => {
+          throw new Error();
+        });
+
+      await expect(authService.login(loginUserDto)).rejects.toThrow(
         new InternalServerErrorException('Error logging user'),
+      );
+    });
+  });
+
+  describe('refreshToken', () => {
+    it('should refresh tokens if user exists', async () => {
+      const user = {
+        id: '1',
+        email: 'test@test.com',
+        name: 'Test User',
+        userType: 'admin',
+      };
+
+      jest
+        .spyOn(userService, 'findUserByEmail')
+        .mockImplementation(async () => user as User);
+      jest
+        .spyOn(accessJwtService, 'getJwtAccessToken')
+        .mockResolvedValue(tokens.access_token);
+      jest
+        .spyOn(refreshJwtService, 'getJwtRefreshToken')
+        .mockResolvedValue(tokens.refresh_token);
+
+      expect(await authService.refreshToken(user.email)).toEqual({
+        user_info: user,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+      });
+    });
+
+    it('should throw UnauthorizedException if user does not exist', async () => {
+      jest
+        .spyOn(userService, 'findUserByEmail')
+        .mockImplementation(async () => undefined);
+
+      await expect(authService.refreshToken(email)).rejects.toThrow(
+        new UnauthorizedException('Credential are not valid.'),
+      );
+    });
+    it('should throw InternalServerErrorException if error occurs', async () => {
+      jest
+        .spyOn(accessJwtService, 'getJwtAccessToken')
+        .mockImplementation(async () => {
+          throw new Error();
+        });
+
+      await expect(authService.refreshToken(email)).rejects.toThrow(
+        new InternalServerErrorException('Error refreshing token'),
       );
     });
   });
