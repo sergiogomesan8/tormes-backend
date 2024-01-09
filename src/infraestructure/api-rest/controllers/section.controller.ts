@@ -26,7 +26,7 @@ import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
 import { SectionService } from '../../../core/domain/services/section.service';
 import { Section } from '../../../core/domain/models/section.model';
 import { CreateSectionDto, UpdateSectionDto } from '../dtos/section.dto';
-import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
 
 @ApiTags('section')
 @ApiBearerAuth()

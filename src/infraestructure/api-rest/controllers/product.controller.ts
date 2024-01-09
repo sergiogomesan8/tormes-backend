@@ -27,7 +27,7 @@ import {
   ApiConsumes,
 } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
-import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
 import { ProductService } from '../../../core/domain/services/product.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto';
@@ -37,8 +37,8 @@ import { Product } from '../../../core/domain/models/product.model';
 import { getStorageConfig } from '../helpers/file-upload.helper';
 import * as fs from 'fs';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
-import { UserType } from '../dtos/user.dto';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
+import { UserType } from '../../../core/domain/models/user.model';
 
 @ApiTags('product')
 @ApiBearerAuth()
