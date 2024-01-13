@@ -11,7 +11,7 @@
     "start": "nx serve",
     "start:dev": "nest start --watch",
     "start:debug": "nx serve --configuration=debug",
-    "start:prod": "node dist/main.js",
+    "start:prod": "node dist/tormes-backend/src/main",
     "lint": "nx lint",
     "test": "nx test",
     "coverage": "jest --collect-coverage",
