@@ -16,7 +16,10 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: ['http://localhost:4200', 'https://tormes-frontend-c9e2b3d2e8ef.herokuapp.com'], // Permite estos dos orígenes
+    origin: [
+      'http://localhost:4200',
+      'https://tormes-frontend-c9e2b3d2e8ef.herokuapp.com',
+    ],
   });
 
   const config = new DocumentBuilder()
