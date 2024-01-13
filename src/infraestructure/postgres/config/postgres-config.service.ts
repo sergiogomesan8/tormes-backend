@@ -21,7 +21,9 @@ export class PostgreConfigService implements TypeOrmOptionsFactory {
       logging: true,
       autoLoadEntities: true,
       namingStrategy: new SnakeNamingStrategy(),
-      ssl: true,
+      ssl: {
+        rejectUnauthorized: false,
+      },
     };
   }
 }
