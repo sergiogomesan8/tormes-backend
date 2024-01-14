@@ -4,6 +4,7 @@ import {
 } from '../../../core/domain/models/order.model';
 import { User } from '../../../core/domain/models/user.model';
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -16,8 +17,13 @@ import { UserEntity } from './user.entity';
 export class OrderEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
   @Column({ unique: true })
   orderId: string;
+  @BeforeInsert()
+  generateOrderId() {
+    this.orderId = 'P' + Math.floor(100000000 + Math.random() * 900000000);
+  }
 
   @Column({ nullable: false })
   status: OrderStatus;
