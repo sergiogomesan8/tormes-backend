@@ -10,6 +10,7 @@ import { QueryFailedError, Repository } from 'typeorm';
 import { Order, OrderStatus, OrderedProduct } from '../models/order.model';
 import { CreateOrderDto } from '../../../infraestructure/api-rest/dtos/order.dto';
 import { ProductService } from './product.service';
+import { UserService } from './user.service';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -17,6 +18,7 @@ export class OrderService implements IOrderService {
     @InjectRepository(OrderEntity)
     private orderRepository: Repository<OrderEntity>,
     private readonly productService: ProductService,
+    private readonly userService: UserService,
   ) {}
 
   async findAllOrders(): Promise<Order[]> {
@@ -43,14 +45,25 @@ export class OrderService implements IOrderService {
     return orders;
   }
 
-  async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
+  async createOrder(
+    userId: string,
+    createOrderDto: CreateOrderDto,
+  ): Promise<Order> {
     try {
+      const user = await this.userService.findUserById(userId);
+      if (!user) {
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+
       const order = this.orderRepository.create(createOrderDto);
+      order.customer = user;
+      order.total = await this.calculateOrderTotal(order.orderedProducts);
+      order.status = OrderStatus.processing;
       await this.orderRepository.save(order);
       return order;
     } catch (error) {
       if (error instanceof QueryFailedError) {
-        throw new ConflictException('Order with this name already exists');
+        throw new ConflictException(error.message);
       }
     }
   }
@@ -88,7 +101,7 @@ export class OrderService implements IOrderService {
     const products = await Promise.all(
       orderedProducts.map(async (orderedProduct) => {
         const product = await this.productService.findProductById(
-          orderedProduct.product.id,
+          orderedProduct.productId,
         );
         return product.price * orderedProduct.amount;
       }),
