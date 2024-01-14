@@ -18,10 +18,12 @@ export class OrderService implements IOrderService {
     private orderRepository: Repository<OrderEntity>,
     private readonly productService: ProductService,
   ) {}
+
   async findAllOrders(): Promise<Order[]> {
     const orders = await this.orderRepository.find();
     return orders;
   }
+
   async findOrderById(id: string): Promise<Order> {
     const order = await this.orderRepository.findOne({
       where: { id: id },
