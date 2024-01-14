@@ -16,7 +16,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: 'http://localhost:4200', // Permite solo este origen
+    origin: ['http://localhost:4200', 'https://tormes-frontend.netlify.app'],
   });
 
   const config = new DocumentBuilder()
@@ -30,6 +30,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(basePath + '/swagger', app, document);
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
