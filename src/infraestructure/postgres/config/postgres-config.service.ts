@@ -8,6 +8,8 @@ export class PostgreConfigService implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions | Promise<TypeOrmModuleOptions> {
+    const isProduction = process.env.NODE_ENV === 'production';
+
     return {
       type: 'postgres',
       host: this.configService.get('POSTGRES_HOST'),
@@ -20,6 +22,11 @@ export class PostgreConfigService implements TypeOrmOptionsFactory {
       logging: true,
       autoLoadEntities: true,
       namingStrategy: new SnakeNamingStrategy(),
+      ssl: isProduction
+        ? {
+            rejectUnauthorized: false,
+          }
+        : false,
     };
   }
 }
