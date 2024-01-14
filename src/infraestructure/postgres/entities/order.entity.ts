@@ -7,8 +7,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UserEntity } from './user.entity';
 
 @Entity({ name: 'orders' })
 export class OrderEntity {
@@ -27,8 +29,8 @@ export class OrderEntity {
   @Column({ nullable: true })
   trackingNumber?: string;
 
-  @Column({ nullable: false })
-  customer: User['id'];
+  @ManyToOne(() => UserEntity)
+  customer: User;
   @Column({ nullable: true })
   customerName?: string;
   @Column({ nullable: true })
@@ -40,6 +42,6 @@ export class OrderEntity {
   @Column({ nullable: true })
   paymentMethod?: string;
 
-  @Column({ nullable: false })
+  @Column('json', { nullable: true })
   orderedProducts: OrderedProduct[];
 }
