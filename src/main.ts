@@ -16,10 +16,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: [
-      'http://localhost:4200',
-      'https://tormes-frontend-c9e2b3d2e8ef.herokuapp.com',
-    ],
+    origin: ['http://localhost:4200', 'https://tormes-frontend.netlify.app/'],
   });
 
   const config = new DocumentBuilder()
