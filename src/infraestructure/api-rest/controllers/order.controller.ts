@@ -24,9 +24,14 @@ import {
   Post,
   Patch,
   Delete,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OrderService } from '../../../core/domain/services/order.service';
-import { Order, OrderStatus } from '../../../core/domain/models/order.model';
+import {
+  OrderStatus,
+  SeralizedOrder,
+} from '../../../core/domain/models/order.model';
 import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
 import { Request } from 'express';
 import { CreateOrderDto } from '../dtos/order.dto';
@@ -56,8 +61,9 @@ export class OrderController {
     description: 'Endpoint to get a list of all orders',
   })
   @Get('/list')
-  async findAllOrders(): Promise<Order[]> {
-    return await this.orderService.findAllOrders();
+  async findAllOrders(): Promise<SeralizedOrder[]> {
+    const orders = await this.orderService.findAllOrders();
+    return orders.map((order) => new SeralizedOrder(order));
   }
 
   @ApiOperation({
@@ -65,11 +71,16 @@ export class OrderController {
     description: 'Endpoint to get an order by ID',
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the order' })
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('/:id')
   async findOrderById(
     @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<Order> {
-    return await this.orderService.findOrderById(id);
+  ): Promise<SeralizedOrder> {
+    const order = await this.orderService.findOrderById(id);
+    if (order) {
+      const seralizedOrder = new SeralizedOrder(order);
+      return seralizedOrder;
+    }
   }
 
   @ApiOperation({
@@ -78,10 +89,12 @@ export class OrderController {
       'Endpoint to get a list of all orders for the currently authenticated user',
   })
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async findAllOrdersByUser(@Req() req: Request): Promise<Order[]> {
+  async findAllOrdersByUser(@Req() req: Request): Promise<SeralizedOrder[]> {
     const user = req.user;
-    return await this.orderService.findAllOrdersByUser(user['id']);
+    const orders = await this.orderService.findAllOrdersByUser(user['id']);
+    return orders.map((order) => new SeralizedOrder(order));
   }
 
   @ApiOperation({
@@ -92,9 +105,21 @@ export class OrderController {
     description: 'Order created successfully',
   })
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
-    return this.orderService.createOrder(createOrderDto);
+  async createOrder(
+    @Req() req: Request,
+    @Body() createOrderDto: CreateOrderDto,
+  ): Promise<SeralizedOrder> {
+    const user = req.user;
+    const order = await this.orderService.createOrder(
+      user['id'],
+      createOrderDto,
+    );
+    if (order) {
+      const seralizedOrder = new SeralizedOrder(order);
+      return seralizedOrder;
+    }
   }
 
   @ApiOperation({
@@ -104,12 +129,17 @@ export class OrderController {
   @ApiParam({ name: 'id', type: String, description: 'The ID of the order' })
   @UserTypes(UserType.manager, UserType.employee)
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Patch('/:id')
   async updateOrderStatus(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() status: OrderStatus,
-  ): Promise<Order> {
-    return this.orderService.updateOrderStatus(id, status);
+  ): Promise<SeralizedOrder> {
+    const order = await this.orderService.updateOrderStatus(id, status);
+    if (order) {
+      const seralizedOrder = new SeralizedOrder(order);
+      return seralizedOrder;
+    }
   }
 
   @ApiOperation({
