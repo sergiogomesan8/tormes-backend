@@ -1,6 +1,30 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { OrderedProduct } from '../../../core/domain/models/order.model';
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class OrderedProductDto {
+  @ApiProperty({
+    description: 'Product ID',
+    example: '1',
+  })
+  @IsString()
+  @IsNotEmpty()
+  productId: string;
+
+  @ApiProperty({
+    description: 'Amount of products',
+    example: 2,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
+}
 
 export class CreateOrderDto {
   @ApiProperty({
@@ -15,6 +39,8 @@ export class CreateOrderDto {
     description: 'Customer phone number',
     example: '1234567890',
   })
+  @IsNumber()
+  @IsNotEmpty()
   customerContact: number;
 
   @ApiProperty({
@@ -23,7 +49,7 @@ export class CreateOrderDto {
   })
   @IsString()
   @IsNotEmpty()
-  deliveryAddres: string;
+  deliveryAddress: string;
 
   @ApiProperty({
     description: 'Billing Address',
@@ -37,7 +63,20 @@ export class CreateOrderDto {
     description: 'Payment Method',
     example: 'Credit Card',
   })
+  @IsNotEmpty()
+  @IsString()
   paymentMethod: string;
 
+  @ApiProperty({
+    description: 'Ordered Products',
+    example: [
+      { productId: 'productId1', amount: 2 },
+      { productId: 'productId2', amount: 3 },
+    ],
+    type: [OrderedProductDto],
+  })
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => OrderedProductDto)
   orderedProducts: OrderedProduct[];
 }
