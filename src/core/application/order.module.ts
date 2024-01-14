@@ -4,9 +4,10 @@ import { OrderController } from '../../infraestructure/api-rest/controllers/orde
 import { OrderEntity } from '../../infraestructure/postgres/entities/order.entity';
 import { OrderService } from '../domain/services/order.service';
 import { ProductModule } from './product.module';
+import { UserModule } from './user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderEntity]), ProductModule],
+  imports: [TypeOrmModule.forFeature([OrderEntity]), ProductModule, UserModule],
   controllers: [OrderController],
   providers: [OrderService],
 })
