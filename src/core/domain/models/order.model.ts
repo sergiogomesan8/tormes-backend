@@ -9,13 +9,14 @@ export interface Order {
 
   date: number;
   total: number;
-  deliveryAddres?: string;
-  paymentMethod?: string;
   trackingNumber?: string;
 
   customer: User['id'];
   customerName?: string;
-  customerContact?: string;
+  customerContact?: number;
+  deliveryAddres?: string;
+  billingAddress?: string;
+  paymentMethod?: string;
 
   orderedProducts: OrderedProduct[];
 }

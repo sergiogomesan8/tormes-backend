@@ -25,10 +25,6 @@ export class OrderEntity {
   @Column({ nullable: false })
   total: number;
   @Column({ nullable: true })
-  deliveryAddress?: string;
-  @Column({ nullable: true })
-  paymentMethod?: string;
-  @Column({ nullable: true })
   trackingNumber?: string;
 
   @Column({ nullable: false })
@@ -36,7 +32,13 @@ export class OrderEntity {
   @Column({ nullable: true })
   customerName?: string;
   @Column({ nullable: true })
-  customerContact?: string;
+  customerContact?: number;
+  @Column({ nullable: true })
+  deliveryAddress?: string;
+  @Column({ nullable: true })
+  billingAddress?: string;
+  @Column({ nullable: true })
+  paymentMethod?: string;
 
   @Column({ nullable: false })
   orderedProducts: OrderedProduct[];
