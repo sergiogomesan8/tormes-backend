@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Tokens } from '../../../models/auth.model';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from '../jwt-playload.interface';
-import { IRefreshJwtService } from 'src/core/domain/ports/inbound/refresh-jwt.service.interface';
+import { IRefreshJwtService } from '../../../../../core/domain/ports/inbound/refresh-jwt.service.interface';
 
 @Injectable()
 export class RefreshJwtService implements IRefreshJwtService {

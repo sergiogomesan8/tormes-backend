@@ -25,14 +25,14 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
-import { OrderService } from 'src/core/domain/services/order.service';
-import { Order, OrderStatus } from 'src/core/domain/models/order.model';
-import { JwtAuthGuard } from 'src/core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
+import { OrderService } from '../../../core/domain/services/order.service';
+import { Order, OrderStatus } from '../../../core/domain/models/order.model';
+import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
 import { Request } from 'express';
 import { CreateOrderDto } from '../dtos/order.dto';
-import { RolesGuard } from 'src/core/domain/services/roles-authorization/roles.guard';
-import { UserType } from 'src/core/domain/models/user.model';
-import { UserTypes } from 'src/core/domain/services/roles-authorization/roles.decorator';
+import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
+import { UserType } from '../../../core/domain/models/user.model';
+import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
 
 @ApiTags('order')
 @ApiBearerAuth()
