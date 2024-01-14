@@ -35,8 +35,11 @@ export class OrderService implements IOrderService {
     return order;
   }
 
-  findAllOrdersByUser(userId: string): Promise<Order[]> {
-    const orders = this.orderRepository.find({ where: { customer: userId } });
+  async findAllOrdersByUser(userId: string): Promise<Order[]> {
+    const orders = await this.orderRepository
+      .createQueryBuilder('order')
+      .where('order.customerId = :userId', { userId })
+      .getMany();
     return orders;
   }
 
