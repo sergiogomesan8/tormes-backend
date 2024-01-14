@@ -16,7 +16,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: ['http://localhost:4200', 'https://tormes-frontend.netlify.app/'],
+    origin: ['http://localhost:4200', 'https://tormes-frontend.netlify.app'],
   });
 
   const config = new DocumentBuilder()
