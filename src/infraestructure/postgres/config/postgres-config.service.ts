@@ -10,7 +10,7 @@ export class PostgreConfigService implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions | Promise<TypeOrmModuleOptions> {
     const isProduction = process.env.NODE_ENV === 'production';
 
-    return {
+    let options: Partial<TypeOrmModuleOptions> = {
       type: 'postgres',
       host: this.configService.get('POSTGRES_HOST'),
       port: this.configService.get('POSTGRES_PORT'),
@@ -28,5 +28,14 @@ export class PostgreConfigService implements TypeOrmOptionsFactory {
           }
         : false,
     };
+
+    if (isProduction) {
+      options = {
+        ...options,
+        url: this.configService.get('DATABASE_URL'),
+      };
+    }
+
+    return options as TypeOrmModuleOptions;
   }
 }
