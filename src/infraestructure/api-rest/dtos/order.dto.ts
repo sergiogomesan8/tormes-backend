@@ -11,7 +11,7 @@ import { Type } from 'class-transformer';
 export class OrderedProductDto {
   @ApiProperty({
     description: 'Product ID',
-    example: '1',
+    example: 'productId',
   })
   @IsString()
   @IsNotEmpty()
@@ -24,6 +24,11 @@ export class OrderedProductDto {
   @IsNumber()
   @IsNotEmpty()
   amount: number;
+
+  constructor(productId: string, amount: number) {
+    this.productId = productId;
+    this.amount = amount;
+  }
 }
 
 export class CreateOrderDto {
@@ -79,4 +84,20 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => OrderedProductDto)
   orderedProducts: OrderedProduct[];
+
+  constructor(
+    customerName: string,
+    customerContact: number,
+    deliveryAddress: string,
+    billingAddress: string,
+    paymentMethod: string,
+    orderedProducts: OrderedProduct[],
+  ) {
+    this.customerName = customerName;
+    this.customerContact = customerContact;
+    this.deliveryAddress = deliveryAddress;
+    this.billingAddress = billingAddress;
+    this.paymentMethod = paymentMethod;
+    this.orderedProducts = orderedProducts;
+  }
 }
