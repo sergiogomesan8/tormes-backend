@@ -71,7 +71,6 @@ export class ProductController {
     description: 'Endpoint to get a product by ID',
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
-  @UseGuards(JwtAuthGuard)
   @Get('/:id')
   async findProductById(
     @Param('id', new ParseUUIDPipe()) id: string,

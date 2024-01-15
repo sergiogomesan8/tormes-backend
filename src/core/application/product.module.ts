@@ -8,5 +8,6 @@ import { ProductEntity } from '../../infraestructure/postgres/entities/product.e
   imports: [TypeOrmModule.forFeature([ProductEntity])],
   controllers: [ProductController],
   providers: [ProductService],
+  exports: [ProductService],
 })
 export class ProductModule {}
