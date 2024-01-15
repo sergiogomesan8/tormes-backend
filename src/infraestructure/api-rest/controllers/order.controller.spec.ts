@@ -135,6 +135,41 @@ describe('OrderController', () => {
     });
   });
 
+  describe('findAllOrdersByUser', () => {
+    it('should return an array of orders for a specific user', async () => {
+      const req: Partial<Request> = { user: { id: 'userId', email: email } };
+      jest
+        .spyOn(orderService, 'findAllOrdersByUser')
+        .mockResolvedValue([order]);
+
+      expect(await orderController.findAllOrdersByUser(req as Request)).toEqual(
+        [expectedResponse],
+      );
+      expect(orderService.findAllOrdersByUser).toHaveBeenCalledWith('userId');
+    });
+
+    it('should return an empty array if the user has no orders', async () => {
+      const req: Partial<Request> = { user: { id: 'userId', email: email } };
+      jest.spyOn(orderService, 'findAllOrdersByUser').mockResolvedValue([]);
+
+      expect(await orderController.findAllOrdersByUser(req as Request)).toEqual(
+        [],
+      );
+      expect(orderService.findAllOrdersByUser).toHaveBeenCalledWith('userId');
+    });
+
+    it('should return an Http Exception error when it happens', () => {
+      const req: Partial<Request> = { user: { id: 'userId', email: email } };
+      jest
+        .spyOn(orderService, 'findAllOrdersByUser')
+        .mockRejectedValue(new InternalServerErrorException());
+
+      return expect(
+        orderController.findAllOrdersByUser(req as Request),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+  });
+
   describe('createOrder', () => {
     it('should create an order', async () => {
       const req: Partial<Request> = { user: { id: 'userId', email: email } };
