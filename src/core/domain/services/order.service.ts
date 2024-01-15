@@ -64,6 +64,8 @@ export class OrderService implements IOrderService {
     } catch (error) {
       if (error instanceof QueryFailedError) {
         throw new ConflictException(error.message);
+      } else {
+        throw error;
       }
     }
   }
