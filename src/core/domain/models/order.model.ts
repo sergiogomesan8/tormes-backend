@@ -15,7 +15,7 @@ export interface Order {
   customer: User;
   customerName?: string;
   customerContact?: number;
-  deliveryAddres?: string;
+  deliveryAddress?: string;
   billingAddress?: string;
   paymentMethod?: string;
 
