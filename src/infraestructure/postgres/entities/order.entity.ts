@@ -12,6 +12,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { randomBytes } from 'crypto';
 
 @Entity({ name: 'orders' })
 export class OrderEntity {
@@ -22,7 +23,8 @@ export class OrderEntity {
   orderId: string;
   @BeforeInsert()
   generateOrderId() {
-    this.orderId = 'P' + Math.floor(100000000 + Math.random() * 900000000);
+    const randomNum = parseInt(randomBytes(4).toString('hex'), 16);
+    this.orderId = 'P' + randomNum.toString().padStart(9, '0').substring(0, 9);
   }
 
   @Column({ nullable: false })
