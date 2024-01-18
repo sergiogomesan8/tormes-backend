@@ -1,4 +1,9 @@
-import { CreateOrderDto, OrderedProductDto } from './order.dto';
+import { OrderStatus } from '../../../core/domain/models/order.model';
+import {
+  CreateOrderDto,
+  OrderedProductDto,
+  UpdateOrderStatusDto,
+} from './order.dto';
 
 describe('CreateOrderDto', () => {
   it('should create a CreateOrderDto object', () => {
@@ -41,5 +46,16 @@ describe('OrderedProductDto', () => {
     expect(orderedProductDto).toBeDefined();
     expect(orderedProductDto.productId).toBe(productId);
     expect(orderedProductDto.amount).toBe(amount);
+  });
+});
+
+describe('UpdateOrderStatusDto', () => {
+  it('should create a UpdateOrderStatusDto object', () => {
+    const status = OrderStatus.processing;
+
+    const updateOrderStatusDto = new UpdateOrderStatusDto(status);
+
+    expect(updateOrderStatusDto).toBeDefined();
+    expect(updateOrderStatusDto.status).toBe(status);
   });
 });
