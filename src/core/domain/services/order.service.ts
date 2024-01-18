@@ -8,7 +8,10 @@ import {
 import { OrderEntity } from '../../../infraestructure/postgres/entities/order.entity';
 import { QueryFailedError, Repository } from 'typeorm';
 import { Order, OrderStatus, OrderedProduct } from '../models/order.model';
-import { CreateOrderDto } from '../../../infraestructure/api-rest/dtos/order.dto';
+import {
+  CreateOrderDto,
+  UpdateOrderStatusDto,
+} from '../../../infraestructure/api-rest/dtos/order.dto';
 import { ProductService } from './product.service';
 import { UserService } from './user.service';
 
@@ -39,12 +42,12 @@ export class OrderService implements IOrderService {
 
   async findAllOrdersByUser(userId: string): Promise<Order[]> {
     const orders = await this.orderRepository
-      .createQueryBuilder('order')
-      .where('order.customerId = :userId', { userId })
+      .createQueryBuilder('orders')
+      .innerJoin('orders.customer', 'customer')
+      .where('customer.id = :userId', { userId })
       .getMany();
     return orders;
   }
-
   async createOrder(
     userId: string,
     createOrderDto: CreateOrderDto,
@@ -70,9 +73,12 @@ export class OrderService implements IOrderService {
     }
   }
 
-  async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
+  async updateOrderStatus(
+    id: string,
+    updateOrderStatusDto: UpdateOrderStatusDto,
+  ): Promise<Order> {
     const updateResult = await this.orderRepository.update(id, {
-      status: status,
+      status: updateOrderStatusDto.status,
     });
     if (updateResult.affected === 0) {
       throw new NotFoundException('Order not found');

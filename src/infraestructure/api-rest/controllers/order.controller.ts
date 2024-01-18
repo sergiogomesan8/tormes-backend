@@ -28,13 +28,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { OrderService } from '../../../core/domain/services/order.service';
-import {
-  OrderStatus,
-  SeralizedOrder,
-} from '../../../core/domain/models/order.model';
+import { SeralizedOrder } from '../../../core/domain/models/order.model';
 import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
 import { Request } from 'express';
-import { CreateOrderDto } from '../dtos/order.dto';
+import { CreateOrderDto, UpdateOrderStatusDto } from '../dtos/order.dto';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { UserType } from '../../../core/domain/models/user.model';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
@@ -133,9 +130,12 @@ export class OrderController {
   @Patch('/:id')
   async updateOrderStatus(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() status: OrderStatus,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto,
   ): Promise<SeralizedOrder> {
-    const order = await this.orderService.updateOrderStatus(id, status);
+    const order = await this.orderService.updateOrderStatus(
+      id,
+      updateOrderStatusDto,
+    );
     if (order) {
       const seralizedOrder = new SeralizedOrder(order);
       return seralizedOrder;
