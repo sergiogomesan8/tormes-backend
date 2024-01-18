@@ -110,4 +110,8 @@ export class UpdateOrderStatusDto {
   @IsEnum(OrderStatus)
   @IsNotEmpty()
   status: OrderStatus;
+
+  constructor(status: OrderStatus) {
+    this.status = status;
+  }
 }
