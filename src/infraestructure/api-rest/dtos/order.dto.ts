@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { OrderedProduct } from '../../../core/domain/models/order.model';
 import {
+  OrderStatus,
+  OrderedProduct,
+} from '../../../core/domain/models/order.model';
+import {
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -100,4 +104,10 @@ export class CreateOrderDto {
     this.paymentMethod = paymentMethod;
     this.orderedProducts = orderedProducts;
   }
+}
+
+export class UpdateOrderStatusDto {
+  @IsEnum(OrderStatus)
+  @IsNotEmpty()
+  status: OrderStatus;
 }
