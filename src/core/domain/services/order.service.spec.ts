@@ -5,7 +5,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.model';
 import { OrderStatus } from '../models/order.model';
-import { CreateOrderDto } from '../../../infraestructure/api-rest/dtos/order.dto';
+import {
+  CreateOrderDto,
+  UpdateOrderStatusDto,
+} from '../../../infraestructure/api-rest/dtos/order.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { UserService } from './user.service';
@@ -101,6 +104,8 @@ describe('OrderService', () => {
     orderedProducts,
   );
 
+  const updateOrderStatusDto = new UpdateOrderStatusDto(OrderStatus.delivered);
+
   describe('findAllOrders', () => {
     it('should return all orders', async () => {
       jest.spyOn(orderRepository, 'find').mockResolvedValue([order]);
@@ -174,6 +179,7 @@ describe('OrderService', () => {
       const userId = 'userId';
       const ordersForUser = [order];
       jest.spyOn(orderRepository, 'createQueryBuilder').mockReturnValue({
+        innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue(ordersForUser),
       } as any);
@@ -185,6 +191,7 @@ describe('OrderService', () => {
     it('should return an empty array if no orders are found for the user', async () => {
       const userId = 'userId';
       jest.spyOn(orderRepository, 'createQueryBuilder').mockReturnValue({
+        innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([]),
       } as any);
@@ -196,6 +203,7 @@ describe('OrderService', () => {
     it('should throw an error if the database query fails', async () => {
       const userId = 'userId';
       jest.spyOn(orderRepository, 'createQueryBuilder').mockReturnValue({
+        innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockRejectedValue(new Error('Database error')),
       } as any);
@@ -277,7 +285,10 @@ describe('OrderService', () => {
         .mockResolvedValue({ affected: 1 } as any);
       jest.spyOn(orderRepository, 'findOne').mockResolvedValue(order);
 
-      const updatedOrder = await orderService.updateOrderStatus(id, status);
+      const updatedOrder = await orderService.updateOrderStatus(
+        id,
+        updateOrderStatusDto,
+      );
 
       expect(updatedOrder).toEqual(order);
       expect(orderRepository.update).toHaveBeenCalledWith(id, { status });
@@ -292,9 +303,9 @@ describe('OrderService', () => {
         .spyOn(orderRepository, 'update')
         .mockResolvedValue({ affected: 0 } as any);
 
-      await expect(orderService.updateOrderStatus(id, status)).rejects.toThrow(
-        new NotFoundException('Order not found'),
-      );
+      await expect(
+        orderService.updateOrderStatus(id, updateOrderStatusDto),
+      ).rejects.toThrow(new NotFoundException('Order not found'));
       expect(orderRepository.update).toHaveBeenCalledWith(id, { status });
     });
 
@@ -307,7 +318,9 @@ describe('OrderService', () => {
         .mockResolvedValue({ affected: 1 } as any);
       jest.spyOn(orderRepository, 'findOne').mockResolvedValue(undefined);
 
-      await expect(orderService.updateOrderStatus(id, status)).rejects.toThrow(
+      await expect(
+        orderService.updateOrderStatus(id, updateOrderStatusDto),
+      ).rejects.toThrow(
         new NotFoundException('Error retrieving updated product'),
       );
       expect(orderRepository.update).toHaveBeenCalledWith(id, { status });

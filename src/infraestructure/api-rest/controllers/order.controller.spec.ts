@@ -6,7 +6,7 @@ import {
   OrderStatus,
   SeralizedOrder,
 } from '../../../core/domain/models/order.model';
-import { CreateOrderDto } from '../dtos/order.dto';
+import { CreateOrderDto, UpdateOrderStatusDto } from '../dtos/order.dto';
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -78,6 +78,8 @@ describe('OrderController', () => {
     paymentMethod,
     orderedProducts,
   );
+
+  const updateOrderStatusDto = new UpdateOrderStatusDto(OrderStatus.delivered);
 
   describe('findAllOrders', () => {
     it('should return an array of orders', async () => {
@@ -204,12 +206,12 @@ describe('OrderController', () => {
       expect(
         await orderController.updateOrderStatus(
           expect.any(String),
-          OrderStatus.delivered,
+          updateOrderStatusDto,
         ),
       ).toEqual(expectedResponse);
       expect(orderService.updateOrderStatus).toHaveBeenCalledWith(
         expect.any(String),
-        OrderStatus.delivered,
+        { status: OrderStatus.delivered },
       );
     });
 
@@ -220,10 +222,9 @@ describe('OrderController', () => {
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(
-        orderController.updateOrderStatus(
-          expect.any(String),
-          OrderStatus.delivered,
-        ),
+        orderController.updateOrderStatus(expect.any(String), {
+          status: OrderStatus.delivered,
+        }),
       ).rejects.toThrow(InternalServerErrorException);
     });
   });
