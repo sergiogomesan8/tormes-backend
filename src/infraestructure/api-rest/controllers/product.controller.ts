@@ -39,6 +39,7 @@ import * as fs from 'fs';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { UserType } from '../../../core/domain/models/user.model';
+import { CloudinaryService } from '../../../infraestructure/postgres/adapters/cloudinary-config/cloudinary.service';
 
 @ApiTags('product')
 @ApiBearerAuth()
@@ -55,7 +56,10 @@ import { UserType } from '../../../core/domain/models/user.model';
 @UseFilters(new HttpExceptionFilter())
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @ApiOperation({
     summary: 'Retrieve all products',
@@ -100,9 +104,14 @@ export class ProductController {
     @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File,
     @Body() createProductDto: CreateProductDto,
   ): Promise<Product> {
+    const image =
+      process.env.NODE_ENV === 'production'
+        ? (await this.cloudinaryService.uploadImage(file)).url
+        : file.filename;
+
     return this.productService.createProduct({
       ...createProductDto,
-      image: file.filename,
+      image,
     });
   }
 
@@ -130,17 +139,26 @@ export class ProductController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    if (file && file.filename !== '') {
+    if (file) {
+      let image;
       const existingProduct = await this.productService.findProductById(id);
-      const existingImage = existingProduct.image;
-      const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+
+      if (process.env.NODE_ENV === 'production') {
+        await this.cloudinaryService.deleteImage(existingProduct.image);
+        const uploadResponse = await this.cloudinaryService.uploadImage(file);
+        image = uploadResponse.url;
+      } else {
+        const existingImage = existingProduct.image;
+        const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+        image = file.filename;
       }
 
       return await this.productService.updateProduct(id, {
         ...updateProductDto,
-        image: file.filename,
+        image,
       });
     } else {
       return await this.productService.updateProduct(id, updateProductDto);
@@ -159,9 +177,13 @@ export class ProductController {
     const existingProduct = await this.productService.findProductById(id);
     const existingImage = existingProduct.image;
     if (existingImage) {
-      const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      if (process.env.NODE_ENV === 'production') {
+        await this.cloudinaryService.deleteImage(existingProduct.image);
+      } else {
+        const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
       }
     }
     return await this.productService.deleteProduct(id);
