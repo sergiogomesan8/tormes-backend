@@ -24,4 +24,5 @@ export default {
     '/docker-data/',
     '/coverage/',
   ],
+  setupFiles: ['reflect-metadata'],
 };

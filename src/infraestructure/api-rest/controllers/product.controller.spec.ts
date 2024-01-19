@@ -6,10 +6,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { CloudinaryService } from '../../../infraestructure/postgres/adapters/cloudinary-config/cloudinary.service';
+import { UploadApiResponse } from 'cloudinary';
 
 describe('ProductController', () => {
   let productController: ProductController;
   let productService: ProductService;
+  let cloudinaryService: CloudinaryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,11 +28,19 @@ describe('ProductController', () => {
             deleteProduct: jest.fn(),
           },
         },
+        {
+          provide: CloudinaryService,
+          useValue: {
+            uploadImage: jest.fn(),
+            deleteImage: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     productController = module.get<ProductController>(ProductController);
     productService = module.get<ProductService>(ProductService);
+    cloudinaryService = module.get<CloudinaryService>(CloudinaryService);
   });
 
   const name = 'Product name';
@@ -122,6 +133,8 @@ describe('ProductController', () => {
 
   describe('createProduct', () => {
     it('should create a product and should save the file in the correct location', async () => {
+      process.env.NODE_ENV = 'development';
+
       jest.spyOn(productService, 'createProduct').mockResolvedValue(product);
 
       expect(
@@ -133,9 +146,40 @@ describe('ProductController', () => {
       });
     });
 
-    it('should return an Http Exception error when it happens', () => {
+    it('should create a product with image on cloudinary service', async () => {
+      process.env.NODE_ENV = 'production';
+
+      jest
+        .spyOn(cloudinaryService, 'uploadImage')
+        .mockResolvedValue({ url: 'test.jpg' } as UploadApiResponse);
+      jest.spyOn(productService, 'createProduct').mockResolvedValue(product);
+
+      expect(
+        await productController.createProduct(imageMock, createProductDto),
+      ).toBe(product);
+      expect(productService.createProduct).toHaveBeenCalledWith({
+        ...createProductDto,
+        image: 'test.jpg',
+      });
+    });
+
+    it('should return an Http Exception error when it happens in development', () => {
+      process.env.NODE_ENV = 'development';
+
       jest
         .spyOn(productService, 'createProduct')
+        .mockRejectedValue(new InternalServerErrorException());
+
+      return expect(
+        productController.createProduct(imageMock, createProductDto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should return an Http Exception error when it happens in production', () => {
+      process.env.NODE_ENV = 'production';
+
+      jest
+        .spyOn(cloudinaryService, 'uploadImage')
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(
@@ -146,6 +190,8 @@ describe('ProductController', () => {
 
   describe('updateProduct', () => {
     it('should update a product', async () => {
+      process.env.NODE_ENV = 'development';
+
       jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
       jest.spyOn(productService, 'updateProduct').mockResolvedValue(product);
 
@@ -161,6 +207,33 @@ describe('ProductController', () => {
         {
           ...updateProductDto,
           image: imageMock.filename,
+        },
+      );
+    });
+
+    it('should update a product in production and image on cloudinary service', async () => {
+      process.env.NODE_ENV = 'production';
+
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
+
+      jest.spyOn(cloudinaryService, 'deleteImage').mockResolvedValue();
+      jest
+        .spyOn(cloudinaryService, 'uploadImage')
+        .mockResolvedValue({ url: 'test.jpg' } as UploadApiResponse);
+      jest.spyOn(productService, 'updateProduct').mockResolvedValue(product);
+
+      expect(
+        await productController.updateProduct(
+          imageMock,
+          expect.any(String),
+          updateProductDto,
+        ),
+      ).toBe(product);
+      expect(productService.updateProduct).toHaveBeenCalledWith(
+        expect.any(String),
+        {
+          ...updateProductDto,
+          image: 'test.jpg',
         },
       );
     });
@@ -184,7 +257,9 @@ describe('ProductController', () => {
       );
     });
 
-    it('should return an Http Exception error when it happens', () => {
+    it('should return an Http Exception error when it happens in development', () => {
+      process.env.NODE_ENV = 'development';
+
       jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
       jest
         .spyOn(productService, 'updateProduct')
@@ -198,10 +273,25 @@ describe('ProductController', () => {
         ),
       ).rejects.toThrow(InternalServerErrorException);
     });
+
+    it('should return an Http Exception error when it happens in production', () => {
+      process.env.NODE_ENV = 'production';
+
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
+      jest
+        .spyOn(cloudinaryService, 'uploadImage')
+        .mockRejectedValue(new InternalServerErrorException());
+
+      return expect(
+        productController.createProduct(imageMock, createProductDto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
   });
 
   describe('deleteProduct', () => {
     it('should delete a product', async () => {
+      process.env.NODE_ENV = 'development';
+
       jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
       jest.spyOn(productService, 'deleteProduct').mockResolvedValue({
         message: `Product with id ${expect.any(String)} was deleted.`,
@@ -217,10 +307,45 @@ describe('ProductController', () => {
       );
     });
 
-    it('should return an Http Exception error when it happens', () => {
+    it('should delete a product and image on cloudinary service', async () => {
+      process.env.NODE_ENV = 'production';
+
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
+      jest.spyOn(cloudinaryService, 'deleteImage').mockResolvedValue();
+
+      jest.spyOn(productService, 'deleteProduct').mockResolvedValue({
+        message: `Product with id ${expect.any(String)} was deleted.`,
+      });
+
+      expect(await productController.deleteProduct(expect.any(String))).toEqual(
+        {
+          message: `Product with id ${expect.any(String)} was deleted.`,
+        },
+      );
+      expect(productService.deleteProduct).toHaveBeenCalledWith(
+        expect.any(String),
+      );
+    });
+
+    it('should return an Http Exception error when it happens in development', () => {
+      process.env.NODE_ENV = 'development';
+
       jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
       jest
         .spyOn(productService, 'deleteProduct')
+        .mockRejectedValue(new InternalServerErrorException());
+
+      return expect(
+        productController.deleteProduct(expect.any(String)),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should return an Http Exception error when it happens in production', () => {
+      process.env.NODE_ENV = 'production';
+
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
+      jest
+        .spyOn(cloudinaryService, 'deleteImage')
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(
