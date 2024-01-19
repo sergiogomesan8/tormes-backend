@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CloudinaryService } from '../../../infraestructure/postgres/adapters/cloudinary-config/cloudinary.service';
+import { CloudinaryService } from '../../cloudinary-config/cloudinary.service';
 import { UploadApiResponse } from 'cloudinary';
 
 describe('ProductController', () => {

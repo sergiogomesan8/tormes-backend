@@ -39,7 +39,7 @@ import * as fs from 'fs';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { UserType } from '../../../core/domain/models/user.model';
-import { CloudinaryService } from '../../../infraestructure/postgres/adapters/cloudinary-config/cloudinary.service';
+import { CloudinaryService } from '../../cloudinary-config/cloudinary.service';
 
 @ApiTags('product')
 @ApiBearerAuth()
