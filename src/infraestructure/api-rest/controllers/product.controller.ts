@@ -106,7 +106,7 @@ export class ProductController {
   ): Promise<Product> {
     const image =
       process.env.NODE_ENV === 'production'
-        ? (await this.cloudinaryService.uploadImage(file)).url
+        ? ((await this.cloudinaryService.uploadImage(file)).url as string)
         : file.filename;
 
     return this.productService.createProduct({
@@ -146,7 +146,7 @@ export class ProductController {
       if (process.env.NODE_ENV === 'production') {
         await this.cloudinaryService.deleteImage(existingProduct.image);
         const uploadResponse = await this.cloudinaryService.uploadImage(file);
-        image = uploadResponse.url;
+        image = uploadResponse.url as string;
       } else {
         const existingImage = existingProduct.image;
         const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
