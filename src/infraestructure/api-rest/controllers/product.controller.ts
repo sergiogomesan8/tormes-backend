@@ -39,7 +39,7 @@ import * as fs from 'fs';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { UserType } from '../../../core/domain/models/user.model';
-import { CloudinaryService } from 'src/infraestructure/postgres/adapters/cloudinary-config/cloudinary.service';
+import { CloudinaryService } from '../../../infraestructure/postgres/adapters/cloudinary-config/cloudinary.service';
 
 @ApiTags('product')
 @ApiBearerAuth()
@@ -177,9 +177,13 @@ export class ProductController {
     const existingProduct = await this.productService.findProductById(id);
     const existingImage = existingProduct.image;
     if (existingImage) {
-      const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      if (process.env.NODE_ENV === 'production') {
+        await this.cloudinaryService.deleteImage(existingProduct.image);
+      } else {
+        const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
       }
     }
     return await this.productService.deleteProduct(id);
