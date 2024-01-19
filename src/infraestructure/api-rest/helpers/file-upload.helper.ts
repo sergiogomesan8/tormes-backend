@@ -8,6 +8,9 @@ import { extname } from 'path';
 import { randomBytes } from 'crypto';
 
 export function getStorageConfig(destination: string) {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
   return {
     storage: diskStorage({
       destination: destination,
