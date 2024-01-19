@@ -104,10 +104,15 @@ export class ProductController {
     @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File,
     @Body() createProductDto: CreateProductDto,
   ): Promise<Product> {
-    const image =
-      process.env.NODE_ENV === 'production'
-        ? ((await this.cloudinaryService.uploadImage(file)).url as string)
-        : file.filename;
+    let image;
+    if (file) {
+      image =
+        process.env.NODE_ENV === 'production'
+          ? ((await this.cloudinaryService.uploadImage(file)).url as string)
+          : file.filename;
+    } else {
+      throw new Error('No file provided');
+    }
 
     return this.productService.createProduct({
       ...createProductDto,
