@@ -7,7 +7,12 @@ import {
 } from '@nestjs/common';
 import { OrderEntity } from '../../../infraestructure/postgres/entities/order.entity';
 import { QueryFailedError, Repository } from 'typeorm';
-import { Order, OrderStatus, OrderedProduct } from '../models/order.model';
+import {
+  Order,
+  OrderStatus,
+  OrderedProduct,
+  ShoppingOrderedProduct,
+} from '../models/order.model';
 import {
   CreateOrderDto,
   UpdateOrderStatusDto,
@@ -59,7 +64,14 @@ export class OrderService implements IOrderService {
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
 
-      const order = this.orderRepository.create(createOrderDto);
+      const orderedProducts: OrderedProduct[] = await this.findOrderedProducts(
+        createOrderDto.orderedProducts,
+      );
+      const order = this.orderRepository.create({
+        ...createOrderDto,
+        orderedProducts: orderedProducts,
+      });
+
       order.customer = user;
       order.total = await this.calculateOrderTotal(order.orderedProducts);
       order.status = OrderStatus.processing;
@@ -107,16 +119,29 @@ export class OrderService implements IOrderService {
     orderedProducts: OrderedProduct[],
   ): Promise<number> {
     let total = 0;
-    const products = await Promise.all(
+
+    total = orderedProducts.reduce((accumulator, orderedProduct) => {
+      return accumulator + orderedProduct.product.price * orderedProduct.amount;
+    }, 0);
+
+    return total;
+  }
+
+  private async findOrderedProducts(
+    orderedProducts: ShoppingOrderedProduct[],
+  ): Promise<OrderedProduct[]> {
+    const products: OrderedProduct[] = await Promise.all(
       orderedProducts.map(async (orderedProduct) => {
         const product = await this.productService.findProductById(
           orderedProduct.productId,
         );
-        return product.price * orderedProduct.amount;
+        return {
+          product: product,
+          amount: orderedProduct.amount,
+        };
       }),
     );
 
-    total = products.reduce((a, b) => a + b, 0);
-    return total;
+    return products;
   }
 }
