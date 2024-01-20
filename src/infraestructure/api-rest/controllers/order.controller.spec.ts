@@ -14,6 +14,7 @@ import {
 import { Request } from 'express';
 import { SerializedUser, User } from '../../../core/domain/models/user.model';
 import { plainToClass } from 'class-transformer';
+import { Product } from 'src/core/domain/models/product.model';
 
 describe('OrderController', () => {
   let orderController: OrderController;
@@ -41,6 +42,24 @@ describe('OrderController', () => {
     orderService = module.get<OrderService>(OrderService);
   });
 
+  const product1: Product = {
+    id: expect.any(String),
+    name: 'Product 1',
+    price: 100,
+    description: 'Product 1 description',
+    image: 'filename',
+    section: 'section1',
+  };
+
+  const product2: Product = {
+    id: expect.any(String),
+    name: 'Product 2',
+    price: 200,
+    description: 'Product 2 description',
+    image: 'filename',
+    section: 'section2',
+  };
+
   const email = 'user@example.com';
   const customerName = 'John Doe';
   const customerContact = 1234567890;
@@ -48,11 +67,16 @@ describe('OrderController', () => {
   const billingAddress = 'Street 123';
   const paymentMethod = 'Credit Card';
   const orderedProducts = [
-    { productId: 'productId1', amount: 2 },
-    { productId: 'productId2', amount: 3 },
+    { product: product1, amount: 2 },
+    { product: product2, amount: 3 },
   ];
   const status = OrderStatus.processing;
   const user = { id: 'userId', name: 'Test User', email } as User;
+
+  const shoppingOrderedProducts = [
+    { productId: 'productId1', amount: 2 },
+    { productId: 'productId2', amount: 3 },
+  ];
 
   const order: Order = {
     id: 'id-123',
@@ -76,7 +100,7 @@ describe('OrderController', () => {
     deliveryAddress,
     billingAddress,
     paymentMethod,
-    orderedProducts,
+    shoppingOrderedProducts,
   );
 
   const updateOrderStatusDto = new UpdateOrderStatusDto(OrderStatus.delivered);
