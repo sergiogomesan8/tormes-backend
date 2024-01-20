@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   OrderStatus,
-  OrderedProduct,
+  ShoppingOrderedProduct,
 } from '../../../core/domain/models/order.model';
 import {
   IsEnum,
@@ -87,7 +87,7 @@ export class CreateOrderDto {
   @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => OrderedProductDto)
-  orderedProducts: OrderedProduct[];
+  orderedProducts: ShoppingOrderedProduct[];
 
   constructor(
     customerName: string,
@@ -95,7 +95,7 @@ export class CreateOrderDto {
     deliveryAddress: string,
     billingAddress: string,
     paymentMethod: string,
-    orderedProducts: OrderedProduct[],
+    orderedProducts: ShoppingOrderedProduct[],
   ) {
     this.customerName = customerName;
     this.customerContact = customerContact;
