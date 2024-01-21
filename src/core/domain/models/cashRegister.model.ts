@@ -1,3 +1,5 @@
+import { User } from './user.model';
+
 export interface CashRegister {
   id: string;
   date: number;
@@ -13,6 +15,8 @@ export interface CashRegister {
 
   reportedTotal: number;
   calculatedTotal: number;
+
+  employee: User;
 }
 
 export interface Coins {

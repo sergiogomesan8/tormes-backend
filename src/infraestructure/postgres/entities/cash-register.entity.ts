@@ -3,8 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UserEntity } from './user.entity';
+import { User } from '../../../core/domain/models/user.model';
 
 @Entity({ name: 'cash-registers' })
 export class CashRegisterEntity {
@@ -34,4 +37,7 @@ export class CashRegisterEntity {
   reportedTotal: number;
   @Column({ type: 'double precision', nullable: false })
   calculatedTotal: number;
+
+  @ManyToOne(() => UserEntity)
+  customer: User;
 }
