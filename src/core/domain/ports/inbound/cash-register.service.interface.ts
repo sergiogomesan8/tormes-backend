@@ -3,6 +3,7 @@ import { CashRegister } from '../../models/cashRegister.model';
 
 export interface ICashRegisterService {
   createCashRegister(
+    userId: string,
     createCashRegisterDto: CreateCashRegisterDto,
   ): Promise<CashRegister>;
 }
