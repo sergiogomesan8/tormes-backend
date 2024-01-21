@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ICashRegisterService } from '../ports/inbound/cash-register.service.interface';
 import { CreateCashRegisterDto } from 'src/infraestructure/api-rest/dtos/cash-register.dto';
 import {
@@ -20,6 +24,22 @@ export class CashRegisterService implements ICashRegisterService {
     private cashRegisterRepository: Repository<CashRegisterEntity>,
     private readonly userService: UserService,
   ) {}
+
+  async findAllCashRegisters(): Promise<CashRegister[]> {
+    const cashRegisters = await this.cashRegisterRepository.find();
+    return cashRegisters;
+  }
+
+  async findCashRegisterById(id: string): Promise<CashRegister> {
+    const cashRegister = await this.cashRegisterRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!cashRegister) {
+      throw new NotFoundException('Cash Register Not Found');
+    }
+    return cashRegister;
+  }
 
   async createCashRegister(
     userId: string,

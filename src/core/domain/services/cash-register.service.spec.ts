@@ -88,6 +88,84 @@ describe('CashRegisterService', () => {
     1000,
   );
 
+  describe('findAllCashRegisters', () => {
+    it('should return all cash registers', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'find')
+        .mockResolvedValue([cashRegister]);
+
+      const cashRegisters = await cashRegisterService.findAllCashRegisters();
+      expect(cashRegisters).toEqual([cashRegister]);
+      expect(cashRegisterRepository.find).toHaveBeenCalled();
+    });
+
+    it('should return an empty array if no cash registers are found', async () => {
+      jest.spyOn(cashRegisterRepository, 'find').mockResolvedValue([]);
+
+      const cashRegisters = await cashRegisterService.findAllCashRegisters();
+      expect(cashRegisters).toEqual([]);
+      expect(cashRegisterRepository.find).toHaveBeenCalled();
+    });
+
+    it('should throw an error if the database query fails', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'find')
+        .mockRejectedValue(new Error('Database error'));
+
+      await expect(cashRegisterService.findAllCashRegisters()).rejects.toThrow(
+        'Database error',
+      );
+      expect(cashRegisterRepository.find).toHaveBeenCalled();
+    });
+  });
+
+  describe('findCashRegisterById', () => {
+    it('should return cash register with the id', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(cashRegister);
+
+      const result = await cashRegisterService.findCashRegisterById(
+        expect.any(String),
+      );
+      expect(result).toEqual(cashRegister);
+      expect(cashRegisterRepository.findOne).toHaveBeenCalled();
+    });
+
+    it('should return NotFoundException when cash register does not exists', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(undefined);
+
+      await expect(
+        cashRegisterService.findCashRegisterById(expect.any(String)),
+      ).rejects.toThrow(NotFoundException);
+      expect(cashRegisterRepository.findOne).toHaveBeenCalled();
+    });
+
+    it('should throw an error if the database query fails', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockRejectedValue(new Error('Database error'));
+
+      await expect(
+        cashRegisterService.findCashRegisterById(expect.any(String)),
+      ).rejects.toThrow('Database error');
+      expect(cashRegisterRepository.findOne).toHaveBeenCalled();
+    });
+
+    it('should throw an error when it happens', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockRejectedValue(new Error());
+
+      await expect(
+        cashRegisterService.findCashRegisterById(expect.any(String)),
+      ).rejects.toThrow(Error);
+      expect(cashRegisterRepository.findOne).toHaveBeenCalled();
+    });
+  });
+
   describe('createCashRegister', () => {
     it('should create a cash regsiter for a given user and return it', async () => {
       jest.spyOn(userService, 'findUserById').mockResolvedValue(user);
