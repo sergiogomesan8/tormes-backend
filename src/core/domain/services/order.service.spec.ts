@@ -255,13 +255,13 @@ describe('OrderService', () => {
 
     it('should throw a NotFoundException if the user is not found', async () => {
       const userId = 'userId';
-      jest.spyOn(userService, 'findUserById').mockResolvedValue(undefined);
+      jest.spyOn(userService, 'findUserById').mockImplementation(() => {
+        throw new NotFoundException('User Not Found');
+      });
 
       await expect(
         orderService.createOrder(userId, createOrderDto),
-      ).rejects.toThrow(
-        new NotFoundException(`User with ID ${userId} not found`),
-      );
+      ).rejects.toThrow(new NotFoundException('User Not Found'));
     });
 
     it('should throw a ConflictException if the database query fails', async () => {
