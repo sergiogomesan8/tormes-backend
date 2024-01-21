@@ -5,7 +5,7 @@ import {
   IsNumber,
   IsOptional,
 } from 'class-validator';
-import { Bills, Coins } from '../../../core/domain/models/cashRegister.model';
+import { Bills, Coins } from '../../../core/domain/models/cash-register.model';
 import { Type } from 'class-transformer';
 
 export class CoinsDto {

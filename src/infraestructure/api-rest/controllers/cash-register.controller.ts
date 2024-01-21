@@ -24,7 +24,7 @@ import { CreateCashRegisterDto } from '../dtos/cash-register.dto';
 import {
   CashRegister,
   SeralizedCashRegister,
-} from '../../../core/domain/models/cashRegister.model';
+} from '../../../core/domain/models/cash-register.model';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { UserType } from '../../../core/domain/models/user.model';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';

@@ -6,7 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CashRegisterEntity } from '../../../infraestructure/postgres/entities/cash-register.entity';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { User } from '../models/user.model';
-import { CashRegister } from '../models/cashRegister.model';
+import { CashRegister } from '../models/cash-register.model';
 import {
   CreateCashRegisterDto,
   UpdateCashRegisterDto,

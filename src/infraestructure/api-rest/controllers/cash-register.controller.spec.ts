@@ -5,7 +5,7 @@ import { User } from '../../../core/domain/models/user.model';
 import {
   CashRegister,
   SeralizedCashRegister,
-} from '../../../core/domain/models/cashRegister.model';
+} from '../../../core/domain/models/cash-register.model';
 import { CreateCashRegisterDto } from '../dtos/cash-register.dto';
 import { Request } from 'express';
 import { InternalServerErrorException } from '@nestjs/common';

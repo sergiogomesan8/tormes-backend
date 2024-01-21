@@ -14,7 +14,7 @@ import {
   CashRegister,
   Coins,
   CoinValue,
-} from '../models/cashRegister.model';
+} from '../models/cash-register.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CashRegisterEntity } from '../../../infraestructure/postgres/entities/cash-register.entity';
 import { QueryFailedError, Repository } from 'typeorm';

@@ -1,4 +1,4 @@
-import { Bills, Coins } from '../../../core/domain/models/cashRegister.model';
+import { Bills, Coins } from '../../../core/domain/models/cash-register.model';
 import {
   Column,
   CreateDateColumn,
