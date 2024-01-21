@@ -12,6 +12,7 @@ import { join } from 'path';
 import { OrderModule } from './core/application/order.module';
 import { PostgresConfigModule } from './infraestructure/postgres/adapters/postgres-config/postgres-config.module';
 import { PostgreConfigService } from './infraestructure/postgres/adapters/postgres-config/postgres-config.service';
+import { EmployeeModule } from './core/application/employee.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PostgreConfigService } from './infraestructure/postgres/adapters/postgr
     ProductModule,
     SectionModule,
     OrderModule,
+    EmployeeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
