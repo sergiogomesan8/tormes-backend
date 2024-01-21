@@ -14,6 +14,7 @@ import { ProductService } from './product.service';
 import { UserService } from './user.service';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { ProductEntity } from '../../../infraestructure/postgres/entities/product.entity';
+import { Product } from '../models/product.model';
 
 describe('OrderService', () => {
   let orderService: OrderService;
@@ -56,16 +57,35 @@ describe('OrderService', () => {
     userService = module.get<UserService>(UserService);
   });
 
+  const product1: Product = {
+    id: expect.any(String),
+    name: 'Product 1',
+    price: 100,
+    description: 'Product 1 description',
+    image: 'filename',
+    section: 'section1',
+  };
+
+  const product2: Product = {
+    id: expect.any(String),
+    name: 'Product 2',
+    price: 200,
+    description: 'Product 2 description',
+    image: 'filename',
+    section: 'section2',
+  };
+
+  const orderedProducts = [
+    { product: product1, amount: 2 },
+    { product: product2, amount: 3 },
+  ];
+
   const email = 'user@example.com';
   const customerName = 'John Doe';
   const customerContact = 1234567890;
   const deliveryAddress = 'Street 123';
   const billingAddress = 'Street 123';
   const paymentMethod = 'Credit Card';
-  const orderedProducts = [
-    { productId: 'productId1', amount: 2 },
-    { productId: 'productId2', amount: 3 },
-  ];
   const status = OrderStatus.processing;
 
   const user = { id: 'userId', name: 'Test User', email } as User;
@@ -95,13 +115,18 @@ describe('OrderService', () => {
     price: 100,
   };
 
+  const shoppingOrderedProducts = [
+    { productId: 'productId1', amount: 2 },
+    { productId: 'productId2', amount: 3 },
+  ];
+
   const createOrderDto = new CreateOrderDto(
     customerName,
     customerContact,
     deliveryAddress,
     billingAddress,
     paymentMethod,
-    orderedProducts,
+    shoppingOrderedProducts,
   );
 
   const updateOrderStatusDto = new UpdateOrderStatusDto(OrderStatus.delivered);

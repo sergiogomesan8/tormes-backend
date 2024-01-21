@@ -48,6 +48,11 @@ export class SeralizedOrder {
 }
 
 export interface OrderedProduct {
+  product: Product;
+  amount: number;
+}
+
+export interface ShoppingOrderedProduct {
   productId: Product['id'];
   amount: number;
 }
