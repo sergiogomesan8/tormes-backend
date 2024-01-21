@@ -162,7 +162,7 @@ export class CreateCashRegisterDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  totalCardPayments?: number;
+  totalCardPayments: number;
 
   @ApiProperty({
     description: 'Total spent',
@@ -180,17 +180,27 @@ export class CreateCashRegisterDto {
   @IsNumber()
   cashInBox: number;
 
+  @ApiProperty({
+    description: 'Reported Total',
+    example: 1000,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  reportedTotal: number;
+
   constructor(
     coins: Coins,
     bills: Bills,
-    totalCardPayments?: number,
-    totalSpent?: number,
-    cashInBox?: number,
+    totalCardPayments: number,
+    totalSpent: number,
+    cashInBox: number,
+    reportedTotal: number,
   ) {
     this.coins = coins;
     this.bills = bills;
     this.totalCardPayments = totalCardPayments;
     this.totalSpent = totalSpent;
     this.cashInBox = cashInBox;
+    this.reportedTotal = reportedTotal;
   }
 }
