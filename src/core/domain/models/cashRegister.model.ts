@@ -1,4 +1,5 @@
-import { User } from './user.model';
+import { Type } from 'class-transformer';
+import { SerializedUser, User } from './user.model';
 
 export interface CashRegister {
   id: string;
@@ -17,6 +18,30 @@ export interface CashRegister {
   calculatedTotal: number;
 
   employee: User;
+}
+
+export class SeralizedCashRegister {
+  id: string;
+  date: number;
+
+  coins: Coins;
+  bills: Bills;
+
+  totalCoinPayments: number;
+  totalBillPayments: number;
+  totalCardPayments: number;
+  totalSpent: number;
+  cashInBox: number;
+
+  reportedTotal: number;
+  calculatedTotal: number;
+
+  @Type(() => SerializedUser)
+  employee: SerializedUser;
+
+  constructor(partial: Partial<SeralizedCashRegister>) {
+    Object.assign(this, partial);
+  }
 }
 
 export interface Coins {
