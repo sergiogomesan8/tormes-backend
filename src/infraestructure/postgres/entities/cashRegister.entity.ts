@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity({ name: 'users' })
-export class UserEntity {
+@Entity({ name: 'cash-registers' })
+export class CashRegisterEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -19,6 +19,10 @@ export class UserEntity {
   @Column({ nullable: false })
   bills: Bill;
 
+  @Column({ nullable: false })
+  totalCoinPayments: number;
+  @Column({ nullable: false })
+  totalBillPayments: number;
   @Column({ nullable: false })
   totalCardPayments: number;
   @Column({ nullable: false })
