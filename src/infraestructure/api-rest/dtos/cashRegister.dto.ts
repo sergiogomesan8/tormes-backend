@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, ValidateNested, IsNumber } from 'class-validator';
-import { Bill, Coin } from '../../../core/domain/models/cashRegister.model';
+import { Bills, Coins } from '../../../core/domain/models/cashRegister.model';
 import { Type } from 'class-transformer';
 
-export class CoinDto {
+export class CoinsDto {
   @ApiProperty({
     description: 'One cent coins',
     example: 1,
@@ -81,7 +81,7 @@ export class CoinDto {
   }
 }
 
-export class BillDto {
+export class BillsDto {
   @ApiProperty({
     description: 'Five euro bill',
     example: 5,
@@ -140,21 +140,21 @@ export class BillDto {
 export class CreateCashRegisterDto {
   @ApiProperty({
     description: 'Coins',
-    type: CoinDto,
+    type: CoinsDto,
   })
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => CoinDto)
-  coin: Coin;
+  @Type(() => CoinsDto)
+  coins: Coins;
 
   @ApiProperty({
     description: 'Bills',
-    type: BillDto,
+    type: BillsDto,
   })
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => BillDto)
-  bill: Bill;
+  @Type(() => BillsDto)
+  bills: Bills;
 
   @ApiProperty({
     description: 'Total card payments',
@@ -181,14 +181,14 @@ export class CreateCashRegisterDto {
   cashInBox: number;
 
   constructor(
-    coin: Coin,
-    bill: Bill,
+    coins: Coins,
+    bills: Bills,
     totalCardPayments?: number,
     totalSpent?: number,
     cashInBox?: number,
   ) {
-    this.coin = coin;
-    this.bill = bill;
+    this.coins = coins;
+    this.bills = bills;
     this.totalCardPayments = totalCardPayments;
     this.totalSpent = totalSpent;
     this.cashInBox = cashInBox;
