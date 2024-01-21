@@ -11,7 +11,8 @@ export interface CashRegister {
   totalSpent: number;
   cashInBox: number;
 
-  total: number;
+  reportedTotal: number;
+  calculatedTotal: number;
 }
 
 export interface Coins {

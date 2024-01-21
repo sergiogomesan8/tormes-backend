@@ -1,4 +1,4 @@
-import { Bill, Coin } from '../../../core/domain/models/cashRegister.model';
+import { Bills, Coins } from '../../../core/domain/models/cashRegister.model';
 import {
   Column,
   CreateDateColumn,
@@ -15,9 +15,9 @@ export class CashRegisterEntity {
   date: number;
 
   @Column({ nullable: false })
-  coins: Coin;
+  coins: Coins;
   @Column({ nullable: false })
-  bills: Bill;
+  bills: Bills;
 
   @Column({ nullable: false })
   totalCoinPayments: number;
@@ -31,5 +31,7 @@ export class CashRegisterEntity {
   cashInBox: number;
 
   @Column({ nullable: false })
-  total: number;
+  reportedTotal: number;
+  @Column({ nullable: false })
+  calculatedTotal: number;
 }
