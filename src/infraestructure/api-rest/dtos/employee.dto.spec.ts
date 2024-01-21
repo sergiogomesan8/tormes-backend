@@ -6,13 +6,21 @@ describe('CreateEmployeeDto', () => {
     const name = 'John';
     const lastName = 'Doe';
     const job = 'Butcher';
+    const address = 'Fake Street 123';
 
-    const createEmployeeDto = new CreateEmployeeDto(email, name, lastName, job);
+    const createEmployeeDto = new CreateEmployeeDto(
+      email,
+      name,
+      lastName,
+      job,
+      address,
+    );
 
     expect(createEmployeeDto).toBeDefined();
     expect(createEmployeeDto.email).toBe(email);
     expect(createEmployeeDto.name).toBe(name);
     expect(createEmployeeDto.lastName).toBe(lastName);
     expect(createEmployeeDto.job).toBe(job);
+    expect(createEmployeeDto.address).toBe(address);
   });
 });
