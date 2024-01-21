@@ -39,5 +39,5 @@ export class CashRegisterEntity {
   calculatedTotal: number;
 
   @ManyToOne(() => UserEntity)
-  customer: User;
+  employee: User;
 }
