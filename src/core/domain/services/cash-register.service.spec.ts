@@ -7,7 +7,10 @@ import { CashRegisterEntity } from '../../../infraestructure/postgres/entities/c
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { User } from '../models/user.model';
 import { CashRegister } from '../models/cashRegister.model';
-import { CreateCashRegisterDto } from '../../../infraestructure/api-rest/dtos/cash-register.dto';
+import {
+  CreateCashRegisterDto,
+  UpdateCashRegisterDto,
+} from '../../../infraestructure/api-rest/dtos/cash-register.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('CashRegisterService', () => {
@@ -80,6 +83,15 @@ describe('CashRegisterService', () => {
   } as CashRegister;
 
   const createCashRegisterDto = new CreateCashRegisterDto(
+    coins,
+    bills,
+    200,
+    60,
+    400,
+    1000,
+  );
+
+  const updateCashRegisterDto = new UpdateCashRegisterDto(
     coins,
     bills,
     200,
@@ -229,6 +241,77 @@ describe('CashRegisterService', () => {
         expect(e).toBeInstanceOf(Error);
         expect(e).toHaveProperty('message', 'Save error');
       }
+    });
+  });
+
+  describe('updateCashRegister', () => {
+    it('should update a cash register', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'update')
+        .mockResolvedValue({ affected: 1 } as any);
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(cashRegister);
+
+      const result = await cashRegisterService.updateCashRegister(
+        'id',
+        updateCashRegisterDto,
+      );
+      expect(result).toEqual(cashRegister);
+      expect(cashRegisterRepository.update).toHaveBeenCalledWith(
+        'id',
+        updateCashRegisterDto,
+      );
+      expect(cashRegisterRepository.findOne).toHaveBeenCalled();
+    });
+
+    it('should throw a NotFoundException when no cash register is found to update', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'update')
+        .mockResolvedValue({ affected: 0 } as any);
+
+      await expect(
+        cashRegisterService.updateCashRegister('id', updateCashRegisterDto),
+      ).rejects.toThrow(new NotFoundException('Cash Register not found'));
+    });
+
+    it('should throw a NotFoundException when the updated cash register cannot be found', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'update')
+        .mockResolvedValue({ affected: 1 } as any);
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(undefined);
+
+      await expect(
+        cashRegisterService.updateCashRegister('id', updateCashRegisterDto),
+      ).rejects.toThrow(
+        new NotFoundException('Error retrieving updated cash register'),
+      );
+    });
+
+    it('should throw an error on update method when it happens', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'update')
+        .mockRejectedValue(new Error());
+      await expect(
+        cashRegisterService.updateCashRegister('id', updateCashRegisterDto),
+      ).rejects.toThrow(Error);
+      expect(cashRegisterRepository.update).toHaveBeenCalled();
+    });
+
+    it('should throw an error on findOne method when it happens', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'update')
+        .mockResolvedValue({ affected: 1 } as any);
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockRejectedValue(new Error());
+      await expect(
+        cashRegisterService.updateCashRegister('id', updateCashRegisterDto),
+      ).rejects.toThrow(Error);
+      expect(cashRegisterRepository.update).toHaveBeenCalled();
+      expect(cashRegisterRepository.findOne).toHaveBeenCalled();
     });
   });
 });

@@ -4,7 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ICashRegisterService } from '../ports/inbound/cash-register.service.interface';
-import { CreateCashRegisterDto } from 'src/infraestructure/api-rest/dtos/cash-register.dto';
+import {
+  CreateCashRegisterDto,
+  UpdateCashRegisterDto,
+} from '../../../infraestructure/api-rest/dtos/cash-register.dto';
 import {
   Bills,
   BillValue,
@@ -71,6 +74,27 @@ export class CashRegisterService implements ICashRegisterService {
         throw error;
       }
     }
+  }
+
+  async updateCashRegister(
+    id: string,
+    updateCashRegisterDto: UpdateCashRegisterDto,
+  ): Promise<CashRegister> {
+    const updatedResult = await this.cashRegisterRepository.update(
+      id,
+      updateCashRegisterDto,
+    );
+    if (updatedResult.affected === 0) {
+      throw new NotFoundException('Cash Register not found');
+    }
+
+    const updatedCashRegister = await this.cashRegisterRepository.findOne({
+      where: { id: id },
+    });
+    if (!updatedCashRegister) {
+      throw new NotFoundException('Error retrieving updated cash register');
+    }
+    return updatedCashRegister;
   }
 
   private calculateTotalCoins(coins: Coins): number {
