@@ -14,9 +14,9 @@ export class CashRegisterEntity {
   @CreateDateColumn()
   date: number;
 
-  @Column({ nullable: false })
+  @Column({ type: 'json', nullable: false })
   coins: Coins;
-  @Column({ nullable: false })
+  @Column({ type: 'json', nullable: false })
   bills: Bills;
 
   @Column({ nullable: false })

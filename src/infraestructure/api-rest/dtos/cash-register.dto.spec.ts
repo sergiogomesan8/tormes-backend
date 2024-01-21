@@ -1,4 +1,4 @@
-import { CoinsDto, BillsDto, CreateCashRegisterDto } from './cashRegister.dto';
+import { CoinsDto, BillsDto, CreateCashRegisterDto } from './cash-register.dto';
 
 describe('CoinsDto', () => {
   it('should create a CoinsDto object', () => {
