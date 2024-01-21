@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, ValidateNested, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  ValidateNested,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
 import { Bills, Coins } from '../../../core/domain/models/cashRegister.model';
 import { Type } from 'class-transformer';
 
@@ -195,6 +200,80 @@ export class CreateCashRegisterDto {
     totalSpent: number,
     cashInBox: number,
     reportedTotal: number,
+  ) {
+    this.coins = coins;
+    this.bills = bills;
+    this.totalCardPayments = totalCardPayments;
+    this.totalSpent = totalSpent;
+    this.cashInBox = cashInBox;
+    this.reportedTotal = reportedTotal;
+  }
+}
+
+export class UpdateCashRegisterDto {
+  @ApiProperty({
+    description: 'Coins',
+    type: CoinsDto,
+  })
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => CoinsDto)
+  @IsOptional()
+  coins?: Coins;
+
+  @ApiProperty({
+    description: 'Bills',
+    type: BillsDto,
+  })
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => BillsDto)
+  @IsOptional()
+  bills?: Bills;
+
+  @ApiProperty({
+    description: 'Total card payments',
+    example: 200,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  @IsOptional()
+  totalCardPayments?: number;
+
+  @ApiProperty({
+    description: 'Total spent',
+    example: 60,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  @IsOptional()
+  totalSpent?: number;
+
+  @ApiProperty({
+    description: 'Cash in box',
+    example: 400,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  @IsOptional()
+  cashInBox?: number;
+
+  @ApiProperty({
+    description: 'Reported Total',
+    example: 1000,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  @IsOptional()
+  reportedTotal?: number;
+
+  constructor(
+    coins?: Coins,
+    bills?: Bills,
+    totalCardPayments?: number,
+    totalSpent?: number,
+    cashInBox?: number,
+    reportedTotal?: number,
   ) {
     this.coins = coins;
     this.bills = bills;
