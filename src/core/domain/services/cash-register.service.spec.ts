@@ -314,4 +314,59 @@ describe('CashRegisterService', () => {
       expect(cashRegisterRepository.findOne).toHaveBeenCalled();
     });
   });
+
+  describe('deleteCashRegister', () => {
+    it('should delete a cash register when cash register exists', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(cashRegister);
+      jest
+        .spyOn(cashRegisterRepository, 'delete')
+        .mockResolvedValue({ affected: 1, raw: [] });
+
+      const result = await cashRegisterService.deleteCashRegister(
+        cashRegister.id,
+      );
+      expect(cashRegisterRepository.findOne).toHaveBeenCalledWith({
+        where: { id: cashRegister.id },
+      });
+      expect(cashRegisterRepository.delete).toHaveBeenCalledWith(
+        cashRegister.id,
+      );
+      expect(result).toEqual({
+        message: `Cash register with id ${cashRegister.id} was deleted.`,
+      });
+    });
+
+    it('should throw NotFoundException when cash register does not exist', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(undefined);
+      await expect(
+        cashRegisterService.deleteCashRegister('cashRegister-id'),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw an error on findOne method when it happens', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockRejectedValue(new Error());
+      await expect(
+        cashRegisterService.deleteCashRegister('cashRegister-id'),
+      ).rejects.toThrow(Error);
+      expect(cashRegisterRepository.findOne).toHaveBeenCalled();
+    });
+
+    it('should throw error when delete method throws an error', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(cashRegister);
+      jest.spyOn(cashRegisterRepository, 'delete').mockImplementation(() => {
+        throw new Error('Error');
+      });
+      await expect(
+        cashRegisterService.deleteCashRegister('cashRegister-id'),
+      ).rejects.toThrow('Error');
+    });
+  });
 });

@@ -97,6 +97,17 @@ export class CashRegisterService implements ICashRegisterService {
     return updatedCashRegister;
   }
 
+  async deleteCashRegister(id: string) {
+    const order = await this.cashRegisterRepository.findOne({
+      where: { id: id },
+    });
+    if (!order) {
+      throw new NotFoundException('Cash register not found');
+    }
+    await this.cashRegisterRepository.delete(id);
+    return { message: `Cash register with id ${id} was deleted.` };
+  }
+
   private calculateTotalCoins(coins: Coins): number {
     let totalCoins = 0;
     for (const coinType in coins) {
