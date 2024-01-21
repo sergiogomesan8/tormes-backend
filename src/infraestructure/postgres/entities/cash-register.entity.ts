@@ -19,19 +19,19 @@ export class CashRegisterEntity {
   @Column({ type: 'json', nullable: false })
   bills: Bills;
 
-  @Column({ nullable: false })
+  @Column({ type: 'double precision', nullable: false })
   totalCoinPayments: number;
   @Column({ nullable: false })
   totalBillPayments: number;
-  @Column({ nullable: false })
+  @Column({ type: 'double precision', nullable: false })
   totalCardPayments: number;
-  @Column({ nullable: false })
+  @Column({ type: 'double precision', nullable: false })
   totalSpent: number;
-  @Column({ nullable: false })
+  @Column({ type: 'double precision', nullable: false })
   cashInBox: number;
 
-  @Column({ nullable: false })
+  @Column({ type: 'double precision', nullable: false })
   reportedTotal: number;
-  @Column({ nullable: false })
+  @Column({ type: 'double precision', nullable: false })
   calculatedTotal: number;
 }
