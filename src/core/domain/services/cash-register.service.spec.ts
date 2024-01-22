@@ -8,8 +8,6 @@ import { UserEntity } from '../../../infraestructure/postgres/entities/user.enti
 import { User } from '../models/user.model';
 import { CashRegister } from '../models/cash-register.model';
 import {
-  BillsDto,
-  CoinsDto,
   CreateCashRegisterDto,
   UpdateCashRegisterDto,
 } from '../../../infraestructure/api-rest/dtos/cash-register.dto';
@@ -84,19 +82,23 @@ describe('CashRegisterService', () => {
     employee: user,
   } as CashRegister;
 
-  const coin = new CoinsDto(1, 2, 3, 4, 5, 6, 7, 8);
-  const bill = new BillsDto(5, 10, 20, 50, 100);
-  const params = {
-    coins: coin,
-    bills: bill,
-    totalCardPayments: 200,
-    totalSpent: 60,
-    cashInBox: 400,
-    reportedTotal: 1000,
-  };
-  const createCashRegisterDto = new CreateCashRegisterDto(params);
+  const createCashRegisterDto = new CreateCashRegisterDto(
+    coins,
+    bills,
+    200,
+    60,
+    400,
+    1000,
+  );
 
-  const updateCashRegisterDto = new UpdateCashRegisterDto(params);
+  const updateCashRegisterDto = new UpdateCashRegisterDto(
+    coins,
+    bills,
+    200,
+    60,
+    400,
+    1000,
+  );
 
   describe('findAllCashRegisters', () => {
     it('should return all cash registers', async () => {
