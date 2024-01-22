@@ -60,9 +60,6 @@ export class OrderService implements IOrderService {
   ): Promise<Order> {
     try {
       const user = await this.userService.findUserById(userId);
-      if (!user) {
-        throw new NotFoundException(`User with ID ${userId} not found`);
-      }
 
       const orderedProducts: OrderedProduct[] = await this.findOrderedProducts(
         createOrderDto.orderedProducts,
