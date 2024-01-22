@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateSectionDto {
   @ApiProperty({
@@ -10,17 +10,11 @@ export class CreateSectionDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({
-    description: 'Section image',
-    example: 'https://example.com/image.jpg',
-  })
-  @IsString()
-  @IsNotEmpty()
-  image: string;
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  image: any;
 
-  constructor(name: string, image: string) {
+  constructor(name: string) {
     this.name = name;
-    this.image = image;
   }
 }
 
@@ -33,15 +27,11 @@ export class UpdateSectionDto {
   @IsNotEmpty()
   name?: string;
 
-  @ApiProperty({
-    description: 'Section image',
-    example: 'https://example.com/image.jpg',
-  })
-  @IsString()
-  @IsNotEmpty()
-  image?: string;
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @IsOptional()
+  image?: any;
 
-  constructor(name?: string, image?: string) {
+  constructor(name?: string, image?: any) {
     this.name = name;
     this.image = image;
   }
