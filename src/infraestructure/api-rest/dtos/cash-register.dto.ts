@@ -142,6 +142,15 @@ export class BillsDto {
   }
 }
 
+export class CashRegisterParams {
+  coins: Coins;
+  bills: Bills;
+  totalCardPayments: number;
+  totalSpent: number;
+  cashInBox: number;
+  reportedTotal: number;
+}
+
 export class CreateCashRegisterDto {
   @ApiProperty({
     description: 'Coins',
@@ -193,20 +202,13 @@ export class CreateCashRegisterDto {
   @IsNumber()
   reportedTotal: number;
 
-  constructor(
-    coins: Coins,
-    bills: Bills,
-    totalCardPayments: number,
-    totalSpent: number,
-    cashInBox: number,
-    reportedTotal: number,
-  ) {
-    this.coins = coins;
-    this.bills = bills;
-    this.totalCardPayments = totalCardPayments;
-    this.totalSpent = totalSpent;
-    this.cashInBox = cashInBox;
-    this.reportedTotal = reportedTotal;
+  constructor(params: CashRegisterParams) {
+    this.coins = params.coins;
+    this.bills = params.bills;
+    this.totalCardPayments = params.totalCardPayments;
+    this.totalSpent = params.totalSpent;
+    this.cashInBox = params.cashInBox;
+    this.reportedTotal = params.reportedTotal;
   }
 }
 
@@ -267,19 +269,14 @@ export class UpdateCashRegisterDto {
   @IsOptional()
   reportedTotal?: number;
 
-  constructor(
-    coins?: Coins,
-    bills?: Bills,
-    totalCardPayments?: number,
-    totalSpent?: number,
-    cashInBox?: number,
-    reportedTotal?: number,
-  ) {
-    this.coins = coins;
-    this.bills = bills;
-    this.totalCardPayments = totalCardPayments;
-    this.totalSpent = totalSpent;
-    this.cashInBox = cashInBox;
-    this.reportedTotal = reportedTotal;
+  constructor(params?: Partial<CashRegisterParams>) {
+    if (params) {
+      this.coins = params.coins;
+      this.bills = params.bills;
+      this.totalCardPayments = params.totalCardPayments;
+      this.totalSpent = params.totalSpent;
+      this.cashInBox = params.cashInBox;
+      this.reportedTotal = params.reportedTotal;
+    }
   }
 }
