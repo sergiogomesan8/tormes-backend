@@ -64,6 +64,7 @@ export class CashRegisterController {
   })
   @UserTypes(UserType.manager)
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('/list')
   async findAllCashRegisters(): Promise<SeralizedCashRegister[]> {
     const cashRegisters = await this.cashRegisterService.findAllCashRegisters();
@@ -102,6 +103,7 @@ export class CashRegisterController {
   })
   @UserTypes(UserType.manager)
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   async createCashRegister(
     @Req() req: Request,
@@ -129,7 +131,9 @@ export class CashRegisterController {
     type: String,
     description: 'The ID of the cash register',
   })
-  @UseGuards(JwtAuthGuard)
+  @UserTypes(UserType.manager)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Patch('/:id')
   async updateCashRegister(
     @Param('id') id: string,
@@ -154,7 +158,9 @@ export class CashRegisterController {
     type: String,
     description: 'The ID of the cash register',
   })
-  @UseGuards(JwtAuthGuard)
+  @UserTypes(UserType.manager)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Delete('/:id')
   async deleteCashRegister(@Param('id') id: string) {
     return await this.cashRegisterService.deleteCashRegister(id);
