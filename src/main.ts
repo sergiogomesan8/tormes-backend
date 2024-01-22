@@ -15,20 +15,27 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  const allowedOrigins =
+    process.env.NODE_ENV === 'production'
+      ? ['https://tormes-frontend.netlify.app']
+      : ['http://localhost:4200', 'https://tormes-frontend.netlify.app'];
   app.enableCors({
-    origin: ['http://localhost:4200', 'https://tormes-frontend.netlify.app'],
+    origin: allowedOrigins,
   });
 
-  const config = new DocumentBuilder()
-    .setTitle('Tormes Api')
-    .setDescription('Tormes API Documentation')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .addTag('Tormes')
-    .build();
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Tormes Api')
+      .setDescription('Tormes API Documentation')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addTag('Tormes')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(basePath + '/swagger', app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(basePath + '/swagger', app, document);
+  }
 
   await app.listen(process.env.PORT || 3000);
 }
