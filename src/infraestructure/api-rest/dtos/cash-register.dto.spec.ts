@@ -36,14 +36,16 @@ describe('CreateCashRegisterDto', () => {
   it('should create a CreateCashRegisterDto object', () => {
     const coin = new CoinsDto(1, 2, 3, 4, 5, 6, 7, 8);
     const bill = new BillsDto(5, 10, 20, 50, 100);
-    const cashRegister = new CreateCashRegisterDto(
-      coin,
-      bill,
-      200,
-      60,
-      400,
-      1000,
-    );
+    const params = {
+      coins: coin,
+      bills: bill,
+      totalCardPayments: 200,
+      totalSpent: 60,
+      cashInBox: 400,
+      reportedTotal: 1000,
+    };
+    const cashRegister = new CreateCashRegisterDto(params);
+
     expect(cashRegister).toBeInstanceOf(CreateCashRegisterDto);
 
     expect(coin).toBeInstanceOf(CoinsDto);
@@ -74,14 +76,16 @@ describe('UpdateCashRegisterDto', () => {
   it('should create a UpdateCashRegisterDto object', () => {
     const coin = new CoinsDto(1, 2, 3, 4, 5, 6, 7, 8);
     const bill = new BillsDto(5, 10, 20, 50, 100);
-    const cashRegister = new UpdateCashRegisterDto(
-      coin,
-      bill,
-      200,
-      60,
-      400,
-      1000,
-    );
+    const params = {
+      coins: coin,
+      bills: bill,
+      totalCardPayments: 200,
+      totalSpent: 60,
+      cashInBox: 400,
+      reportedTotal: 1000,
+    };
+    const cashRegister = new UpdateCashRegisterDto(params);
+
     expect(cashRegister).toBeInstanceOf(UpdateCashRegisterDto);
 
     expect(coin).toBeInstanceOf(CoinsDto);

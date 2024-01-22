@@ -7,6 +7,8 @@ import {
   SeralizedCashRegister,
 } from '../../../core/domain/models/cash-register.model';
 import {
+  BillsDto,
+  CoinsDto,
   CreateCashRegisterDto,
   UpdateCashRegisterDto,
 } from '../dtos/cash-register.dto';
@@ -82,22 +84,19 @@ describe('CashRegisterController', () => {
 
   const expectedResponse = new SeralizedCashRegister(cashRegister);
 
-  const createCashRegisterDto = new CreateCashRegisterDto(
-    coins,
-    bills,
-    200,
-    60,
-    400,
-    1000,
-  );
+  const coin = new CoinsDto(1, 2, 3, 4, 5, 6, 7, 8);
+  const bill = new BillsDto(5, 10, 20, 50, 100);
+  const params = {
+    coins: coin,
+    bills: bill,
+    totalCardPayments: 200,
+    totalSpent: 60,
+    cashInBox: 400,
+    reportedTotal: 1000,
+  };
+  const createCashRegisterDto = new CreateCashRegisterDto(params);
 
-  const updateCashRegisterDto = new UpdateCashRegisterDto(
-    coins,
-    bills,
-    200,
-    60,
-    400,
-  );
+  const updateCashRegisterDto = new UpdateCashRegisterDto(params);
 
   describe('findAllCashRegisters', () => {
     it('should return an array of cash registers', async () => {
