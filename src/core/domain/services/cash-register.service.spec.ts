@@ -267,6 +267,9 @@ describe('CashRegisterService', () => {
 
     it('should throw a NotFoundException when no cash register is found to update', async () => {
       jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(cashRegister);
+      jest
         .spyOn(cashRegisterRepository, 'update')
         .mockResolvedValue({ affected: 0 } as any);
 
@@ -275,43 +278,38 @@ describe('CashRegisterService', () => {
       ).rejects.toThrow(new NotFoundException('Cash Register not found'));
     });
 
-    it('should throw a NotFoundException when the updated cash register cannot be found', async () => {
-      jest
-        .spyOn(cashRegisterRepository, 'update')
-        .mockResolvedValue({ affected: 1 } as any);
+    it('should throw a NotFoundException when the cash register cannot be found', async () => {
       jest
         .spyOn(cashRegisterRepository, 'findOne')
         .mockResolvedValue(undefined);
 
       await expect(
         cashRegisterService.updateCashRegister('id', updateCashRegisterDto),
-      ).rejects.toThrow(
-        new NotFoundException('Error retrieving updated cash register'),
-      );
-    });
-
-    it('should throw an error on update method when it happens', async () => {
-      jest
-        .spyOn(cashRegisterRepository, 'update')
-        .mockRejectedValue(new Error());
-      await expect(
-        cashRegisterService.updateCashRegister('id', updateCashRegisterDto),
-      ).rejects.toThrow(Error);
-      expect(cashRegisterRepository.update).toHaveBeenCalled();
+      ).rejects.toThrow(new NotFoundException('Cash Register not found'));
     });
 
     it('should throw an error on findOne method when it happens', async () => {
-      jest
-        .spyOn(cashRegisterRepository, 'update')
-        .mockResolvedValue({ affected: 1 } as any);
       jest
         .spyOn(cashRegisterRepository, 'findOne')
         .mockRejectedValue(new Error());
       await expect(
         cashRegisterService.updateCashRegister('id', updateCashRegisterDto),
       ).rejects.toThrow(Error);
-      expect(cashRegisterRepository.update).toHaveBeenCalled();
       expect(cashRegisterRepository.findOne).toHaveBeenCalled();
+    });
+
+    it('should throw an error on udpate method when it happens', async () => {
+      jest
+        .spyOn(cashRegisterRepository, 'findOne')
+        .mockResolvedValue(cashRegister);
+      jest
+        .spyOn(cashRegisterRepository, 'update')
+        .mockRejectedValue(new Error());
+      await expect(
+        cashRegisterService.updateCashRegister('id', updateCashRegisterDto),
+      ).rejects.toThrow(Error);
+      expect(cashRegisterRepository.findOne).toHaveBeenCalled();
+      expect(cashRegisterRepository.update).toHaveBeenCalled();
     });
   });
 

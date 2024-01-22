@@ -80,6 +80,22 @@ export class CashRegisterService implements ICashRegisterService {
     id: string,
     updateCashRegisterDto: UpdateCashRegisterDto,
   ): Promise<CashRegister> {
+    const cashRegister = await this.cashRegisterRepository.findOne({
+      where: { id: id },
+    });
+    if (!cashRegister) {
+      throw new NotFoundException('Cash Register not found');
+    }
+
+    cashRegister.totalCoinPayments = this.calculateTotalCoins(
+      updateCashRegisterDto.coins,
+    );
+    cashRegister.totalBillPayments = this.calculateTotalBills(
+      updateCashRegisterDto.bills,
+    );
+    cashRegister.calculatedTotal =
+      this.calculateTotalCashRegister(cashRegister);
+
     const updatedResult = await this.cashRegisterRepository.update(
       id,
       updateCashRegisterDto,
@@ -88,13 +104,7 @@ export class CashRegisterService implements ICashRegisterService {
       throw new NotFoundException('Cash Register not found');
     }
 
-    const updatedCashRegister = await this.cashRegisterRepository.findOne({
-      where: { id: id },
-    });
-    if (!updatedCashRegister) {
-      throw new NotFoundException('Error retrieving updated cash register');
-    }
-    return updatedCashRegister;
+    return cashRegister;
   }
 
   async deleteCashRegister(id: string) {
@@ -132,7 +142,7 @@ export class CashRegisterService implements ICashRegisterService {
     return (
       cashRegister.totalCoinPayments +
       cashRegister.totalBillPayments +
-      cashRegister.totalCardPayments -
+      cashRegister.totalCardPayments +
       cashRegister.totalSpent -
       cashRegister.cashInBox
     );
