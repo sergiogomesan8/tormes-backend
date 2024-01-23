@@ -16,12 +16,8 @@ async function bootstrap() {
     }),
   );
 
-  const allowedOrigins =
-    process.env.NODE_ENV === 'production'
-      ? ['https://tormes-frontend.netlify.app']
-      : ['http://localhost:4200', 'https://tormes-frontend.netlify.app'];
   app.enableCors({
-    origin: allowedOrigins,
+    origin: ['http://localhost:4200', 'https://tormes-frontend.netlify.app'],
   });
 
   if (process.env.NODE_ENV !== 'production') {
