@@ -24,7 +24,7 @@ export class UpdateSectionDto {
     example: 'Example Section',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   name?: string;
 
   @ApiPropertyOptional({ type: 'string', format: 'binary' })
