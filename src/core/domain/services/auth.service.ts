@@ -32,7 +32,6 @@ export class AuthService implements IAuthService {
         password: hashedPassword,
       });
     } catch (error) {
-      console.error(error);
       throw new InternalServerErrorException('Error creating user');
     }
   }
