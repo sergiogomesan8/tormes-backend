@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -13,7 +12,6 @@ import { LoginUserDto } from '../../../infraestructure/api-rest/dtos/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { AccessJwtService } from './jwt-config/access-token/access-jwt.service';
 import { RefreshJwtService } from './jwt-config/refresh-token/refresh-jwt.service';
-import { QueryFailedError } from 'typeorm';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -34,9 +32,7 @@ export class AuthService implements IAuthService {
         password: hashedPassword,
       });
     } catch (error) {
-      if (error instanceof QueryFailedError) {
-        throw new ConflictException('User with this email already exists');
-      }
+      console.error(error);
       throw new InternalServerErrorException('Error creating user');
     }
   }
