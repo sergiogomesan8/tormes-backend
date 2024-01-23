@@ -72,6 +72,7 @@ export class UserEntity {
     type: 'enum',
     enum: UserType,
     nullable: true,
+    default: UserType.customer,
   })
   userType?: UserType;
 }
