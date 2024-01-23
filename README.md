@@ -22,11 +22,19 @@ You need to have the backend up and running along with the Docker containers.
 To run docker containers:
 `docker compose up`
 
+`docker inspect <POSTGRES_CONTAINER_ID>`
+
+And get:
+
+`"IPAddress": "x.x.x.x",`
+
+to connect with pgAdmin on Host name/address
+
 With this command, you will launch the Docker containers, which consist of 3 components: the PostgreSQL database, SonarCube and PG Admin which you can set up on a local server with the following configuration:
 
 `Email: sergio.gomesan8@gmail.com`
 
-`Password: tormes-backend`
+`Password: tormesBackend`
 
 
 ```bash
