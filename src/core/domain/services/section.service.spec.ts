@@ -40,7 +40,7 @@ describe('SectionService', () => {
     image,
   };
 
-  const createSectionDto = new CreateSectionDto(name, image);
+  const createSectionDto = new CreateSectionDto(name);
 
   const updateSectionDto = new UpdateSectionDto(name, image);
 
