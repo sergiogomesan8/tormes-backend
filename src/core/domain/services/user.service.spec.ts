@@ -6,6 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
+import { UserType } from '../models/user.model';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -33,7 +34,13 @@ describe('UserService', () => {
   const name = 'John';
 
   const createUserDto = new CreateUserDto(name, email, password);
-  const user = { name: 'Test User' };
+  const createUserAdminDto = new CreateUserDto(
+    'admin@tormes.com',
+    'admin@tormes.com',
+    'admin@tormes.com',
+  );
+
+  const user = { name: 'Test User', userType: UserType.manager };
 
   describe('create', () => {
     it('should create a user', async () => {
@@ -94,6 +101,96 @@ describe('UserService', () => {
       }
     });
   });
+
+  describe('createAdminUser', () => {
+    it('should create an admin user', async () => {
+      jest.spyOn(userRepository, 'findOne').mockResolvedValue(undefined);
+      const createSpy = jest
+        .spyOn(userRepository, 'create')
+        .mockImplementation(() => user as any);
+      const saveSpy = jest
+        .spyOn(userRepository, 'save')
+        .mockImplementation(() => Promise.resolve(user as any));
+
+      await userService.createAdminUser(createUserAdminDto);
+
+      expect(createSpy).toHaveBeenCalledWith(createUserAdminDto);
+      expect(saveSpy).toHaveBeenCalled();
+    });
+
+    it('should return if admin user exists', async () => {
+      jest
+        .spyOn(userRepository, 'findOne')
+        .mockImplementation(() => user as any);
+      const createSpy = jest
+        .spyOn(userRepository, 'create')
+        .mockImplementation(() => user as any);
+      const saveSpy = jest
+        .spyOn(userRepository, 'save')
+        .mockImplementation(() => Promise.resolve(user as any));
+
+      try {
+        await userService.createAdminUser(createUserAdminDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(ConflictException);
+        expect(error.message).toEqual('User with this email already exists');
+      }
+
+      expect(createSpy).not.toHaveBeenCalledWith(createUserAdminDto);
+      expect(saveSpy).not.toHaveBeenCalledWith(user);
+    });
+
+    it('should throw ConflictException when admin name already exists', async () => {
+      jest.spyOn(userRepository, 'findOne').mockImplementation(undefined);
+      jest
+        .spyOn(userRepository, 'create')
+        .mockImplementation(() => user as any);
+      jest.spyOn(userRepository, 'save').mockImplementation(() => {
+        throw new QueryFailedError('query', [], new Error());
+      });
+
+      try {
+        await userService.createAdminUser(createUserDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(ConflictException);
+        expect(error.message).toEqual('User with this email already exists');
+      }
+      expect(userRepository.create).toHaveBeenCalledWith(createUserDto);
+      expect(userRepository.save).toHaveBeenCalledWith(user);
+    });
+
+    it('should throw an error if creation fails', async () => {
+      jest.spyOn(userRepository, 'findOne').mockImplementation(undefined);
+      jest.spyOn(userRepository, 'create').mockImplementation(() => {
+        throw new Error('Create error');
+      });
+
+      try {
+        await userService.createAdminUser(createUserDto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e).toHaveProperty('message', 'Create error');
+      }
+    });
+
+    it('should throw an error if save fails', async () => {
+      jest.spyOn(userRepository, 'findOne').mockImplementation(undefined);
+      jest
+        .spyOn(userRepository, 'create')
+        .mockImplementation(() => user as any);
+      jest.spyOn(userRepository, 'save').mockImplementation(() => {
+        throw new Error('Save error');
+      });
+
+      try {
+        await userService.createAdminUser(createUserDto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e).toHaveProperty('message', 'Save error');
+      }
+    });
+  });
+
   describe('findUserByEmail', () => {
     it('should return a user if one is found', async () => {
       jest

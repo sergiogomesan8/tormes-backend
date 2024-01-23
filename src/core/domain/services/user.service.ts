@@ -31,18 +31,19 @@ export class UserService implements IUserService {
   }
 
   async createAdminUser(createUserDto: CreateUserDto) {
-    const user = await this.findUserByEmail(createUserDto.email);
-    if (user) {
-      return;
-    }
-    try {
-      const user = this.userRepository.create(createUserDto);
-      user.userType = UserType.manager;
+    const user = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+    });
+    if (!user) {
+      try {
+        const user = this.userRepository.create(createUserDto);
+        user.userType = UserType.manager;
 
-      await this.userRepository.save(user);
-    } catch (error) {
-      if (error instanceof QueryFailedError) {
-        throw new ConflictException('User with this email already exists');
+        await this.userRepository.save(user);
+      } catch (error) {
+        if (error instanceof QueryFailedError) {
+          throw new ConflictException('User with this email already exists');
+        }
       }
     }
   }
