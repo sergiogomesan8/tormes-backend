@@ -32,7 +32,7 @@ export class OrderEntity {
 
   @CreateDateColumn({ nullable: false })
   date: number;
-  @Column({ nullable: false })
+  @Column({ type: 'double precision', nullable: false })
   total: number;
   @Column({ nullable: true })
   trackingNumber?: string;
