@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { AuthService } from '../domain/services/auth.service';
 import { UserEntity } from '../../infraestructure/postgres/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -17,4 +17,17 @@ import { AccessTokenModule } from '../domain/services/jwt-config/access-token/ac
   controllers: [AuthController],
   providers: [UserService, AuthService, RolesGuard],
 })
-export class AuthModule {}
+export class AuthModule implements OnModuleInit {
+  constructor(private readonly authService: AuthService) {}
+  onModuleInit() {
+    this.registerAdminUser();
+  }
+
+  async registerAdminUser() {
+    await this.authService.registerAdminUser({
+      name: process.env.ADMIN_USER_EMAIL,
+      email: process.env.ADMIN_USER_EMAIL,
+      password: process.env.ADMIN_USER_PASSWORD,
+    });
+  }
+}

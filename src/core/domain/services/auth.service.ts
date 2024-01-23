@@ -23,6 +23,19 @@ export class AuthService implements IAuthService {
     private readonly refreshJwtService: RefreshJwtService,
   ) {}
 
+  async registerAdminUser(createUserDto: CreateUserDto) {
+    try {
+      const { password } = createUserDto;
+      const hashedPassword = bcrypt.hashSync(password, AuthService.SALT_ROUNDS);
+      await this.userService.createAdminUser({
+        ...createUserDto,
+        password: hashedPassword,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Error creating user');
+    }
+  }
+
   async register(createUserDto: CreateUserDto): Promise<AuthModel> {
     try {
       const { password } = createUserDto;

@@ -8,7 +8,7 @@ import { QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { CreateUserDto } from '../../../infraestructure/api-rest/dtos/user.dto';
-import { User } from '../models/user.model';
+import { User, UserType } from '../models/user.model';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -30,9 +30,23 @@ export class UserService implements IUserService {
     }
   }
 
-  // findOneBy(id: string): Promise<UserEntity | null> {
-  //   return this.userRepository.findOneBy({ id });
-  // }
+  async createAdminUser(createUserDto: CreateUserDto) {
+    const user = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+    });
+    if (!user) {
+      try {
+        const user = this.userRepository.create(createUserDto);
+        user.userType = UserType.manager;
+
+        await this.userRepository.save(user);
+      } catch (error) {
+        if (error instanceof QueryFailedError) {
+          throw new ConflictException('User with this email already exists');
+        }
+      }
+    }
+  }
 
   async findUserByEmail(email: string): Promise<User | null> {
     const user = await this.userRepository.findOne({

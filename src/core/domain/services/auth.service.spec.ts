@@ -33,6 +33,7 @@ describe('AuthService', () => {
           provide: getRepositoryToken(UserEntity),
           useValue: {
             create: jest.fn().mockResolvedValue({} as User),
+            findOne: jest.fn(),
           },
         },
         {
@@ -67,6 +68,37 @@ describe('AuthService', () => {
 
   const createUserDto = new CreateUserDto(name, email, password);
   const loginUserDto = new LoginUserDto(email, password);
+
+  describe('registerAdminUser', () => {
+    it('should register an admin user', async () => {
+      jest.spyOn(bcrypt, 'hashSync').mockReturnValue(password);
+      const createAdminUserSpy = jest
+        .spyOn(userService, 'createAdminUser')
+        .mockResolvedValue(undefined);
+
+      await userService.createAdminUser(createUserDto);
+
+      expect(createAdminUserSpy).toHaveBeenCalledWith({
+        ...createUserDto,
+        password,
+      });
+    });
+
+    it('should throw an error if userService.createAdminUser fails', async () => {
+      jest.spyOn(bcrypt, 'hashSync').mockReturnValue(password);
+      jest
+        .spyOn(userService, 'createAdminUser')
+        .mockImplementation(async () => {
+          throw new InternalServerErrorException('Error creating user');
+        });
+
+      await expect(
+        authService.registerAdminUser(createUserDto),
+      ).rejects.toThrow(
+        new InternalServerErrorException('Error creating user'),
+      );
+    });
+  });
 
   describe('register', () => {
     it('should register a user', async () => {
