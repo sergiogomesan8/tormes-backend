@@ -34,7 +34,7 @@ With this command, you will launch the Docker containers, which consist of 3 com
 
 `Email: sergio.gomesan8@gmail.com`
 
-`Password: tormesBackend`
+`Password: tormes-backend`
 
 
 ```bash
