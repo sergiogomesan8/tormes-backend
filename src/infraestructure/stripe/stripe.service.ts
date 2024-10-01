@@ -19,12 +19,40 @@ export class StripeService {
     return products.data;
   }
 
-  async createProduct(name: string): Promise<Stripe.Product> {
+  async createProduct(name: string, description: string, imageUrl: string, unitAmount: number): Promise<Stripe.Product> {
     const product = await this.stripe.products.create({
       name,
+      description,
+      images: [imageUrl],
+    });
+
+    const price = await this.stripe.prices.create({
+      product: product.id,
+      unit_amount: unitAmount,
+      currency: this.configService.get<string>('STRIPE_PRICE_CURRENCY'),
     });
     return product;
   }
+
+  async updateProduct(productId: string, name: string, description: string, imageUrl: string, unitAmount: number): Promise<Stripe.Product> {
+    const product = await this.stripe.products.update(productId, {
+      name,
+      description,
+      images: [imageUrl],
+    });
+
+    const price = await this.stripe.prices.create({
+      product: product.id,
+      unit_amount: unitAmount,
+      currency: this.configService.get<string>('STRIPE_PRICE_CURRENCY'),
+    });
+    return product;
+  }
+
+  async deleteProduct(productId: string): Promise<void> {
+    await this.stripe.products.del(productId);
+  }
+
 
   async createCheckoutSession(checkoutDto: CheckoutDto): Promise<string> {
     const lineItems = await Promise.all(checkoutDto.orderedProducts.map(async product => {
