@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -33,7 +34,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto';
 import { OptionalFilePipe } from '../pipe-builders/uploadFile.pipe.builder';
 import { FileInterceptorSavePath } from '../models/file-interceptor.model';
-import { Product } from '../../../core/domain/models/product.model';
+import { SerializedProduct } from '../../../core/domain/models/product.model';
 import { getStorageConfig } from '../helpers/file-upload.helper';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
@@ -62,9 +63,11 @@ export class ProductController {
     summary: 'Retrieve all products',
     description: 'Endpoint to get a list of all products',
   })
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('/list')
-  async findAllProducts(): Promise<Product[]> {
-    return await this.productService.findAllProducts();
+  async findAllProducts(): Promise<SerializedProduct[]> {
+    const products = await this.productService.findAllProducts();
+    return products.map(product => new SerializedProduct(product));
   }
 
   @ApiOperation({
@@ -72,11 +75,17 @@ export class ProductController {
     description: 'Endpoint to get a product by ID',
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('/:id')
   async findProductById(
     @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<Product> {
-    return await this.productService.findProductById(id);
+  ): Promise<SerializedProduct> {
+    const product = await this.productService.findProductById(id);
+    if (product) {
+      const serializedProduct = new SerializedProduct(product);
+      console.log(serializedProduct);
+      return serializedProduct;
+    }
   }
 
   @ApiOperation({
@@ -96,16 +105,20 @@ export class ProductController {
   )
   @UserTypes(UserType.manager, UserType.employee)
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   async createProduct(
     @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File,
     @Body() createProductDto: CreateProductDto,
-  ): Promise<Product> {
+  ): Promise<SerializedProduct> {
     if (!file) {
       throw new Error('No file provided');
     }
-
-    return this.productService.createProduct(createProductDto, file);
+    const product = await this.productService.createProduct(createProductDto, file);
+    if (product) {
+      const serializedProduct = new SerializedProduct(product);
+      return serializedProduct;
+    }
   }
 
   @ApiOperation({
@@ -126,13 +139,18 @@ export class ProductController {
   )
   @UserTypes(UserType.manager, UserType.employee)
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Patch('/:id')
   async updateProduct(
     @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File | null,
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
-    return await this.productService.updateProduct(id, updateProductDto, file);
+  ): Promise<SerializedProduct> {
+    const product = await this.productService.updateProduct(id, updateProductDto, file);
+    if (product) {
+      const serializedProduct = new SerializedProduct(product);
+      return serializedProduct;
+    }
   }
 
   @ApiOperation({
@@ -142,6 +160,7 @@ export class ProductController {
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
   @UserTypes(UserType.manager, UserType.employee)
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Delete('/:id')
   async deleteProduct(@Param('id') id: string) {
     return await this.productService.deleteProduct(id);
