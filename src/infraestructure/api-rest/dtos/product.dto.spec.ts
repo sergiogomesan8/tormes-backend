@@ -35,13 +35,11 @@ describe('UpdateProductDto', () => {
       description,
       price,
       section,
-      image,
     );
 
     expect(updateProductDto).toBeDefined();
     expect(updateProductDto.name).toBe(name);
     expect(updateProductDto.description).toBe(description);
-    expect(updateProductDto.image).toBe(image);
     expect(updateProductDto.price).toBe(price);
     expect(updateProductDto.section).toBe(section);
   });
