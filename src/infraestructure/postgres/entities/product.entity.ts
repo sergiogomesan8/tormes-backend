@@ -19,4 +19,7 @@ export class ProductEntity {
 
   @Column({ nullable: false })
   section: string;
+
+  @Column({ nullable: false })
+  paymentId: string;
 }
