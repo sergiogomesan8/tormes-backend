@@ -37,6 +37,14 @@ describe('OrderService', () => {
             findProductById: jest.fn(),
           },
         },
+        {
+          provide: 'IPaymentService',
+          useValue: {},
+        },
+        {
+          provide: 'IImageService',
+          useValue: {},
+        },
         UserService,
         {
           provide: getRepositoryToken(UserEntity),
