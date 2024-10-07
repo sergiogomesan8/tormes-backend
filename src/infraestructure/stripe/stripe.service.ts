@@ -2,9 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { CheckoutDto } from '../api-rest/dtos/checkout.dto';
+import { IPaymentService } from '../../core/domain/ports/inbound/payment.service.interface';
 
 @Injectable()
-export class StripeService {
+export class StripeService implements IPaymentService {
   private stripe: Stripe;
 
   constructor(@Inject('STRIPE_API_KEY') private readonly apiKey: string,
