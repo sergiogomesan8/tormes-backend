@@ -1,7 +1,7 @@
 import {
-  ConflictException,
+  Inject,
   Injectable,
-  NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { IProductService } from '../ports/inbound/product.service.interface';
 import {
@@ -11,26 +11,29 @@ import {
 import { Product } from '../models/product.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from '../../../infraestructure/postgres/entities/product.entity';
-import { DataSource, QueryFailedError, Repository } from 'typeorm';
-import { StripeService } from '../../../infraestructure/stripe/stripe.service';
-import { CloudinaryService } from '../../../infraestructure/cloudinary-config/cloudinary.service';
-import * as fs from 'fs';
-import { FileInterceptorSavePath } from '../../../infraestructure/api-rest/models/file-interceptor.model';
-import Stripe from 'stripe';
+import { Repository } from 'typeorm';
+import { IPaymentService } from '../ports/inbound/payment.service.interface';
+import { IImageService } from '../ports/inbound/image.service.interface';
 
 @Injectable()
 export class ProductService implements IProductService {
+  private readonly logger = new Logger(ProductService.name);
+
   constructor(
     @InjectRepository(ProductEntity)
     private productRepository: Repository<ProductEntity>,
-    private stripeService: StripeService,
-    private readonly cloudinaryService: CloudinaryService,
-    private dataSource: DataSource,
+    @Inject('IPaymentService')
+    private readonly paymentService: IPaymentService,
+    @Inject('IImageService')
+    private readonly imageService: IImageService,
   ) {}
 
   async findAllProducts(): Promise<Product[]> {
-    const product = await this.productRepository.find();
-    return product;
+    const products = await this.productRepository.find();
+    if (!products) {
+      this.logger.error('Products not found');
+    }
+    return products;
   }
 
   async findProductById(id: string): Promise<Product> {
@@ -38,32 +41,28 @@ export class ProductService implements IProductService {
       where: { id: id },
     });
     if (!product) {
-      throw new NotFoundException('Product Not Found');
+      this.logger.error(`Product with ${id} not found`);
     }
     return product;
   }
 
   async createProduct(createProductDto: CreateProductDto, file: Express.Multer.File): Promise<Product> {
-    return await this.dataSource.transaction(async (transactionalEntityManager) => {
-      try {
-        const image = await this.uploadImage(file);
-        const stripeProduct = await this.createStripeProduct(createProductDto.name, createProductDto.description, createProductDto.price, image);
+    try {
+      const image = await this.imageService.uploadImage(file);
 
-        const product = this.productRepository.create({
-          ...createProductDto,
-          image,
-          paymentId: stripeProduct.id,
-        });
+      const stripeProduct = await this.paymentService.createProduct(createProductDto.name, createProductDto.description, image, createProductDto.price, );
 
-        await transactionalEntityManager.save(product);
-        return product;
-      } catch (error) {
-        if (error instanceof QueryFailedError) {
-          throw new ConflictException('Product with this name already exists');
-        }
-        throw error;
-      }
-    });
+      const product = this.productRepository.create({
+        ...createProductDto,
+        image,
+        paymentId: stripeProduct.id,
+      });
+
+      await this.productRepository.save(product);
+      return product;
+    } catch (error) {
+      this.logger.error(`Error creating product: ${error.message}`, error.stack);
+    }
   }
 
   async updateProduct(
@@ -71,89 +70,52 @@ export class ProductService implements IProductService {
     updateProductDto: UpdateProductDto,
     file: Express.Multer.File | null,
   ): Promise<Product> {
-    return await this.productRepository.manager.transaction(async (transactionalEntityManager) => {
-      const existingProduct = await transactionalEntityManager.findOne(ProductEntity, { where: { id } });
-      if (!existingProduct) {
-        throw new NotFoundException('Product not found');
-      }
-
-      let image = existingProduct.image;
+    try{
+      const existingProduct = await this.productRepository.findOne({
+        where: { id: id },
+      });
+      let image: string;
       if (file) {
-        await this.deleteImage(existingProduct.image);
-        image = await this.uploadImage(file);
+        await this.imageService.deleteImage(existingProduct.image);
+        image = await this.imageService.uploadImage(file);
+      }
+      else{
+        image = existingProduct.image;
       }
 
-      const updatedProductDto = { ...existingProduct, ...updateProductDto, image };
-      const updateResult = await transactionalEntityManager.update(ProductEntity, id, updatedProductDto);
-      if (updateResult.affected === 0) {
-        throw new NotFoundException('Product not found');
-      }
+      await this.productRepository.update(
+        id,
+        {...updateProductDto, image}
+      );
 
-      const updatedProduct = await transactionalEntityManager.findOne(ProductEntity, { where: { id } });
-      if (!updatedProduct) {
-        throw new NotFoundException('Error retrieving updated product');
-      }
+      await this.paymentService.updateProduct(
+        id,
+        updateProductDto.name,
+        updateProductDto.description,
+        image,
+        updateProductDto.price,
+      );
 
-      if (existingProduct.paymentId) {
-        await this.updateStripeProduct(existingProduct.paymentId, updatedProduct.name, updatedProduct.description, updatedProduct.price, updatedProduct.image);
-      }
-
-      return updatedProduct as Product;
-    });
-  }
-
-  async deleteProduct(id: string) {
-    return await this.productRepository.manager.transaction(async (transactionalEntityManager) => {
-      const product = await transactionalEntityManager.findOne(ProductEntity, { where: { id } });
-      if (!product) {
-        throw new NotFoundException('Product not found');
-      }
-
-      if (product.paymentId) {
-        await this.deleteStripeProduct(product.paymentId);
-      }
-
-      const existingImage = product.image;
-      if (existingImage) {
-        await this.deleteImage(existingImage);
-      }
-
-      await transactionalEntityManager.delete(ProductEntity, id);
-      return { message: `Product with id ${id} was deleted.` };
-    });
-  }
-
-  private async createStripeProduct(name: string, description:string, price:number, imageUrl:string): Promise<Stripe.Product> {
-    const unitAmount = price * 100;
-    return await this.stripeService.createProduct(name, description, imageUrl, unitAmount);
-  }
-
-  private async deleteStripeProduct(stripeProductId: string): Promise<void> {
-    await this.stripeService.deleteProduct(stripeProductId);
-  }
-
-  private async updateStripeProduct(stripeProductId: string, name: string, description: string, price: number, imageUrl: string): Promise<Stripe.Product> {
-    const unitAmount = price * 100;
-    return await this.stripeService.updateProduct(stripeProductId, name, description, imageUrl, unitAmount);
-  }
-
-  private async uploadImage(file: Express.Multer.File): Promise<string> {
-    if (process.env.NODE_ENV === 'production') {
-      const result = await this.cloudinaryService.uploadImage(file);
-      return result.url as string;
-    } else {
-      return file.filename;
+      const updatedProduct = await this.productRepository.findOne({
+        where: { id: id },
+      });
+      return updatedProduct;
+    } catch (error) {
+      this.logger.error(`Error updating product: ${error.message}`, error.stack);
     }
   }
 
-  private async deleteImage(image: string): Promise<void> {
-    if (process.env.NODE_ENV === 'production') {
-      await this.cloudinaryService.deleteImage(image);
-    } else {
-      const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${image}`;
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
+  async deleteProduct(id: string) {
+    const product = await this.productRepository.findOne({ where: { id: id } });
+
+    if(product){
+      await this.imageService.deleteImage(product.image);
+      await this.paymentService.deleteProduct(product.paymentId);
+      await this.productRepository.delete(id);
+      return { message: `Product with id ${id} was deleted.` };
+    }
+    else{
+      this.logger.error(`Product with ${id} not found`);
     }
   }
 }
