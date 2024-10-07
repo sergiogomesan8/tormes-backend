@@ -3,11 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductController } from '../../infraestructure/api-rest/controllers/product.controller';
 import { ProductService } from '../domain/services/product.service';
 import { ProductEntity } from '../../infraestructure/postgres/entities/product.entity';
-import { StripeModule } from '../../infraestructure/stripe/stripe.module';
-import { CloudinaryModule } from '../../infraestructure/cloudinary-config/cloudinary.module';
+import { PaymentModule } from './payment.module';
+import { ImageModule } from './image.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProductEntity]), CloudinaryModule, StripeModule.forRootAsync()],
+  imports: [TypeOrmModule.forFeature([ProductEntity]), ImageModule, PaymentModule],
   controllers: [ProductController],
   providers: [ProductService],
   exports: [ProductService],
