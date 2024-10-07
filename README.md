@@ -20,9 +20,10 @@ $ npm install
 You need to have the backend up and running along with the Docker containers.
 
 To run docker containers:
-`docker compose up`
+`docker-compose up -d --build`
 
 `docker inspect <POSTGRES_CONTAINER_ID>`
+`docker inspect tormes-backend-postgres-database-1`
 
 And get:
 
@@ -53,6 +54,7 @@ $ npm run start:prod
 ```bash
 # unit tests
 $ npm run test
+$ npx jest src/ 
 
 # test coverage
 $ npm run coverage
@@ -66,3 +68,10 @@ docker inspect <Container-ID>
 "IPAddress": "172.21.0.2",
 
 - PgAdmin: 172.21.0.2 -> server addres
+
+
+## To create a Migration:
+
+```bash
+$ npm run migration:generate -- src/infraestructure/postgres/migrations/product/NombreDeLaMigracion
+```
