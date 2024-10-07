@@ -87,7 +87,6 @@ export class ProductController {
     const product = await this.productService.findProductById(id);
     if (product) {
       const serializedProduct = new SerializedProduct(product);
-      console.log(serializedProduct);
       return serializedProduct;
     }
     else{
