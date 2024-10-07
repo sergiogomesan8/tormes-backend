@@ -1,48 +1,60 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { HttpExceptionFilter } from './http-exception.filter';
-import { HttpException, HttpStatus, ArgumentsHost } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { ArgumentsHost } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 describe('HttpExceptionFilter', () => {
-  it('should catch exceptions', () => {
-    const mockRequest = {
-      url: '/test',
-    } as Request;
+  let filter: HttpExceptionFilter;
+  let mockResponse: Response;
+  let mockRequest: Request;
+  let mockArgumentsHost: ArgumentsHost;
 
-    const mockJson = jest.fn();
-    const mockStatus = jest.fn().mockReturnValue({ json: mockJson });
-    const mockResponse = {
-      status: mockStatus,
+  beforeEach(() => {
+    filter = new HttpExceptionFilter();
+    mockRequest = { url: '/test' } as Request;
+    mockResponse = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
     } as unknown as Response;
 
-    const mockNextFunction = jest.fn() as NextFunction;
-
-    const mockArgumentsHost: ArgumentsHost = {
+    mockArgumentsHost = {
       switchToHttp: () => ({
-        getResponse: <T = any>() => mockResponse as T,
-        getRequest: <T = any>() => mockRequest as T,
-        getNext: <T = any>() => mockNextFunction as T,
+        getResponse: () => mockResponse,
+        getRequest: () => mockRequest,
       }),
-      getArgs: <T = any>() => [] as T,
+      getArgs: () => [],
       getArgByIndex: () => null,
       switchToRpc: () => null,
       switchToWs: () => null,
-      getType: <TContext = string>() => 'http' as TContext,
-    };
+      getType: () => 'http',
+    } as unknown as ArgumentsHost;
+  });
 
-    const mockExceptionResponse = { message: 'Test exception' };
+  it('should return the correct status and message for HttpException', () => {
+    const mockExceptionResponse = { message: 'Bad Request' };
     const mockExceptionStatus = HttpStatus.BAD_REQUEST;
-    const mockException = {
-      getResponse: () => mockExceptionResponse,
-      getStatus: () => mockExceptionStatus,
-    } as unknown as HttpException;
+    const mockException = new HttpException(mockExceptionResponse, mockExceptionStatus);
 
-    const filter = new HttpExceptionFilter();
     filter.catch(mockException, mockArgumentsHost);
 
-    expect(mockStatus).toHaveBeenCalledWith(500);
-    expect(mockJson).toHaveBeenCalledWith({
-      statusCode: 500,
+    expect(mockResponse.status).toHaveBeenCalledWith(mockExceptionStatus);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      statusCode: mockExceptionStatus,
       message: mockExceptionResponse.message,
+      timestamp: expect.any(String),
+      path: mockRequest.url,
+    });
+  });
+
+  it('should return 500 Internal Server Error for non-HttpException', () => {
+    const mockNonHttpException = new Error('Some unexpected error');
+
+    filter.catch(mockNonHttpException, mockArgumentsHost);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error',
       timestamp: expect.any(String),
       path: mockRequest.url,
     });
