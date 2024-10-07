@@ -57,7 +57,7 @@ describe('CloudinaryService', () => {
 
       const result = await cloudinaryService.uploadImage(mockFile);
 
-      expect(result).toEqual(mockUploadApiResponse);
+      expect(result).toEqual(mockUploadApiResponse.secure_url);
     });
 
     it('should handle upload failure', async () => {
@@ -83,7 +83,7 @@ describe('CloudinaryService', () => {
 
       await expect(
         cloudinaryService.uploadImage(mockFile),
-      ).rejects.toThrowError(mockError);
+      ).rejects.toThrowError(new Error(mockError.message));
     });
   });
 
@@ -109,7 +109,7 @@ describe('CloudinaryService', () => {
 
       const mockError: UploadApiErrorResponse = {
         http_code: 500,
-        message: 'Upload failed',
+        message: 'Delete failed',
       } as UploadApiErrorResponse;
 
       (v2.uploader.destroy as jest.Mock).mockImplementation(
@@ -117,9 +117,10 @@ describe('CloudinaryService', () => {
           callback(mockError, null);
         },
       );
+
       await expect(
         cloudinaryService.deleteImage(mockPublicId),
-      ).rejects.toThrowError(mockError);
+      ).rejects.toThrowError(new Error(mockError.message));
     });
   });
 });

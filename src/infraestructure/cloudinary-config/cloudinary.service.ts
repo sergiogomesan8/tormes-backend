@@ -8,10 +8,6 @@ export class CloudinaryService extends AbstractImageService {
   private readonly logger = new Logger(CloudinaryService.name);
 
   async uploadImage(file: Express.Multer.File): Promise<string> {
-    if (process.env.NODE_ENV !== 'production') {
-      return file.filename;
-    }
-
     try {
       const result = await new Promise<UploadApiResponse>((resolve, reject) => {
         const upload = cloudinary.uploader.upload_stream((error, result) => {
