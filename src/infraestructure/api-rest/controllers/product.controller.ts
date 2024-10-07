@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -48,13 +50,12 @@ import { UserType } from '../../../core/domain/models/user.model';
   description: 'Unauthorized. User authentication failed.',
 })
 @ApiForbiddenResponse({ description: 'Forbidden.' })
-@ApiNotFoundResponse({
-  description: 'Not found. The specified ID does not exist.',
-})
 @ApiInternalServerErrorResponse({ description: 'Internet Server Error.' })
 @UseFilters(new HttpExceptionFilter())
 @Controller('product')
 export class ProductController {
+  private readonly logger = new Logger(ProductController.name);
+
   constructor(
     private readonly productService: ProductService,
   ) {}
@@ -75,6 +76,9 @@ export class ProductController {
     description: 'Endpoint to get a product by ID',
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
+  @ApiNotFoundResponse({
+    description: 'Not found. The specified ID does not exist.',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('/:id')
   async findProductById(
@@ -85,6 +89,10 @@ export class ProductController {
       const serializedProduct = new SerializedProduct(product);
       console.log(serializedProduct);
       return serializedProduct;
+    }
+    else{
+      this.logger.error(`Product with ${id} not found`);
+      throw new NotFoundException('Product Not Found');
     }
   }
 
@@ -131,6 +139,9 @@ export class ProductController {
     description: 'Product data and image file',
     type: UpdateProductDto,
   })
+  @ApiNotFoundResponse({
+    description: 'Not found. The specified ID does not exist.',
+  })
   @UseInterceptors(
     FileInterceptor(
       'image',
@@ -158,6 +169,9 @@ export class ProductController {
     description: 'Endpoint to delete a product by ID',
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the product' })
+  @ApiNotFoundResponse({
+    description: 'Not found. The specified ID does not exist.',
+  })
   @UserTypes(UserType.manager, UserType.employee)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(ClassSerializerInterceptor)
