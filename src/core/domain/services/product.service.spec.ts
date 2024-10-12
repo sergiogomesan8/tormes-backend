@@ -278,8 +278,6 @@ describe('ProductService', () => {
     it('should throw an error if save on database fails', async () => {
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
       jest.spyOn(paymentService, 'createProduct').mockResolvedValue({ id: paymentId });
-      jest.spyOn(productRepository, 'create').mockReturnValue(product as any);
-      jest.spyOn(productRepository, 'save').mockResolvedValue(product as any);
       jest
         .spyOn(productRepository, 'create')
         .mockImplementation(() => product as ProductEntity);

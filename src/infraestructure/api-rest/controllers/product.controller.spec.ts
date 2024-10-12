@@ -37,14 +37,14 @@ describe('ProductController', () => {
   const price: number = 100;
   const description = 'Product Description';
   const section = 'Product Section';
-  const imageMock = { filename: 'test.jpg' } as Express.Multer.File;
+  const image = { filename: 'test.jpg' } as Express.Multer.File;
 
   const product = {
     id: expect.any(String),
     name,
     price,
     description,
-    image: imageMock.filename,
+    image: image.filename,
     section,
   };
 
@@ -130,11 +130,11 @@ describe('ProductController', () => {
       jest.spyOn(productService, 'createProduct').mockResolvedValue(product);
 
       expect(
-        await productController.createProduct(imageMock, createProductDto),
+        await productController.createProduct(image, createProductDto),
       ).toStrictEqual(serializedProduct);
       expect(productService.createProduct).toHaveBeenCalledWith(
         createProductDto,
-        imageMock,
+        image,
       );
     });
 
@@ -150,7 +150,7 @@ describe('ProductController', () => {
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(
-        productController.createProduct(imageMock, createProductDto),
+        productController.createProduct(image, createProductDto),
       ).rejects.toThrow(InternalServerErrorException);
     });
   });
@@ -161,7 +161,7 @@ describe('ProductController', () => {
 
       expect(
         await productController.updateProduct(
-          imageMock,
+          image,
           expect.any(String),
           updateProductDto,
         ),
@@ -169,7 +169,7 @@ describe('ProductController', () => {
       expect(productService.updateProduct).toHaveBeenCalledWith(
         expect.any(String),
         updateProductDto,
-        imageMock
+        image
       );
     });
 
@@ -197,7 +197,7 @@ describe('ProductController', () => {
 
       return expect(
         productController.updateProduct(
-          imageMock,
+          image,
           expect.any(String),
           updateProductDto,
         ),
