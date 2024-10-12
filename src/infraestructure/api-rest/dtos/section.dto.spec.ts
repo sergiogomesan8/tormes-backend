@@ -14,12 +14,10 @@ describe('CreateSectionDto', () => {
 describe('UpdateSectionDto', () => {
   it('should create a UpdateProductDto object', () => {
     const name = 'Example Product';
-    const image = 'https://example.com/image.jpg';
 
-    const createProductDto = new UpdateSectionDto(name, image);
+    const createProductDto = new UpdateSectionDto(name);
 
     expect(createProductDto).toBeDefined();
     expect(createProductDto.name).toBe(name);
-    expect(createProductDto.image).toBe(image);
   });
 });
