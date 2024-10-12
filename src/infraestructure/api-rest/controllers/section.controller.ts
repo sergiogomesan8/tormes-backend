@@ -55,9 +55,7 @@ import { OptionalFilePipe } from '../pipe-builders/uploadFile.pipe.builder';
 export class SectionController {
   private readonly logger = new Logger(SectionController.name);
 
-  constructor(
-    private readonly sectionService: SectionService,
-  ) {}
+  constructor(private readonly sectionService: SectionService) {}
 
   @ApiOperation({
     summary: 'Retrieve all sections',

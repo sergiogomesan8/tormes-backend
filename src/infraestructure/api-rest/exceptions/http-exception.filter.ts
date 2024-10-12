@@ -19,7 +19,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     let status: number;
     let message: string | object;
-    let error: string | undefined;
 
     if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse();
@@ -27,7 +26,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         message = (exceptionResponse as any).message;
-        error = (exceptionResponse as any).error;
       } else {
         message = exceptionResponse;
       }

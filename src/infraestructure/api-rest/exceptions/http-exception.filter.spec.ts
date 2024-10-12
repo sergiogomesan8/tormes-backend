@@ -33,7 +33,10 @@ describe('HttpExceptionFilter', () => {
   it('should return the correct status and message for HttpException', () => {
     const mockExceptionResponse = { message: 'Bad Request' };
     const mockExceptionStatus = HttpStatus.BAD_REQUEST;
-    const mockException = new HttpException(mockExceptionResponse, mockExceptionStatus);
+    const mockException = new HttpException(
+      mockExceptionResponse,
+      mockExceptionStatus,
+    );
 
     filter.catch(mockException, mockArgumentsHost);
 
@@ -51,7 +54,9 @@ describe('HttpExceptionFilter', () => {
 
     filter.catch(mockNonHttpException, mockArgumentsHost);
 
-    expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(mockResponse.status).toHaveBeenCalledWith(
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
     expect(mockResponse.json).toHaveBeenCalledWith({
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       message: 'Internal server error',

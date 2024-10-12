@@ -18,11 +18,12 @@ const dataSource = new DataSource({
   synchronize: false,
   logging: true,
   namingStrategy: new SnakeNamingStrategy(),
-  ssl: process.env.NODE_ENV === 'production'
-    ? {
-        rejectUnauthorized: false,
-      }
-    : false,
+  ssl:
+    process.env.NODE_ENV === 'production'
+      ? {
+          rejectUnauthorized: false,
+        }
+      : false,
 });
 
 export default dataSource;

@@ -34,7 +34,7 @@ export class StripeService implements IPaymentService {
       images: [imageUrl],
     });
 
-    const price = await this.stripe.prices.create({
+    await this.stripe.prices.create({
       product: product.id,
       unit_amount: unitAmount,
       currency: this.configService.get<string>('STRIPE_PRICE_CURRENCY'),
@@ -55,7 +55,7 @@ export class StripeService implements IPaymentService {
       images: [imageUrl],
     });
 
-    const price = await this.stripe.prices.create({
+    await this.stripe.prices.create({
       product: product.id,
       unit_amount: unitAmount,
       currency: this.configService.get<string>('STRIPE_PRICE_CURRENCY'),
