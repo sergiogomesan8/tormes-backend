@@ -56,9 +56,7 @@ import { UserType } from '../../../core/domain/models/user.model';
 export class ProductController {
   private readonly logger = new Logger(ProductController.name);
 
-  constructor(
-    private readonly productService: ProductService,
-  ) {}
+  constructor(private readonly productService: ProductService) {}
 
   @ApiOperation({
     summary: 'Retrieve all products',
@@ -68,7 +66,7 @@ export class ProductController {
   @Get('/list')
   async findAllProducts(): Promise<SerializedProduct[]> {
     const products = await this.productService.findAllProducts();
-    return products.map(product => new SerializedProduct(product));
+    return products.map((product) => new SerializedProduct(product));
   }
 
   @ApiOperation({
@@ -88,8 +86,7 @@ export class ProductController {
     if (product) {
       const serializedProduct = new SerializedProduct(product);
       return serializedProduct;
-    }
-    else{
+    } else {
       this.logger.error(`Product with ${id} not found`);
       throw new NotFoundException('Product Not Found');
     }
@@ -121,7 +118,10 @@ export class ProductController {
     if (!file) {
       throw new Error('No file provided');
     }
-    const product = await this.productService.createProduct(createProductDto, file);
+    const product = await this.productService.createProduct(
+      createProductDto,
+      file,
+    );
     if (product) {
       const serializedProduct = new SerializedProduct(product);
       return serializedProduct;
@@ -156,7 +156,11 @@ export class ProductController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<SerializedProduct> {
-    const product = await this.productService.updateProduct(id, updateProductDto, file);
+    const product = await this.productService.updateProduct(
+      id,
+      updateProductDto,
+      file,
+    );
     if (product) {
       const serializedProduct = new SerializedProduct(product);
       return serializedProduct;

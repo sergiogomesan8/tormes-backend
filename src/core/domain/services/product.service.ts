@@ -1,8 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { IProductService } from '../ports/inbound/product.service.interface';
 import {
   CreateProductDto,
@@ -46,11 +42,19 @@ export class ProductService implements IProductService {
     return product;
   }
 
-  async createProduct(createProductDto: CreateProductDto, file: Express.Multer.File): Promise<Product> {
+  async createProduct(
+    createProductDto: CreateProductDto,
+    file: Express.Multer.File,
+  ): Promise<Product> {
     try {
       const image = await this.imageService.uploadImage(file);
 
-      const stripeProduct = await this.paymentService.createProduct(createProductDto.name, createProductDto.description, image, createProductDto.price, );
+      const stripeProduct = await this.paymentService.createProduct(
+        createProductDto.name,
+        createProductDto.description,
+        image,
+        createProductDto.price,
+      );
 
       const product = this.productRepository.create({
         ...createProductDto,
@@ -61,7 +65,10 @@ export class ProductService implements IProductService {
       await this.productRepository.save(product);
       return product;
     } catch (error) {
-      this.logger.error(`Error creating product: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error creating product: ${error.message}`,
+        error.stack,
+      );
     }
   }
 
@@ -70,7 +77,7 @@ export class ProductService implements IProductService {
     updateProductDto: UpdateProductDto,
     file: Express.Multer.File | null,
   ): Promise<Product> {
-    try{
+    try {
       const existingProduct = await this.productRepository.findOne({
         where: { id: id },
       });
@@ -78,15 +85,11 @@ export class ProductService implements IProductService {
       if (file) {
         await this.imageService.deleteImage(existingProduct.image);
         image = await this.imageService.uploadImage(file);
-      }
-      else{
+      } else {
         image = existingProduct.image;
       }
 
-      await this.productRepository.update(
-        id,
-        {...updateProductDto, image}
-      );
+      await this.productRepository.update(id, { ...updateProductDto, image });
 
       await this.paymentService.updateProduct(
         id,
@@ -101,20 +104,22 @@ export class ProductService implements IProductService {
       });
       return updatedProduct;
     } catch (error) {
-      this.logger.error(`Error updating product: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error updating product: ${error.message}`,
+        error.stack,
+      );
     }
   }
 
   async deleteProduct(id: string) {
     const product = await this.productRepository.findOne({ where: { id: id } });
 
-    if(product){
+    if (product) {
       await this.imageService.deleteImage(product.image);
       await this.paymentService.deleteProduct(product.paymentId);
       await this.productRepository.delete(id);
       return { message: `Product with id ${id} was deleted.` };
-    }
-    else{
+    } else {
       this.logger.error(`Product with ${id} not found`);
     }
   }

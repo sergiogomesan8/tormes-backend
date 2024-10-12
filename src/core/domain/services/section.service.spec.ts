@@ -4,7 +4,6 @@ import { QueryFailedError, Repository } from 'typeorm';
 import { SectionEntity } from '../../../infraestructure/postgres/entities/section.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Section } from '../models/section.model';
-import { ConflictException, NotFoundException } from '@nestjs/common';
 import {
   CreateSectionDto,
   UpdateSectionDto,
@@ -66,13 +65,9 @@ describe('SectionService', () => {
     image,
   };
 
-  const createSectionDto = new CreateSectionDto(
-    name,
-  );
+  const createSectionDto = new CreateSectionDto(name);
 
-  const updateSectionDto = new UpdateSectionDto(
-    name,
-  );
+  const updateSectionDto = new UpdateSectionDto(name);
 
   describe('findAllSections', () => {
     it('should return all sections', async () => {
@@ -107,9 +102,13 @@ describe('SectionService', () => {
     it('should return section with the id', async () => {
       jest.spyOn(sectionRepository, 'findOne').mockResolvedValue(section);
 
-      const sectionResult = await sectionService.findSectionById(expect.any(String),);
+      const sectionResult = await sectionService.findSectionById(
+        expect.any(String),
+      );
       expect(sectionResult).toEqual(section);
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
     });
 
     it('should throw an error if the database query fails', async () => {
@@ -120,7 +119,9 @@ describe('SectionService', () => {
       await expect(
         sectionService.findSectionById(expect.any(String)),
       ).rejects.toThrow('Database error');
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
     });
 
     it('should throw an error when it happens', async () => {
@@ -129,7 +130,9 @@ describe('SectionService', () => {
       await expect(
         sectionService.findSectionById(expect.any(String)),
       ).rejects.toThrow(Error);
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
     });
   });
 
@@ -178,8 +181,10 @@ describe('SectionService', () => {
       expect(sectionRepository.save).toHaveBeenCalledWith(section);
     });
 
-      it('should throw an error if upload image fails', async () => {
-      jest.spyOn(imageService, 'uploadImage').mockRejectedValue(new Error('Upload failed'));
+    it('should throw an error if upload image fails', async () => {
+      jest
+        .spyOn(imageService, 'uploadImage')
+        .mockRejectedValue(new Error('Upload failed'));
 
       const result = await sectionService.createSection(createSectionDto, file);
 
@@ -240,16 +245,22 @@ describe('SectionService', () => {
         .spyOn(sectionRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
 
-      const result = await sectionService.updateSection('id', updateSectionDto, file);
+      const result = await sectionService.updateSection(
+        'id',
+        updateSectionDto,
+        file,
+      );
 
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(section.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
 
-      expect(sectionRepository.update).toHaveBeenCalledWith(
-        section.id,
-        {...updateSectionDto, image}
-      );
+      expect(sectionRepository.update).toHaveBeenCalledWith(section.id, {
+        ...updateSectionDto,
+        image,
+      });
       expect(result).toEqual(section);
     });
 
@@ -262,18 +273,30 @@ describe('SectionService', () => {
         .spyOn(sectionRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
 
-      const result = await sectionService.updateSection('id', updateSectionDto, null);
+      const result = await sectionService.updateSection(
+        'id',
+        updateSectionDto,
+        null,
+      );
 
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(result).toEqual(section);
     });
 
     it('should throw an error when no section is found to update', async () => {
       jest.spyOn(sectionRepository, 'findOne').mockRejectedValue(new Error());
 
-      const result = await sectionService.updateSection('id', updateSectionDto, null);
+      const result = await sectionService.updateSection(
+        'id',
+        updateSectionDto,
+        null,
+      );
 
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(result).toBeUndefined();
     });
 
@@ -281,11 +304,19 @@ describe('SectionService', () => {
       jest
         .spyOn(sectionRepository, 'findOne')
         .mockResolvedValue(section as SectionEntity);
-      jest.spyOn(imageService, 'deleteImage').mockRejectedValue(new Error('Error'));
+      jest
+        .spyOn(imageService, 'deleteImage')
+        .mockRejectedValue(new Error('Error'));
 
-      const result = await sectionService.updateSection(section.id, updateSectionDto, file);
+      const result = await sectionService.updateSection(
+        section.id,
+        updateSectionDto,
+        file,
+      );
 
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(section.image);
       expect(result).toBeUndefined();
     });
@@ -295,11 +326,19 @@ describe('SectionService', () => {
         .spyOn(sectionRepository, 'findOne')
         .mockResolvedValue(section as SectionEntity);
       jest.spyOn(imageService, 'deleteImage').mockResolvedValue(undefined);
-      jest.spyOn(imageService, 'uploadImage').mockRejectedValue(new Error('Error'));
+      jest
+        .spyOn(imageService, 'uploadImage')
+        .mockRejectedValue(new Error('Error'));
 
-      const result = await sectionService.updateSection(section.id, updateSectionDto, file);
+      const result = await sectionService.updateSection(
+        section.id,
+        updateSectionDto,
+        file,
+      );
 
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(section.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
       expect(result).toBeUndefined();
@@ -313,15 +352,21 @@ describe('SectionService', () => {
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
       jest.spyOn(sectionRepository, 'update').mockRejectedValue(new Error());
 
-      const result = await sectionService.updateSection(section.id, updateSectionDto, file);
+      const result = await sectionService.updateSection(
+        section.id,
+        updateSectionDto,
+        file,
+      );
 
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(section.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(sectionRepository.update).toHaveBeenCalledWith(
-        section.id,
-        {...updateSectionDto, image}
-      );
+      expect(sectionRepository.update).toHaveBeenCalledWith(section.id, {
+        ...updateSectionDto,
+        image,
+      });
       expect(result).toBeUndefined();
     });
 
@@ -331,13 +376,19 @@ describe('SectionService', () => {
         .mockResolvedValue(section as SectionEntity);
       jest.spyOn(sectionRepository, 'update').mockRejectedValue(new Error());
 
-      const result = await sectionService.updateSection(section.id, updateSectionDto, null);
-
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
-      expect(sectionRepository.update).toHaveBeenCalledWith(
+      const result = await sectionService.updateSection(
         section.id,
-        {...updateSectionDto, image: section.image}
+        updateSectionDto,
+        null,
       );
+
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
+      expect(sectionRepository.update).toHaveBeenCalledWith(section.id, {
+        ...updateSectionDto,
+        image: section.image,
+      });
       expect(result).toBeUndefined();
     });
 
@@ -352,17 +403,25 @@ describe('SectionService', () => {
         .spyOn(sectionRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
 
-      const result = await sectionService.updateSection(section.id, updateSectionDto, file);
+      const result = await sectionService.updateSection(
+        section.id,
+        updateSectionDto,
+        file,
+      );
 
       expect(sectionRepository.findOne).toHaveBeenCalledTimes(2);
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(section.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(sectionRepository.update).toHaveBeenCalledWith(
-        section.id,
-        {...updateSectionDto, image}
-      );
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.update).toHaveBeenCalledWith(section.id, {
+        ...updateSectionDto,
+        image,
+      });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(result).toBeUndefined();
     });
 
@@ -375,21 +434,30 @@ describe('SectionService', () => {
         .spyOn(sectionRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
 
-      const result = await sectionService.updateSection(section.id, updateSectionDto, null);
+      const result = await sectionService.updateSection(
+        section.id,
+        updateSectionDto,
+        null,
+      );
 
       expect(sectionRepository.findOne).toHaveBeenCalledTimes(2);
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(result).toBeUndefined();
     });
-
   });
 
   describe('deleteSection', () => {
     it('should delete a section when section exists', async () => {
       jest.spyOn(sectionRepository, 'findOne').mockResolvedValue(section);
       jest.spyOn(imageService, 'deleteImage').mockResolvedValue(undefined);
-      jest.spyOn(sectionRepository, 'delete').mockResolvedValue({ affected: 1, raw: [] });
+      jest
+        .spyOn(sectionRepository, 'delete')
+        .mockResolvedValue({ affected: 1, raw: [] });
 
       const result = await sectionService.deleteSection(section.id);
 
@@ -408,7 +476,9 @@ describe('SectionService', () => {
       await expect(sectionService.deleteSection(section.id)).rejects.toThrow(
         Error,
       );
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
     });
 
     it('should throw error when delete method throws an error', async () => {
@@ -420,17 +490,25 @@ describe('SectionService', () => {
       await expect(sectionService.deleteSection(section.id)).rejects.toThrow(
         'Error',
       );
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(section.image);
     });
 
     it('should throw error when delete image throws an error', async () => {
       jest.spyOn(sectionRepository, 'findOne').mockResolvedValue(section);
-      jest.spyOn(imageService, 'deleteImage').mockRejectedValue(new Error('Error'));
+      jest
+        .spyOn(imageService, 'deleteImage')
+        .mockRejectedValue(new Error('Error'));
 
-      await expect(sectionService.deleteSection(section.id)).rejects.toThrow('Error');
+      await expect(sectionService.deleteSection(section.id)).rejects.toThrow(
+        'Error',
+      );
 
-      expect(sectionRepository.findOne).toHaveBeenCalledWith({ where: { id: section.id } });
+      expect(sectionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: section.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(section.image);
     });
   });

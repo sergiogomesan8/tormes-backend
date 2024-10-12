@@ -35,7 +35,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       message = 'Internal server error';
 
-      this.logger.error(`Unexpected error: ${exception instanceof Error ? exception.message : exception}`, (exception as Error).stack);
+      this.logger.error(
+        `Unexpected error: ${
+          exception instanceof Error ? exception.message : exception
+        }`,
+        (exception as Error).stack,
+      );
     }
 
     response.status(status).json({

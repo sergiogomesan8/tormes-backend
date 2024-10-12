@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import * as streamifier from 'streamifier';
-import { AbstractImageService } from '../../core/domain/ports/outbound/abstract-image.service.interface'
+import { AbstractImageService } from '../../core/domain/ports/outbound/abstract-image.service.interface';
 
 @Injectable()
 export class CloudinaryService extends AbstractImageService {
@@ -19,7 +19,10 @@ export class CloudinaryService extends AbstractImageService {
 
       return result.secure_url;
     } catch (error) {
-      this.logger.error(`Error uploading image to Cloudinary: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error uploading image to Cloudinary: ${error.message}`,
+        error.stack,
+      );
       throw new Error(error.message);
     }
   }

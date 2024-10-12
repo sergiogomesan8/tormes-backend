@@ -7,7 +7,11 @@ import { PaymentModule } from './payment.module';
 import { ImageModule } from './image.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProductEntity]), ImageModule, PaymentModule],
+  imports: [
+    TypeOrmModule.forFeature([ProductEntity]),
+    ImageModule,
+    PaymentModule,
+  ],
   controllers: [ProductController],
   providers: [ProductService],
   exports: [ProductService],

@@ -7,7 +7,10 @@ import { Section } from '../../models/section.model';
 export interface ISectionService {
   findAllSections(): Promise<Section[]>;
   findSectionById(id: string): Promise<Section | null>;
-  createSection(createSectionDto: CreateSectionDto, file: Express.Multer.File): Promise<Section>;
+  createSection(
+    createSectionDto: CreateSectionDto,
+    file: Express.Multer.File,
+  ): Promise<Section>;
   updateSection(
     id: string,
     updateSectionDto: UpdateSectionDto,

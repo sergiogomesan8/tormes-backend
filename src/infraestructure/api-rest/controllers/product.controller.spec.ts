@@ -69,7 +69,9 @@ describe('ProductController', () => {
       jest
         .spyOn(productService, 'findAllProducts')
         .mockResolvedValue([product]);
-      expect(await productController.findAllProducts()).toEqual([serializedProduct]);
+      expect(await productController.findAllProducts()).toEqual([
+        serializedProduct,
+      ]);
       expect(productService.findAllProducts).toHaveBeenCalled();
     });
 
@@ -93,9 +95,9 @@ describe('ProductController', () => {
   describe('findProductById', () => {
     it('should return a product by id', async () => {
       jest.spyOn(productService, 'findProductById').mockResolvedValue(product);
-      expect(await productController.findProductById(expect.any(String))).toStrictEqual(
-        serializedProduct,
-      );
+      expect(
+        await productController.findProductById(expect.any(String)),
+      ).toStrictEqual(serializedProduct);
       expect(productService.findProductById).toHaveBeenCalledWith(
         expect.any(String),
       );
@@ -103,15 +105,15 @@ describe('ProductController', () => {
 
     it('should log an error and return a NotFoundException if product was not found', () => {
       const loggerSpy = jest.spyOn(productController['logger'], 'error');
-      jest
-        .spyOn(productService, 'findProductById')
-        .mockResolvedValue(null);
+      jest.spyOn(productService, 'findProductById').mockResolvedValue(null);
 
-      return expect(
-        productController.findProductById(expect.any(String)),
-      ).rejects.toThrow(NotFoundException).finally(() => {
-        expect(loggerSpy).toHaveBeenCalledWith(`Product with ${expect.any(String)} not found`);
-      });
+      return expect(productController.findProductById(expect.any(String)))
+        .rejects.toThrow(NotFoundException)
+        .finally(() => {
+          expect(loggerSpy).toHaveBeenCalledWith(
+            `Product with ${expect.any(String)} not found`,
+          );
+        });
     });
 
     it('should return an Http Exception error when it happens', () => {
@@ -169,7 +171,7 @@ describe('ProductController', () => {
       expect(productService.updateProduct).toHaveBeenCalledWith(
         expect.any(String),
         updateProductDto,
-        image
+        image,
       );
     });
 
@@ -186,7 +188,7 @@ describe('ProductController', () => {
       expect(productService.updateProduct).toHaveBeenCalledWith(
         expect.any(String),
         updateProductDto,
-        null
+        null,
       );
     });
 

@@ -84,15 +84,15 @@ describe('SectionController', () => {
 
     it('should log an error and return a NotFoundException if section was not found', () => {
       const loggerSpy = jest.spyOn(sectionController['logger'], 'error');
-      jest
-        .spyOn(sectionService, 'findSectionById')
-        .mockResolvedValue(null);
+      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(null);
 
-      return expect(
-        sectionController.findSectionById(expect.any(String)),
-      ).rejects.toThrow(NotFoundException).finally(() => {
-        expect(loggerSpy).toHaveBeenCalledWith(`Section with ${expect.any(String)} not found`);
-      });
+      return expect(sectionController.findSectionById(expect.any(String)))
+        .rejects.toThrow(NotFoundException)
+        .finally(() => {
+          expect(loggerSpy).toHaveBeenCalledWith(
+            `Section with ${expect.any(String)} not found`,
+          );
+        });
     });
 
     it('should return an Http Exception error when it happens', () => {
@@ -150,7 +150,7 @@ describe('SectionController', () => {
       expect(sectionService.updateSection).toHaveBeenCalledWith(
         expect.any(String),
         updateSectionDto,
-        image
+        image,
       );
     });
 
@@ -167,7 +167,7 @@ describe('SectionController', () => {
       expect(sectionService.updateSection).toHaveBeenCalledWith(
         expect.any(String),
         updateSectionDto,
-        null
+        null,
       );
     });
 

@@ -7,7 +7,6 @@ import {
   CreateProductDto,
   UpdateProductDto,
 } from '../../../infraestructure/api-rest/dtos/product.dto';
-import { ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { IPaymentService } from '../ports/inbound/payment.service.interface';
 import { IImageService } from '../ports/inbound/image.service.interface';
 
@@ -82,7 +81,7 @@ describe('ProductService', () => {
     price,
     section,
     paymentId,
-  }
+  };
 
   const createProductDto = new CreateProductDto(
     name,
@@ -133,7 +132,9 @@ describe('ProductService', () => {
 
       const products = await productService.findProductById(expect.any(String));
       expect(products).toEqual(product);
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
     });
 
     it('should throw an error if the database query fails', async () => {
@@ -144,7 +145,9 @@ describe('ProductService', () => {
       await expect(
         productService.findProductById(expect.any(String)),
       ).rejects.toThrow('Database error');
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
     });
 
     it('should throw an error when it happens', async () => {
@@ -153,14 +156,18 @@ describe('ProductService', () => {
       await expect(
         productService.findProductById(expect.any(String)),
       ).rejects.toThrow(Error);
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
     });
   });
 
   describe('createProduct', () => {
     it('should create a product', async () => {
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
-      jest.spyOn(paymentService, 'createProduct').mockResolvedValue({ id: paymentId });
+      jest
+        .spyOn(paymentService, 'createProduct')
+        .mockResolvedValue({ id: paymentId });
       jest
         .spyOn(productRepository, 'create')
         .mockImplementation(() => product as ProductEntity);
@@ -175,22 +182,22 @@ describe('ProductService', () => {
         createProductDto.name,
         createProductDto.description,
         image,
-        createProductDto.price
+        createProductDto.price,
       );
-      expect(productRepository.create).toHaveBeenCalledWith(
-        {
-          ...createProductDto,
-          image: image,
-          paymentId: paymentId,
-        }
-      );
+      expect(productRepository.create).toHaveBeenCalledWith({
+        ...createProductDto,
+        image: image,
+        paymentId: paymentId,
+      });
       expect(productRepository.save).toHaveBeenCalledWith(product);
       expect(result).toEqual(product);
     });
 
     it('should throw an error when product name already exists', async () => {
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
-      jest.spyOn(paymentService, 'createProduct').mockResolvedValue({ id: paymentId });
+      jest
+        .spyOn(paymentService, 'createProduct')
+        .mockResolvedValue({ id: paymentId });
       jest
         .spyOn(productRepository, 'create')
         .mockImplementation(() => product as ProductEntity);
@@ -209,20 +216,20 @@ describe('ProductService', () => {
         createProductDto.name,
         createProductDto.description,
         image,
-        createProductDto.price
+        createProductDto.price,
       );
-      expect(productRepository.create).toHaveBeenCalledWith(
-        {
-          ...createProductDto,
-          image: image,
-          paymentId: paymentId,
-        }
-      );
+      expect(productRepository.create).toHaveBeenCalledWith({
+        ...createProductDto,
+        image: image,
+        paymentId: paymentId,
+      });
       expect(productRepository.save).toHaveBeenCalledWith(product);
     });
 
     it('should throw an error if upload image fails', async () => {
-      jest.spyOn(imageService, 'uploadImage').mockRejectedValue(new Error('Upload failed'));
+      jest
+        .spyOn(imageService, 'uploadImage')
+        .mockRejectedValue(new Error('Upload failed'));
 
       const result = await productService.createProduct(createProductDto, file);
 
@@ -232,7 +239,9 @@ describe('ProductService', () => {
 
     it('should throw an error if create product on stripe fails', async () => {
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
-      jest.spyOn(paymentService, 'createProduct').mockRejectedValue(new Error('Product creation on Stripe failed'));
+      jest
+        .spyOn(paymentService, 'createProduct')
+        .mockRejectedValue(new Error('Product creation on Stripe failed'));
 
       const result = await productService.createProduct(createProductDto, file);
 
@@ -241,14 +250,16 @@ describe('ProductService', () => {
         createProductDto.name,
         createProductDto.description,
         image,
-        createProductDto.price
+        createProductDto.price,
       );
       expect(result).toBeUndefined();
     });
 
     it('should throw an error if creation on database fails', async () => {
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
-      jest.spyOn(paymentService, 'createProduct').mockResolvedValue({ id: paymentId });
+      jest
+        .spyOn(paymentService, 'createProduct')
+        .mockResolvedValue({ id: paymentId });
       jest.spyOn(productRepository, 'create').mockImplementation(() => {
         throw new Error('Create error');
       });
@@ -264,20 +275,20 @@ describe('ProductService', () => {
         createProductDto.name,
         createProductDto.description,
         image,
-        createProductDto.price
+        createProductDto.price,
       );
-      expect(productRepository.create).toHaveBeenCalledWith(
-        {
-          ...createProductDto,
-          image: image,
-          paymentId: paymentId,
-        }
-      );
+      expect(productRepository.create).toHaveBeenCalledWith({
+        ...createProductDto,
+        image: image,
+        paymentId: paymentId,
+      });
     });
 
     it('should throw an error if save on database fails', async () => {
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
-      jest.spyOn(paymentService, 'createProduct').mockResolvedValue({ id: paymentId });
+      jest
+        .spyOn(paymentService, 'createProduct')
+        .mockResolvedValue({ id: paymentId });
       jest
         .spyOn(productRepository, 'create')
         .mockImplementation(() => product as ProductEntity);
@@ -296,15 +307,13 @@ describe('ProductService', () => {
         createProductDto.name,
         createProductDto.description,
         image,
-        createProductDto.price
+        createProductDto.price,
       );
-      expect(productRepository.create).toHaveBeenCalledWith(
-        {
-          ...createProductDto,
-          image: image,
-          paymentId: paymentId,
-        }
-      );
+      expect(productRepository.create).toHaveBeenCalledWith({
+        ...createProductDto,
+        image: image,
+        paymentId: paymentId,
+      });
     });
   });
 
@@ -319,17 +328,25 @@ describe('ProductService', () => {
       jest
         .spyOn(productRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
-      jest.spyOn(paymentService, 'updateProduct').mockResolvedValue({ id: paymentId });
+      jest
+        .spyOn(paymentService, 'updateProduct')
+        .mockResolvedValue({ id: paymentId });
 
-      const result = await productService.updateProduct('id', updateProductDto, file);
+      const result = await productService.updateProduct(
+        'id',
+        updateProductDto,
+        file,
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(productRepository.update).toHaveBeenCalledWith(
-        product.id,
-        {...updateProductDto, image}
-      );
+      expect(productRepository.update).toHaveBeenCalledWith(product.id, {
+        ...updateProductDto,
+        image,
+      });
       expect(paymentService.updateProduct).toHaveBeenCalledWith(
         product.id,
         updateProductDto.name,
@@ -348,11 +365,19 @@ describe('ProductService', () => {
       jest
         .spyOn(productRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
-      jest.spyOn(paymentService, 'updateProduct').mockResolvedValue({ id: paymentId });
+      jest
+        .spyOn(paymentService, 'updateProduct')
+        .mockResolvedValue({ id: paymentId });
 
-      const result = await productService.updateProduct('id', updateProductDto, null);
+      const result = await productService.updateProduct(
+        'id',
+        updateProductDto,
+        null,
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(paymentService.updateProduct).toHaveBeenCalledWith(
         product.id,
         updateProductDto.name,
@@ -366,9 +391,15 @@ describe('ProductService', () => {
     it('should throw an Error when no product is found to update', async () => {
       jest.spyOn(productRepository, 'findOne').mockRejectedValue(new Error());
 
-      const result = await productService.updateProduct(product.id, updateProductDto, file);
+      const result = await productService.updateProduct(
+        product.id,
+        updateProductDto,
+        file,
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(result).toBeUndefined();
     });
 
@@ -376,11 +407,19 @@ describe('ProductService', () => {
       jest
         .spyOn(productRepository, 'findOne')
         .mockResolvedValue(product as ProductEntity);
-      jest.spyOn(imageService, 'deleteImage').mockRejectedValue(new Error('Error'));
+      jest
+        .spyOn(imageService, 'deleteImage')
+        .mockRejectedValue(new Error('Error'));
 
-      const result = await productService.updateProduct(product.id, updateProductDto, file);
+      const result = await productService.updateProduct(
+        product.id,
+        updateProductDto,
+        file,
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
       expect(result).toBeUndefined();
     });
@@ -390,11 +429,19 @@ describe('ProductService', () => {
         .spyOn(productRepository, 'findOne')
         .mockResolvedValue(product as ProductEntity);
       jest.spyOn(imageService, 'deleteImage').mockResolvedValue(undefined);
-      jest.spyOn(imageService, 'uploadImage').mockRejectedValue(new Error('Error'));
+      jest
+        .spyOn(imageService, 'uploadImage')
+        .mockRejectedValue(new Error('Error'));
 
-      const result = await productService.updateProduct(product.id, updateProductDto, file);
+      const result = await productService.updateProduct(
+        product.id,
+        updateProductDto,
+        file,
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
       expect(result).toBeUndefined();
@@ -408,15 +455,21 @@ describe('ProductService', () => {
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
       jest.spyOn(productRepository, 'update').mockRejectedValue(new Error());
 
-      const result = await productService.updateProduct(product.id, updateProductDto, file);
+      const result = await productService.updateProduct(
+        product.id,
+        updateProductDto,
+        file,
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(productRepository.update).toHaveBeenCalledWith(
-        product.id,
-        {...updateProductDto, image}
-      );
+      expect(productRepository.update).toHaveBeenCalledWith(product.id, {
+        ...updateProductDto,
+        image,
+      });
       expect(result).toBeUndefined();
     });
 
@@ -426,36 +479,50 @@ describe('ProductService', () => {
         .mockResolvedValue(product as ProductEntity);
       jest.spyOn(productRepository, 'update').mockRejectedValue(new Error());
 
-      const result = await productService.updateProduct(product.id, updateProductDto, null);
-
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
-      expect(productRepository.update).toHaveBeenCalledWith(
+      const result = await productService.updateProduct(
         product.id,
-        {...updateProductDto, image: product.image}
+        updateProductDto,
+        null,
       );
+
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
+      expect(productRepository.update).toHaveBeenCalledWith(product.id, {
+        ...updateProductDto,
+        image: product.image,
+      });
       expect(result).toBeUndefined();
     });
 
     it('should throw an Error when on update Product on payment service fails', async () => {
       jest
         .spyOn(productRepository, 'findOne')
-        .mockResolvedValue(product as ProductEntity)
+        .mockResolvedValue(product as ProductEntity);
       jest.spyOn(imageService, 'deleteImage').mockResolvedValue(undefined);
       jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
       jest
         .spyOn(productRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
-      jest.spyOn(paymentService, 'updateProduct').mockRejectedValue(new Error());
+      jest
+        .spyOn(paymentService, 'updateProduct')
+        .mockRejectedValue(new Error());
 
-      const result = await productService.updateProduct(product.id, updateProductDto, file);
+      const result = await productService.updateProduct(
+        product.id,
+        updateProductDto,
+        file,
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(productRepository.update).toHaveBeenCalledWith(
-        product.id,
-        {...updateProductDto, image}
-      );
+      expect(productRepository.update).toHaveBeenCalledWith(product.id, {
+        ...updateProductDto,
+        image,
+      });
       expect(paymentService.updateProduct).toHaveBeenCalledWith(
         product.id,
         updateProductDto.name,
@@ -476,18 +543,26 @@ describe('ProductService', () => {
       jest
         .spyOn(productRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
-      jest.spyOn(paymentService, 'updateProduct').mockResolvedValue({ id: paymentId });
+      jest
+        .spyOn(paymentService, 'updateProduct')
+        .mockResolvedValue({ id: paymentId });
 
-      const result = await productService.updateProduct(product.id, updateProductDto, file);
+      const result = await productService.updateProduct(
+        product.id,
+        updateProductDto,
+        file,
+      );
 
       expect(productRepository.findOne).toHaveBeenCalledTimes(2);
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(productRepository.update).toHaveBeenCalledWith(
-        product.id,
-        {...updateProductDto, image}
-      );
+      expect(productRepository.update).toHaveBeenCalledWith(product.id, {
+        ...updateProductDto,
+        image,
+      });
       expect(paymentService.updateProduct).toHaveBeenCalledWith(
         product.id,
         updateProductDto.name,
@@ -495,7 +570,9 @@ describe('ProductService', () => {
         image,
         updateProductDto.price,
       );
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(result).toBeUndefined();
     });
 
@@ -507,12 +584,20 @@ describe('ProductService', () => {
       jest
         .spyOn(productRepository, 'update')
         .mockResolvedValue({ affected: 1 } as any);
-      jest.spyOn(paymentService, 'updateProduct').mockResolvedValue({ id: paymentId });
+      jest
+        .spyOn(paymentService, 'updateProduct')
+        .mockResolvedValue({ id: paymentId });
 
-      const result = await productService.updateProduct(product.id, updateProductDto, null);
+      const result = await productService.updateProduct(
+        product.id,
+        updateProductDto,
+        null,
+      );
 
       expect(productRepository.findOne).toHaveBeenCalledTimes(2);
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(paymentService.updateProduct).toHaveBeenCalledWith(
         product.id,
         updateProductDto.name,
@@ -520,7 +605,9 @@ describe('ProductService', () => {
         product.image,
         updateProductDto.price,
       );
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(result).toBeUndefined();
     });
   });
@@ -530,7 +617,9 @@ describe('ProductService', () => {
       jest.spyOn(productRepository, 'findOne').mockResolvedValue(product);
       jest.spyOn(imageService, 'deleteImage').mockResolvedValue(undefined);
       jest.spyOn(paymentService, 'deleteProduct').mockResolvedValue(undefined);
-      jest.spyOn(productRepository, 'delete').mockResolvedValue({ affected: 1, raw: [] });
+      jest
+        .spyOn(productRepository, 'delete')
+        .mockResolvedValue({ affected: 1, raw: [] });
 
       const result = await productService.deleteProduct(product.id);
 
@@ -538,7 +627,9 @@ describe('ProductService', () => {
         where: { id: product.id },
       });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
-      expect(paymentService.deleteProduct).toHaveBeenCalledWith(product.paymentId);
+      expect(paymentService.deleteProduct).toHaveBeenCalledWith(
+        product.paymentId,
+      );
       expect(productRepository.delete).toHaveBeenCalledWith(product.id);
       expect(result).toEqual({
         message: `Product with id ${product.id} was deleted.`,
@@ -550,7 +641,9 @@ describe('ProductService', () => {
       await expect(productService.deleteProduct(product.id)).rejects.toThrow(
         Error,
       );
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
     });
 
     it('should throw error when delete method throws an error', async () => {
@@ -563,18 +656,28 @@ describe('ProductService', () => {
       await expect(productService.deleteProduct(product.id)).rejects.toThrow(
         'Error',
       );
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
-      expect(paymentService.deleteProduct).toHaveBeenCalledWith(product.paymentId);
+      expect(paymentService.deleteProduct).toHaveBeenCalledWith(
+        product.paymentId,
+      );
     });
 
     it('should throw error when delete image throws an error', async () => {
       jest.spyOn(productRepository, 'findOne').mockResolvedValue(product);
-      jest.spyOn(imageService, 'deleteImage').mockRejectedValue(new Error('Error'));
+      jest
+        .spyOn(imageService, 'deleteImage')
+        .mockRejectedValue(new Error('Error'));
 
-      await expect(productService.deleteProduct(product.id)).rejects.toThrow('Error');
+      await expect(productService.deleteProduct(product.id)).rejects.toThrow(
+        'Error',
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
       expect(paymentService.deleteProduct).not.toHaveBeenCalled();
     });
@@ -582,13 +685,21 @@ describe('ProductService', () => {
     it('should throw error when delete stripe product throws an error', async () => {
       jest.spyOn(productRepository, 'findOne').mockResolvedValue(product);
       jest.spyOn(imageService, 'deleteImage').mockResolvedValue(undefined);
-      jest.spyOn(paymentService, 'deleteProduct').mockRejectedValue(new Error('Error'));
+      jest
+        .spyOn(paymentService, 'deleteProduct')
+        .mockRejectedValue(new Error('Error'));
 
-      await expect(productService.deleteProduct(product.id)).rejects.toThrow('Error');
+      await expect(productService.deleteProduct(product.id)).rejects.toThrow(
+        'Error',
+      );
 
-      expect(productRepository.findOne).toHaveBeenCalledWith({ where: { id: product.id } });
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: { id: product.id },
+      });
       expect(imageService.deleteImage).toHaveBeenCalledWith(product.image);
-      expect(paymentService.deleteProduct).toHaveBeenCalledWith(product.paymentId);
+      expect(paymentService.deleteProduct).toHaveBeenCalledWith(
+        product.paymentId,
+      );
     });
   });
 });

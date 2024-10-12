@@ -26,7 +26,6 @@ describe('UpdateProductDto', () => {
   it('should create a UpdateProductDto object', () => {
     const name = 'Example Product';
     const description = 'This is an example product.';
-    const image = 'https://example.com/image.jpg';
     const price = 100;
     const section = 'Example Section';
 

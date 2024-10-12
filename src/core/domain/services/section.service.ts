@@ -1,10 +1,4 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ISectionService } from '../ports/inbound/section.service.interface';
 import {
   CreateSectionDto,
@@ -13,7 +7,7 @@ import {
 import { Section } from '../models/section.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SectionEntity } from '../../../infraestructure/postgres/entities/section.entity';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { IImageService } from '../ports/inbound/image.service.interface';
 
 @Injectable()
@@ -37,7 +31,7 @@ export class SectionService implements ISectionService {
 
   async findSectionById(id: string): Promise<Section> {
     const section = await this.sectionRepository.findOne({
-      where: { id: id }
+      where: { id: id },
     });
     if (!section) {
       this.logger.error(`Section with ${id} not found`);
@@ -45,7 +39,10 @@ export class SectionService implements ISectionService {
     return section;
   }
 
-  async createSection(createSectionDto: CreateSectionDto, file: Express.Multer.File): Promise<Section> {
+  async createSection(
+    createSectionDto: CreateSectionDto,
+    file: Express.Multer.File,
+  ): Promise<Section> {
     try {
       const image = await this.imageService.uploadImage(file);
       const section = this.sectionRepository.create({
@@ -55,7 +52,10 @@ export class SectionService implements ISectionService {
       await this.sectionRepository.save(section);
       return section;
     } catch (error) {
-      this.logger.error(`Error creating section: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error creating section: ${error.message}`,
+        error.stack,
+      );
     }
   }
 
@@ -72,34 +72,32 @@ export class SectionService implements ISectionService {
       if (file) {
         await this.imageService.deleteImage(existingSection.image);
         image = await this.imageService.uploadImage(file);
-      }
-      else{
+      } else {
         image = existingSection.image;
       }
 
-      await this.sectionRepository.update(
-        id,
-        {...updateSectionDto, image},
-      );
-      
+      await this.sectionRepository.update(id, { ...updateSectionDto, image });
+
       const updateSection = await this.sectionRepository.findOne({
         where: { id: id },
       });
       return updateSection;
     } catch (error) {
-      this.logger.error(`Error updating section: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error updating section: ${error.message}`,
+        error.stack,
+      );
     }
   }
 
   async deleteSection(id: string) {
     const section = await this.sectionRepository.findOne({ where: { id: id } });
 
-    if(section){
+    if (section) {
       await this.imageService.deleteImage(section.image);
       await this.sectionRepository.delete(id);
       return { message: `Section with id ${id} was deleted.` };
-    }
-    else{
+    } else {
       this.logger.error(`Section with ${id} not found`);
     }
   }
