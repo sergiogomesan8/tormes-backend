@@ -26,7 +26,7 @@ export class ProductService implements IProductService {
 
   async findAllProducts(): Promise<Product[]> {
     const products = await this.productRepository.find();
-    if (!products) {
+    if (products.length === 0) {
       this.logger.error('Products not found');
     }
     return products;

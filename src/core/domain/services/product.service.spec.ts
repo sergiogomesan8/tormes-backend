@@ -15,6 +15,7 @@ describe('ProductService', () => {
   let productRepository: Repository<ProductEntity>;
   let paymentService: IPaymentService;
   let imageService: IImageService;
+  let loggerSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -51,6 +52,7 @@ describe('ProductService', () => {
     }).compile();
 
     productService = module.get<ProductService>(ProductService);
+    loggerSpy = jest.spyOn(productService['logger'], 'error');
     productRepository = module.get<Repository<ProductEntity>>(
       getRepositoryToken(ProductEntity),
     );
@@ -112,6 +114,7 @@ describe('ProductService', () => {
       const products = await productService.findAllProducts();
       expect(products).toEqual([]);
       expect(productRepository.find).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalledWith('Products not found');
     });
 
     it('should throw an error if the database query fails', async () => {
