@@ -6,13 +6,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { UploadApiResponse } from 'cloudinary';
-import { CloudinaryService } from '../../../infraestructure/cloudinary-config/cloudinary.service';
 
 describe('SectionController', () => {
   let sectionController: SectionController;
   let sectionService: SectionService;
-  let cloudinaryService: CloudinaryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,19 +25,11 @@ describe('SectionController', () => {
             deleteSection: jest.fn(),
           },
         },
-        {
-          provide: CloudinaryService,
-          useValue: {
-            uploadImage: jest.fn(),
-            deleteImage: jest.fn(),
-          },
-        },
       ],
     }).compile();
 
     sectionController = module.get<SectionController>(SectionController);
     sectionService = module.get<SectionService>(SectionService);
-    cloudinaryService = module.get<CloudinaryService>(CloudinaryService);
   });
 
   const name = 'Section name';
@@ -54,7 +43,7 @@ describe('SectionController', () => {
 
   const createSectionDto = new CreateSectionDto(name);
 
-  const updateSectionDto = new UpdateSectionDto(name, image.filename);
+  const updateSectionDto = new UpdateSectionDto(name);
 
   describe('findAllSections', () => {
     it('should return an array of sections', async () => {
@@ -93,14 +82,17 @@ describe('SectionController', () => {
       );
     });
 
-    it('should return a NotFoundException if section was not found', () => {
+    it('should log an error and return a NotFoundException if section was not found', () => {
+      const loggerSpy = jest.spyOn(sectionController['logger'], 'error');
       jest
         .spyOn(sectionService, 'findSectionById')
-        .mockRejectedValue(new NotFoundException());
+        .mockResolvedValue(null);
 
       return expect(
         sectionController.findSectionById(expect.any(String)),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(NotFoundException).finally(() => {
+        expect(loggerSpy).toHaveBeenCalledWith(`Section with ${expect.any(String)} not found`);
+      });
     });
 
     it('should return an Http Exception error when it happens', () => {
@@ -115,54 +107,27 @@ describe('SectionController', () => {
   });
 
   describe('createSection', () => {
-    it('should create a section in development', async () => {
-      process.env.NODE_ENV = 'development';
-
+    it('should create a section if file is provided', async () => {
       jest.spyOn(sectionService, 'createSection').mockResolvedValue(section);
 
       expect(
         await sectionController.createSection(image, createSectionDto),
-      ).toBe(section);
-      expect(sectionService.createSection).toHaveBeenCalledWith({
-        ...createSectionDto,
-        image: image.filename,
-      });
+      ).toStrictEqual(section);
+      expect(sectionService.createSection).toHaveBeenCalledWith(
+        createSectionDto,
+        image,
+      );
     });
 
-    it('should create a section with image on cloudinary service in production', async () => {
-      process.env.NODE_ENV = 'production';
-
-      jest
-        .spyOn(cloudinaryService, 'uploadImage')
-        .mockResolvedValue({ url: 'test.jpg' } as UploadApiResponse);
-      jest.spyOn(sectionService, 'createSection').mockResolvedValue(section);
-
-      expect(
-        await sectionController.createSection(image, createSectionDto),
-      ).toBe(section);
-      expect(sectionService.createSection).toHaveBeenCalledWith({
-        ...createSectionDto,
-        image: image.filename,
-      });
-    });
-
-    it('should return an Http Exception error when it happens in development', () => {
-      process.env.NODE_ENV = 'development';
-
-      jest
-        .spyOn(sectionService, 'findSectionById')
-        .mockRejectedValue(new InternalServerErrorException());
-
+    it('should throw an error if no file is provided', () => {
       return expect(
-        sectionController.findSectionById(expect.any(String)),
-      ).rejects.toThrow(InternalServerErrorException);
+        sectionController.createSection(null, createSectionDto),
+      ).rejects.toThrow('No file provided');
     });
 
-    it('should return an Http Exception error when it happens in production', () => {
-      process.env.NODE_ENV = 'production';
-
+    it('should return an Http Exception error when it happens', () => {
       jest
-        .spyOn(cloudinaryService, 'uploadImage')
+        .spyOn(sectionService, 'createSection')
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(
@@ -172,10 +137,7 @@ describe('SectionController', () => {
   });
 
   describe('updateSection', () => {
-    it('should update a section in development', async () => {
-      process.env.NODE_ENV = 'development';
-
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
+    it('should update a section if file is provided', async () => {
       jest.spyOn(sectionService, 'updateSection').mockResolvedValue(section);
 
       expect(
@@ -184,85 +146,34 @@ describe('SectionController', () => {
           expect.any(String),
           updateSectionDto,
         ),
-      ).toBe(section);
+      ).toStrictEqual(section);
       expect(sectionService.updateSection).toHaveBeenCalledWith(
         expect.any(String),
-        {
-          ...updateSectionDto,
-          image: image.filename,
-        },
+        updateSectionDto,
+        image
       );
     });
 
-    it('should update a section in production and image on cloudinary service', async () => {
-      process.env.NODE_ENV = 'production';
-
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
-
-      jest.spyOn(cloudinaryService, 'deleteImage').mockResolvedValue();
-      jest
-        .spyOn(cloudinaryService, 'uploadImage')
-        .mockResolvedValue({ url: 'test.jpg' } as UploadApiResponse);
+    it('should update a section without file provided', async () => {
       jest.spyOn(sectionService, 'updateSection').mockResolvedValue(section);
-
-      expect(
-        await sectionController.updateSection(
-          image,
-          expect.any(String),
-          updateSectionDto,
-        ),
-      ).toBe(section);
-      expect(sectionService.updateSection).toHaveBeenCalledWith(
-        expect.any(String),
-        {
-          ...updateSectionDto,
-          image: image.filename,
-        },
-      );
-    });
-
-    it('should update a section without a file', async () => {
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
-      jest.spyOn(sectionService, 'updateSection').mockResolvedValue(section);
-
-      const updateSectionDtoWithoutFile = new UpdateSectionDto('New name');
 
       expect(
         await sectionController.updateSection(
           null,
           expect.any(String),
-          updateSectionDtoWithoutFile,
+          updateSectionDto,
         ),
-      ).toBe(section);
+      ).toStrictEqual(section);
       expect(sectionService.updateSection).toHaveBeenCalledWith(
         expect.any(String),
-        updateSectionDtoWithoutFile,
+        updateSectionDto,
+        null
       );
     });
 
-    it('should return an Http Exception error when it happens in development', () => {
-      process.env.NODE_ENV = 'development';
-
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
+    it('should return an Http Exception error when it happens', () => {
       jest
         .spyOn(sectionService, 'updateSection')
-        .mockRejectedValue(new InternalServerErrorException());
-
-      return expect(
-        sectionController.updateSection(
-          image,
-          expect.any(String),
-          updateSectionDto,
-        ),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should return an Http Exception error when it happens in production', () => {
-      process.env.NODE_ENV = 'production';
-
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
-      jest
-        .spyOn(cloudinaryService, 'uploadImage')
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(
@@ -277,9 +188,6 @@ describe('SectionController', () => {
 
   describe('deleteSection', () => {
     it('should delete a section', async () => {
-      process.env.NODE_ENV = 'development';
-
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
       jest.spyOn(sectionService, 'deleteSection').mockResolvedValue({
         message: `Section with id ${expect.any(String)} was deleted.`,
       });
@@ -294,45 +202,9 @@ describe('SectionController', () => {
       );
     });
 
-    it('should delete a section and image on cloudinary service', async () => {
-      process.env.NODE_ENV = 'production';
-
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
-      jest.spyOn(cloudinaryService, 'deleteImage').mockResolvedValue();
-
-      jest.spyOn(sectionService, 'deleteSection').mockResolvedValue({
-        message: `Section with id ${expect.any(String)} was deleted.`,
-      });
-
-      expect(await sectionController.deleteSection(expect.any(String))).toEqual(
-        {
-          message: `Section with id ${expect.any(String)} was deleted.`,
-        },
-      );
-      expect(sectionService.deleteSection).toHaveBeenCalledWith(
-        expect.any(String),
-      );
-    });
-
-    it('should return an Http Exception error when it happens in development', () => {
-      process.env.NODE_ENV = 'development';
-
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
+    it('should return an Http Exception error when it happens', () => {
       jest
         .spyOn(sectionService, 'deleteSection')
-        .mockRejectedValue(new InternalServerErrorException());
-
-      return expect(
-        sectionController.deleteSection(expect.any(String)),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should return an Http Exception error when it happens in production', () => {
-      process.env.NODE_ENV = 'production';
-
-      jest.spyOn(sectionService, 'findSectionById').mockResolvedValue(section);
-      jest
-        .spyOn(cloudinaryService, 'deleteImage')
         .mockRejectedValue(new InternalServerErrorException());
 
       return expect(

@@ -40,8 +40,6 @@ import { UserTypes } from '../../../core/domain/services/roles-authorization/rol
 import { UserType } from '../../../core/domain/models/user.model';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { OptionalFilePipe } from '../pipe-builders/uploadFile.pipe.builder';
-import { CloudinaryService } from '../../../infraestructure/cloudinary-config/cloudinary.service';
-import * as fs from 'fs';
 
 @ApiTags('section')
 @ApiBearerAuth()
@@ -59,7 +57,6 @@ export class SectionController {
 
   constructor(
     private readonly sectionService: SectionService,
-    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   @ApiOperation({
