@@ -29,13 +29,18 @@ export class SectionService implements ISectionService {
 
   async findAllSections(): Promise<Section[]> {
     const sections = await this.sectionRepository.find();
+    if (!sections) {
+      this.logger.error('Sections not found');
+    }
     return sections;
   }
 
   async findSectionById(id: string): Promise<Section> {
-    const section = await this.sectionRepository.findOne({ where: { id: id } });
+    const section = await this.sectionRepository.findOne({
+      where: { id: id }
+    });
     if (!section) {
-      throw new NotFoundException('Section Not Found');
+      this.logger.error(`Section with ${id} not found`);
     }
     return section;
   }
@@ -43,7 +48,10 @@ export class SectionService implements ISectionService {
   async createSection(createSectionDto: CreateSectionDto, file: Express.Multer.File): Promise<Section> {
     try {
       const image = await this.imageService.uploadImage(file);
-      const section = this.sectionRepository.create(createSectionDto);
+      const section = this.sectionRepository.create({
+        ...createSectionDto,
+        image,
+      });
       await this.sectionRepository.save(section);
       return section;
     } catch (error) {
@@ -69,10 +77,11 @@ export class SectionService implements ISectionService {
         image = existingSection.image;
       }
 
-      const updateResult = await this.sectionRepository.update(
+      await this.sectionRepository.update(
         id,
         {...updateSectionDto, image},
       );
+      
       const updateSection = await this.sectionRepository.findOne({
         where: { id: id },
       });
