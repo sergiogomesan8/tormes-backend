@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { IImageService } from '../ports/inbound/image.service.interface';
 import { FileInterceptorSavePath } from '../../../infraestructure/api-rest/models/file-interceptor.model';
 import * as fs from 'fs';
 
 @Injectable()
 export class ImageService {
-  constructor(private readonly imageService: IImageService) {}
-
+  constructor(
+    @Inject('IImageService')
+    private readonly imageService: IImageService,
+  ) {}
   async uploadImage(file: Express.Multer.File): Promise<string> {
     if (process.env.NODE_ENV !== 'production') {
       return file.filename;
