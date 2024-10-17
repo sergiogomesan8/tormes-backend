@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -38,8 +40,6 @@ import { UserTypes } from '../../../core/domain/services/roles-authorization/rol
 import { UserType } from '../../../core/domain/models/user.model';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { OptionalFilePipe } from '../pipe-builders/uploadFile.pipe.builder';
-import { CloudinaryService } from '../../../infraestructure/cloudinary-config/cloudinary.service';
-import * as fs from 'fs';
 
 @ApiTags('section')
 @ApiBearerAuth()
@@ -49,17 +49,13 @@ import * as fs from 'fs';
   description: 'Unauthorized. User authentication failed.',
 })
 @ApiForbiddenResponse({ description: 'Forbidden.' })
-@ApiNotFoundResponse({
-  description: 'Not found. The specified ID does not exist.',
-})
 @ApiInternalServerErrorResponse({ description: 'Internet Server Error.' })
 @UseFilters(new HttpExceptionFilter())
 @Controller('section')
 export class SectionController {
-  constructor(
-    private readonly sectionService: SectionService,
-    private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  private readonly logger = new Logger(SectionController.name);
+
+  constructor(private readonly sectionService: SectionService) {}
 
   @ApiOperation({
     summary: 'Retrieve all sections',
@@ -75,11 +71,20 @@ export class SectionController {
     description: 'Endpoint to get a section by ID',
   })
   @ApiParam({ name: 'id', type: String, description: 'The ID of the section' })
+  @ApiNotFoundResponse({
+    description: 'Not found. The specified ID does not exist.',
+  })
   @Get('/:id')
   async findSectionById(
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<Section> {
-    return await this.sectionService.findSectionById(id);
+    const section = await this.sectionService.findSectionById(id);
+    if (section) {
+      return section;
+    } else {
+      this.logger.error(`Section with ${id} not found`);
+      throw new NotFoundException('Section Not Found');
+    }
   }
 
   @ApiOperation({
@@ -90,6 +95,9 @@ export class SectionController {
   @ApiBody({
     description: 'Section data and image file',
     type: CreateSectionDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Not found. The specified ID does not exist.',
   })
   @UseInterceptors(
     FileInterceptor(
@@ -104,20 +112,10 @@ export class SectionController {
     @UploadedFile(new OptionalFilePipe()) file: Express.Multer.File,
     @Body() createSectionDto: CreateSectionDto,
   ): Promise<Section> {
-    let image;
-    if (file) {
-      image =
-        process.env.NODE_ENV === 'production'
-          ? ((await this.cloudinaryService.uploadImage(file)).url as string)
-          : file.filename;
-    } else {
+    if (!file) {
       throw new Error('No file provided');
     }
-
-    return this.sectionService.createSection({
-      ...createSectionDto,
-      image,
-    });
+    return await this.sectionService.createSection(createSectionDto, file);
   }
 
   @ApiOperation({
@@ -129,6 +127,9 @@ export class SectionController {
   @ApiBody({
     description: 'Section data and image file',
     type: UpdateSectionDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Not found. The specified ID does not exist.',
   })
   @UseInterceptors(
     FileInterceptor(
@@ -144,30 +145,7 @@ export class SectionController {
     @Param('id') id: string,
     @Body() updateSectionDto: UpdateSectionDto,
   ): Promise<Section> {
-    if (file) {
-      let image;
-      const existingProduct = await this.sectionService.findSectionById(id);
-
-      if (process.env.NODE_ENV === 'production') {
-        await this.cloudinaryService.deleteImage(existingProduct.image);
-        const uploadResponse = await this.cloudinaryService.uploadImage(file);
-        image = uploadResponse.url as string;
-      } else {
-        const existingImage = existingProduct.image;
-        const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-        image = file.filename;
-      }
-
-      return await this.sectionService.updateSection(id, {
-        ...updateSectionDto,
-        image,
-      });
-    } else {
-      return await this.sectionService.updateSection(id, updateSectionDto);
-    }
+    return await this.sectionService.updateSection(id, updateSectionDto, file);
   }
 
   @ApiOperation({
@@ -179,18 +157,6 @@ export class SectionController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete('/:id')
   async deleteSection(@Param('id') id: string) {
-    const existingSection = await this.sectionService.findSectionById(id);
-    const existingImage = existingSection.image;
-    if (existingImage) {
-      if (process.env.NODE_ENV === 'production') {
-        await this.cloudinaryService.deleteImage(existingSection.image);
-      } else {
-        const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${existingImage}`;
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-      }
-    }
     return await this.sectionService.deleteSection(id);
   }
 }

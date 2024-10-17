@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateSectionDto {
@@ -9,9 +9,6 @@ export class CreateSectionDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @ApiPropertyOptional({ type: 'string', format: 'binary' })
-  image: any;
 
   constructor(name: string) {
     this.name = name;
@@ -27,12 +24,7 @@ export class UpdateSectionDto {
   @IsOptional()
   name?: string;
 
-  @ApiPropertyOptional({ type: 'string', format: 'binary' })
-  @IsOptional()
-  image?: any;
-
-  constructor(name?: string, image?: any) {
+  constructor(name?: string) {
     this.name = name;
-    this.image = image;
   }
 }

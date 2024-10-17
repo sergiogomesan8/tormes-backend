@@ -4,7 +4,6 @@ import { StripeService } from './stripe.service';
 
 @Module({})
 export class StripeModule {
-
   static forRootAsync(): DynamicModule {
     return {
       module: StripeModule,
