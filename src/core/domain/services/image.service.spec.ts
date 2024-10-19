@@ -6,7 +6,6 @@ describe('ImageService', () => {
   let imageService: ImageService;
 
   beforeEach(async () => {
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ImageService,
@@ -45,22 +44,22 @@ describe('ImageService', () => {
       expect(result).toBe(image);
     });
 
-      it('should return the filename if in development', async () => {
-        process.env.NODE_ENV = 'development';
-        jest.spyOn(imageService, 'uploadImage').mockResolvedValue(file.filename);
-        const result = await imageService.uploadImage(file);
-        expect(result).toBe(file.filename);
-      });
+    it('should return the filename if in development', async () => {
+      process.env.NODE_ENV = 'development';
+      jest.spyOn(imageService, 'uploadImage').mockResolvedValue(file.filename);
+      const result = await imageService.uploadImage(file);
+      expect(result).toBe(file.filename);
+    });
 
-      it('should throw an error if image upload fails', async () => {
-        process.env.NODE_ENV = 'production';
-        jest
-          .spyOn(imageService, 'uploadImage')
-          .mockRejectedValue(new Error('Failed to upload image'));
-        await expect(imageService.uploadImage(file)).rejects.toThrow(
-          'Failed to upload image',
-        );
-      });
+    it('should throw an error if image upload fails', async () => {
+      process.env.NODE_ENV = 'production';
+      jest
+        .spyOn(imageService, 'uploadImage')
+        .mockRejectedValue(new Error('Failed to upload image'));
+      await expect(imageService.uploadImage(file)).rejects.toThrow(
+        'Failed to upload image',
+      );
+    });
   });
 
   describe('deleteImage', () => {
@@ -76,12 +75,16 @@ describe('ImageService', () => {
       const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${image}`;
       jest.spyOn(fs, 'existsSync').mockReturnValue(true);
       jest.spyOn(fs, 'unlinkSync').mockImplementation(() => {});
-      jest.spyOn(imageService['imageService'], 'deleteImage').mockResolvedValue();
+      jest
+        .spyOn(imageService['imageService'], 'deleteImage')
+        .mockResolvedValue();
 
       await imageService.deleteImage(image);
       expect(fs.existsSync).toHaveBeenCalledWith(imagePath);
       expect(fs.unlinkSync).toHaveBeenCalledWith(imagePath);
-      expect(imageService['imageService'].deleteImage).toHaveBeenCalledWith(image);
+      expect(imageService['imageService'].deleteImage).toHaveBeenCalledWith(
+        image,
+      );
     });
 
     it('should throw an error if image deletion fails', async () => {
