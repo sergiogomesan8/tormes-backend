@@ -91,15 +91,12 @@ export class ProductService implements IProductService {
 
       await this.productRepository.update(id, { ...updateProductDto, image });
 
-      await this.paymentService.updateProduct(
-        id,
-        {
-          name: updateProductDto.name,
-          description: updateProductDto.description,
-          imageUrl: image,
-          price: updateProductDto.price,
-        },
-      );
+      await this.paymentService.updateProduct(id, {
+        name: updateProductDto.name,
+        description: updateProductDto.description,
+        imageUrl: image,
+        price: updateProductDto.price,
+      });
 
       const updatedProduct = await this.productRepository.findOne({
         where: { id: id },

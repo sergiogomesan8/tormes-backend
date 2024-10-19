@@ -1,4 +1,4 @@
-import { PaymentProduct } from "../../models/payment.module";
+import { PaymentProduct } from '../../models/payment.module';
 
 export interface IPaymentService {
   createProduct(paymentProduct: PaymentProduct): Promise<any>;
