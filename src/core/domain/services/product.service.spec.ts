@@ -181,12 +181,12 @@ describe('ProductService', () => {
       const result = await productService.createProduct(createProductDto, file);
 
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(paymentService.createProduct).toHaveBeenCalledWith(
-        createProductDto.name,
-        createProductDto.description,
-        image,
-        createProductDto.price,
-      );
+      expect(paymentService.createProduct).toHaveBeenCalledWith({
+        name: createProductDto.name,
+        description: createProductDto.description,
+        imageUrl: image,
+        price: createProductDto.price,
+      });
       expect(productRepository.create).toHaveBeenCalledWith({
         ...createProductDto,
         image: image,
@@ -215,12 +215,12 @@ describe('ProductService', () => {
       }
 
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(paymentService.createProduct).toHaveBeenCalledWith(
-        createProductDto.name,
-        createProductDto.description,
-        image,
-        createProductDto.price,
-      );
+      expect(paymentService.createProduct).toHaveBeenCalledWith({
+        name: createProductDto.name,
+        description: createProductDto.description,
+        imageUrl: image,
+        price: createProductDto.price,
+      });
       expect(productRepository.create).toHaveBeenCalledWith({
         ...createProductDto,
         image: image,
@@ -249,12 +249,12 @@ describe('ProductService', () => {
       const result = await productService.createProduct(createProductDto, file);
 
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(paymentService.createProduct).toHaveBeenCalledWith(
-        createProductDto.name,
-        createProductDto.description,
-        image,
-        createProductDto.price,
-      );
+      expect(paymentService.createProduct).toHaveBeenCalledWith({
+        name: createProductDto.name,
+        description: createProductDto.description,
+        imageUrl: image,
+        price: createProductDto.price,
+      });
       expect(result).toBeUndefined();
     });
 
@@ -274,12 +274,12 @@ describe('ProductService', () => {
         expect(e).toHaveProperty('message', 'Create error');
       }
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(paymentService.createProduct).toHaveBeenCalledWith(
-        createProductDto.name,
-        createProductDto.description,
-        image,
-        createProductDto.price,
-      );
+      expect(paymentService.createProduct).toHaveBeenCalledWith({
+        name: createProductDto.name,
+        description: createProductDto.description,
+        imageUrl: image,
+        price: createProductDto.price,
+      });
       expect(productRepository.create).toHaveBeenCalledWith({
         ...createProductDto,
         image: image,
@@ -306,12 +306,12 @@ describe('ProductService', () => {
         expect(e).toHaveProperty('message', 'Save error');
       }
       expect(imageService.uploadImage).toHaveBeenCalledWith(file);
-      expect(paymentService.createProduct).toHaveBeenCalledWith(
-        createProductDto.name,
-        createProductDto.description,
-        image,
-        createProductDto.price,
-      );
+      expect(paymentService.createProduct).toHaveBeenCalledWith({
+        name: createProductDto.name,
+        description: createProductDto.description,
+        imageUrl: image,
+        price: createProductDto.price,
+      });
       expect(productRepository.create).toHaveBeenCalledWith({
         ...createProductDto,
         image: image,
@@ -350,13 +350,12 @@ describe('ProductService', () => {
         ...updateProductDto,
         image,
       });
-      expect(paymentService.updateProduct).toHaveBeenCalledWith(
-        product.id,
-        updateProductDto.name,
-        updateProductDto.description,
-        image,
-        updateProductDto.price,
-      );
+      expect(paymentService.updateProduct).toHaveBeenCalledWith(product.id, {
+        name: updateProductDto.name,
+        description: updateProductDto.description,
+        imageUrl: image,
+        price: updateProductDto.price,
+      });
       expect(result).toEqual(product);
     });
 
@@ -381,13 +380,12 @@ describe('ProductService', () => {
       expect(productRepository.findOne).toHaveBeenCalledWith({
         where: { id: product.id },
       });
-      expect(paymentService.updateProduct).toHaveBeenCalledWith(
-        product.id,
-        updateProductDto.name,
-        updateProductDto.description,
-        product.image,
-        updateProductDto.price,
-      );
+      expect(paymentService.updateProduct).toHaveBeenCalledWith(product.id, {
+        name: updateProductDto.name,
+        description: updateProductDto.description,
+        imageUrl: product.image,
+        price: updateProductDto.price,
+      });
       expect(result).toEqual(product);
     });
 
@@ -526,13 +524,12 @@ describe('ProductService', () => {
         ...updateProductDto,
         image,
       });
-      expect(paymentService.updateProduct).toHaveBeenCalledWith(
-        product.id,
-        updateProductDto.name,
-        updateProductDto.description,
-        image,
-        updateProductDto.price,
-      );
+      expect(paymentService.updateProduct).toHaveBeenCalledWith(product.id, {
+        name: updateProductDto.name,
+        description: updateProductDto.description,
+        imageUrl: image,
+        price: updateProductDto.price,
+      });
       expect(result).toBeUndefined();
     });
 
@@ -566,13 +563,12 @@ describe('ProductService', () => {
         ...updateProductDto,
         image,
       });
-      expect(paymentService.updateProduct).toHaveBeenCalledWith(
-        product.id,
-        updateProductDto.name,
-        updateProductDto.description,
-        image,
-        updateProductDto.price,
-      );
+      expect(paymentService.updateProduct).toHaveBeenCalledWith(product.id, {
+        name: updateProductDto.name,
+        description: updateProductDto.description,
+        imageUrl: image,
+        price: updateProductDto.price,
+      });
       expect(productRepository.findOne).toHaveBeenCalledWith({
         where: { id: product.id },
       });
@@ -601,13 +597,12 @@ describe('ProductService', () => {
       expect(productRepository.findOne).toHaveBeenCalledWith({
         where: { id: product.id },
       });
-      expect(paymentService.updateProduct).toHaveBeenCalledWith(
-        product.id,
-        updateProductDto.name,
-        updateProductDto.description,
-        product.image,
-        updateProductDto.price,
-      );
+      expect(paymentService.updateProduct).toHaveBeenCalledWith(product.id, {
+        name: updateProductDto.name,
+        description: updateProductDto.description,
+        imageUrl: product.image,
+        price: updateProductDto.price,
+      });
       expect(productRepository.findOne).toHaveBeenCalledWith({
         where: { id: product.id },
       });
