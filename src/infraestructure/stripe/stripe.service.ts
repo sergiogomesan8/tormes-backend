@@ -11,12 +11,10 @@ export class StripeService implements IPaymentService {
   private stripe: Stripe;
 
   constructor(
-    @Inject('STRIPE_API_KEY') private readonly apiKey: string,
+    @Inject('STRIPE') private readonly stripeProvider: Stripe,
     private readonly configService: ConfigService,
   ) {
-    this.stripe = new Stripe(this.apiKey, {
-      apiVersion: this.configService.get('STRIPE_API_VERSION'),
-    });
+    this.stripe = stripeProvider;
   }
 
   async getProducts(): Promise<Stripe.Product[]> {

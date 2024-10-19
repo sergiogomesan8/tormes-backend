@@ -1,6 +1,9 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StripeService } from './stripe.service';
+import Stripe from 'stripe';
+
+const STRIPE = 'STRIPE';
 
 @Module({})
 export class StripeModule {
@@ -11,13 +14,21 @@ export class StripeModule {
       providers: [
         StripeService,
         {
-          provide: 'STRIPE_API_KEY',
-          useFactory: async (configService: ConfigService) =>
-            configService.get('STRIPE_API_KEY'),
+          provide: STRIPE,
+          useFactory: async (configService: ConfigService) => {
+            const isDev = process.env.NODE_ENV === 'development';
+            const apiKey = isDev
+              ? process.env.STRIPE_TEST_API_KEY // Clave de prueba en desarrollo
+              : configService.get('STRIPE_API_KEY'); // Clave de producción
+
+            return new Stripe(apiKey, {
+              apiVersion: configService.get('STRIPE_API_VERSION'),
+            });
+          },
           inject: [ConfigService],
         },
       ],
-      exports: [StripeService],
+      exports: [StripeService, STRIPE], // Exporta el servicio y el proveedor de Stripe
     };
   }
 }
