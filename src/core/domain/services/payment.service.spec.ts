@@ -96,4 +96,19 @@ describe('PaymentService', () => {
       ).rejects.toThrow('Error');
     });
   });
+
+  describe('deleteProduct', () => {
+    it('should delete a product', async () => {
+      jest.spyOn(stripeService, 'deleteProduct').mockResolvedValue(undefined);
+      await paymentService.deleteProduct(stripeProduct.id);
+      expect(stripeService.deleteProduct).toHaveBeenCalledWith(stripeProduct.id);
+    });
+
+    it('should throw an error if deleteProduct fails', async () => {
+      jest
+        .spyOn(stripeService, 'deleteProduct')
+        .mockRejectedValue(new Error('Error'));
+      await expect(paymentService.deleteProduct(stripeProduct.id)).rejects.toThrow('Error');
+    });
+  });
 });

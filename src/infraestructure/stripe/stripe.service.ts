@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { CheckoutDto } from '../api-rest/dtos/checkout.dto';
@@ -7,6 +7,7 @@ import { PaymentProduct } from 'src/core/domain/models/payment.module';
 
 @Injectable()
 export class StripeService implements IPaymentService {
+  private readonly logger = new Logger(StripeService.name);
   private stripe: Stripe;
 
   constructor(
@@ -57,7 +58,12 @@ export class StripeService implements IPaymentService {
   }
 
   async deleteProduct(productId: string): Promise<void> {
-    await this.stripe.products.del(productId);
+    try {
+      await this.stripe.products.del(productId);
+    } catch (error) {
+      this.logger.error(`Error deleting product: ${error.message}`, error.stack);
+      throw new Error(error.message);
+    }
   }
 
   async createCheckoutSession(checkoutDto: CheckoutDto): Promise<string> {
