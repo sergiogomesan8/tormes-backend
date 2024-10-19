@@ -1,16 +1,10 @@
+import { PaymentProduct } from "../../models/payment.module";
+
 export interface IPaymentService {
-  createProduct(
-    name: string,
-    description: string,
-    imageUrl: string,
-    unitAmount: number,
-  ): Promise<any>;
+  createProduct(paymentProduct: PaymentProduct): Promise<any>;
   updateProduct(
     productId: string,
-    name: string,
-    description: string,
-    imageUrl: string,
-    unitAmount: number,
+    paymentProduct: PaymentProduct,
   ): Promise<any>;
   deleteProduct(productId: string): Promise<void>;
 }

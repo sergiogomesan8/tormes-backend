@@ -49,12 +49,12 @@ export class ProductService implements IProductService {
     try {
       const image = await this.imageService.uploadImage(file);
 
-      const stripeProduct = await this.paymentService.createProduct(
-        createProductDto.name,
-        createProductDto.description,
-        image,
-        createProductDto.price,
-      );
+      const stripeProduct = await this.paymentService.createProduct({
+        name: createProductDto.name,
+        description: createProductDto.description,
+        imageUrl: image,
+        price: createProductDto.price,
+      });
 
       const product = this.productRepository.create({
         ...createProductDto,
@@ -93,10 +93,12 @@ export class ProductService implements IProductService {
 
       await this.paymentService.updateProduct(
         id,
-        updateProductDto.name,
-        updateProductDto.description,
-        image,
-        updateProductDto.price,
+        {
+          name: updateProductDto.name,
+          description: updateProductDto.description,
+          imageUrl: image,
+          price: updateProductDto.price,
+        },
       );
 
       const updatedProduct = await this.productRepository.findOne({
