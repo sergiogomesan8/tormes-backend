@@ -61,7 +61,10 @@ export class StripeService implements IPaymentService {
     try {
       await this.stripe.products.del(productId);
     } catch (error) {
-      this.logger.error(`Error deleting product: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error deleting product: ${error.message}`,
+        error.stack,
+      );
       throw new Error(error.message);
     }
   }
