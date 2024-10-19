@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ImageService } from './image.service';
 import * as fs from 'fs';
 import { FileInterceptorSavePath } from '../../../infraestructure/api-rest/models/file-interceptor.model';
+
 describe('ImageService', () => {
   let imageService: ImageService;
 
@@ -37,16 +38,19 @@ describe('ImageService', () => {
   describe('uploadImage', () => {
     it('should upload image to cloudinary if in production', async () => {
       process.env.NODE_ENV = 'production';
-      jest.spyOn(imageService, 'uploadImage').mockResolvedValue(image);
+      jest
+        .spyOn(imageService['imageService'], 'uploadImage')
+        .mockResolvedValue(image);
       const result = await imageService.uploadImage(file);
 
-      expect(imageService.uploadImage).toHaveBeenCalledWith(file);
+      expect(imageService['imageService'].uploadImage).toHaveBeenCalledWith(
+        file,
+      );
       expect(result).toBe(image);
     });
 
     it('should return the filename if in development', async () => {
       process.env.NODE_ENV = 'development';
-      jest.spyOn(imageService, 'uploadImage').mockResolvedValue(file.filename);
       const result = await imageService.uploadImage(file);
       expect(result).toBe(file.filename);
     });
@@ -54,7 +58,7 @@ describe('ImageService', () => {
     it('should throw an error if image upload fails', async () => {
       process.env.NODE_ENV = 'production';
       jest
-        .spyOn(imageService, 'uploadImage')
+        .spyOn(imageService['imageService'], 'uploadImage')
         .mockRejectedValue(new Error('Failed to upload image'));
       await expect(imageService.uploadImage(file)).rejects.toThrow(
         'Failed to upload image',
