@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ImageService } from './image.service';
-import { IImageService } from '../ports/inbound/image.service.interface';
-
+import * as fs from 'fs';
+import { FileInterceptorSavePath } from '../../../infraestructure/api-rest/models/file-interceptor.model';
 describe('ImageService', () => {
   let imageService: ImageService;
 
@@ -30,6 +30,7 @@ describe('ImageService', () => {
     mimetype: 'image/jpeg',
     buffer: Buffer.from('contenido_simulado_de_imagen'),
     size: 1024,
+    filename: 'producto.jpg',
   } as Express.Multer.File;
 
   const image = 'https://example.com/image.jpg';
@@ -72,9 +73,15 @@ describe('ImageService', () => {
 
     it('should delete image from local file system if in development', async () => {
       process.env.NODE_ENV = 'development';
-      jest.spyOn(imageService, 'deleteImage').mockResolvedValue();
+      const imagePath = `${FileInterceptorSavePath.PRODUCTS}/${image}`;
+      jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+      jest.spyOn(fs, 'unlinkSync').mockImplementation(() => {});
+      jest.spyOn(imageService['imageService'], 'deleteImage').mockResolvedValue();
+
       await imageService.deleteImage(image);
-      expect(imageService.deleteImage).toHaveBeenCalledWith(image);
+      expect(fs.existsSync).toHaveBeenCalledWith(imagePath);
+      expect(fs.unlinkSync).toHaveBeenCalledWith(imagePath);
+      expect(imageService['imageService'].deleteImage).toHaveBeenCalledWith(image);
     });
 
     it('should throw an error if image deletion fails', async () => {
