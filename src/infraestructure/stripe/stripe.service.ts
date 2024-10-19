@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { CheckoutDto } from '../api-rest/dtos/checkout.dto';
 import { IPaymentService } from '../../core/domain/ports/inbound/payment.service.interface';
+import { PaymentProduct } from 'src/core/domain/models/payment.module';
 
 @Injectable()
 export class StripeService implements IPaymentService {
@@ -22,21 +23,16 @@ export class StripeService implements IPaymentService {
     return products.data;
   }
 
-  async createProduct(
-    name: string,
-    description: string,
-    imageUrl: string,
-    unitAmount: number,
-  ): Promise<Stripe.Product> {
+  async createProduct(paymentProduct: PaymentProduct): Promise<Stripe.Product> {
     const product = await this.stripe.products.create({
-      name,
-      description,
-      images: [imageUrl],
+      name: paymentProduct.name,
+      description: paymentProduct.description,
+      images: [paymentProduct.imageUrl],
     });
 
     await this.stripe.prices.create({
       product: product.id,
-      unit_amount: unitAmount,
+      unit_amount: paymentProduct.price,
       currency: this.configService.get<string>('STRIPE_PRICE_CURRENCY'),
     });
     return product;
@@ -44,20 +40,17 @@ export class StripeService implements IPaymentService {
 
   async updateProduct(
     productId: string,
-    name: string,
-    description: string,
-    imageUrl: string,
-    unitAmount: number,
+    paymentProduct: PaymentProduct,
   ): Promise<Stripe.Product> {
     const product = await this.stripe.products.update(productId, {
-      name,
-      description,
-      images: [imageUrl],
+      name: paymentProduct.name,
+      description: paymentProduct.description,
+      images: [paymentProduct.imageUrl],
     });
 
     await this.stripe.prices.create({
       product: product.id,
-      unit_amount: unitAmount,
+      unit_amount: paymentProduct.price,
       currency: this.configService.get<string>('STRIPE_PRICE_CURRENCY'),
     });
     return product;
