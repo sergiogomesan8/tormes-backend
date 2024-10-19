@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
@@ -38,6 +38,9 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
   section: string;
+
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  image: any;
 
   constructor(
     name: string,
@@ -88,6 +91,10 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   section?: string;
+
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @IsOptional()
+  image?: any;
 
   constructor(
     name?: string,
