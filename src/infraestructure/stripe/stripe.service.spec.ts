@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { StripeService } from './stripe.service';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { StripeModule } from './stripe.module';
 
 describe('StripeService', () => {
   let stripeService: StripeService;
@@ -231,15 +230,12 @@ describe('StripeService', () => {
         .spyOn(stripe.prices, 'create')
         .mockResolvedValue(mockPriceResponse as Stripe.Response<Stripe.Price>);
 
-      const product = await stripeService.updateProduct(
-        'prod_1',
-        {
-          name: 'Updated Product',
-          description: 'Updated Description',
-          imageUrl: 'http://newimage.url',
-          price: 2000,
-        },
-      );
+      const product = await stripeService.updateProduct('prod_1', {
+        name: 'Updated Product',
+        description: 'Updated Description',
+        imageUrl: 'http://newimage.url',
+        price: 2000,
+      });
       expect(product).toEqual(mockProductResponse);
       expect(stripe.products.update).toHaveBeenCalledWith('prod_1', {
         name: 'Updated Product',
@@ -263,7 +259,9 @@ describe('StripeService', () => {
     it('should create a checkout session and return the session URL', async () => {
       jest
         .spyOn(stripe.checkout.sessions, 'create')
-        .mockResolvedValue(mockSession as Stripe.Response<Stripe.Checkout.Session>);
+        .mockResolvedValue(
+          mockSession as Stripe.Response<Stripe.Checkout.Session>,
+        );
 
       const checkoutDto = {
         orderedProducts: [{ productId: 'prod_1', amount: 2 }],
