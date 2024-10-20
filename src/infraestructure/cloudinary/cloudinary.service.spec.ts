@@ -8,6 +8,8 @@ import {
   UploadResponseCallback,
   v2,
 } from 'cloudinary';
+import { HttpStatus } from '@nestjs/common';
+import { CloudinaryError } from './exceptions/cloudinary.errors';
 
 jest.mock('@nestjs/config');
 jest.mock('cloudinary', () => ({
@@ -81,9 +83,20 @@ describe('CloudinaryService', () => {
         },
       );
 
+      const loggerSpy = jest.spyOn(cloudinaryService['logger'], 'error');
+
       await expect(
         cloudinaryService.uploadImage(mockFile),
-      ).rejects.toThrowError(new Error(mockError.message));
+      ).rejects.toThrowError(
+        new CloudinaryError(
+          mockError.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
+      );
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error uploading image to Cloudinary: ${mockError.message}`,
+        expect.anything(),
+      );
     });
   });
 
@@ -91,17 +104,15 @@ describe('CloudinaryService', () => {
     it('should delete an image from Cloudinary', async () => {
       const mockPublicId = 'mocked-public-id';
 
-      const mockDestroyResult = { result: 'deleted' };
-
       (v2.uploader.destroy as jest.Mock).mockImplementation(
         (publicId: string, callback: ResponseCallback) => {
-          callback(null, mockDestroyResult);
+          callback(null, undefined);
         },
       );
 
       const result = await cloudinaryService.deleteImage(mockPublicId);
 
-      expect(result).toEqual(mockDestroyResult);
+      expect(result).toBeUndefined();
     });
 
     it('should handle delete failure', async () => {
@@ -118,9 +129,21 @@ describe('CloudinaryService', () => {
         },
       );
 
+      const loggerSpy = jest.spyOn(cloudinaryService['logger'], 'error');
+
       await expect(
         cloudinaryService.deleteImage(mockPublicId),
-      ).rejects.toThrowError(new Error(mockError.message));
+      ).rejects.toThrowError(
+        new CloudinaryError(
+          mockError.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
+      );
+
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error deleting the image: ${mockError.message}`,
+        expect.anything(),
+      );
     });
   });
 });

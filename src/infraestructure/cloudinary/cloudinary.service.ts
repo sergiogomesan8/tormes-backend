@@ -1,7 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import * as streamifier from 'streamifier';
 import { AbstractImageService } from '../../core/domain/ports/outbound/abstract-image.service.interface';
+import { CloudinaryError } from '../cloudinary/exceptions/cloudinary.errors';
 
 @Injectable()
 export class CloudinaryService extends AbstractImageService {
@@ -26,19 +27,33 @@ export class CloudinaryService extends AbstractImageService {
         `Error uploading image to Cloudinary: ${error.message}`,
         error.stack,
       );
-      throw new Error(error.message);
+      throw new CloudinaryError(
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async deleteImage(publicId: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(publicId, (error, result) => {
-        if (error) {
-          reject(new Error(error.message));
-        } else {
-          resolve(result);
-        }
+    try {
+      await new Promise((resolve, reject) => {
+        cloudinary.uploader.destroy(publicId, (error, result) => {
+          if (error) {
+            reject(new Error(error.message));
+          } else {
+            resolve(result);
+          }
+        });
       });
-    });
+    } catch (error) {
+      this.logger.error(
+        `Error deleting the image: ${error.message}`,
+        error.stack,
+      );
+      throw new CloudinaryError(
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

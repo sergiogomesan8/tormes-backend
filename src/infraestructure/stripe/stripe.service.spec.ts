@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { StripeService } from './stripe.service';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { StripeError } from './exceptions/stripe.errors';
+import { HttpStatus } from '@nestjs/common';
 
 describe('StripeService', () => {
   let stripeService: StripeService;
@@ -190,6 +192,23 @@ describe('StripeService', () => {
       expect(products).toEqual([stripeProduct]);
       expect(stripe.products.list).toHaveBeenCalled();
     });
+
+    it('should handle error when an exception occurs', async () => {
+      jest
+        .spyOn(stripe.products, 'list')
+        .mockRejectedValue(new Error('Test error'));
+
+      const loggerSpy = jest.spyOn(stripeService['logger'], 'error');
+
+      await expect(stripeService.getProducts()).rejects.toThrowError(
+        new StripeError('Test error', HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+      expect(loggerSpy).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error retrieving products: Test error`,
+        expect.anything(),
+      );
+    });
   });
 
   describe('createProduct', () => {
@@ -216,6 +235,59 @@ describe('StripeService', () => {
         images: ['http://image.url'],
       });
       expect(stripe.prices.create).toHaveBeenCalled();
+    });
+
+    it('should handle error when an exception occurs creating a product', async () => {
+      jest
+        .spyOn(stripe.products, 'create')
+        .mockRejectedValue(new Error('Test error'));
+
+      const loggerSpy = jest.spyOn(stripeService['logger'], 'error');
+
+      await expect(
+        stripeService.createProduct({
+          name: 'Test Product',
+          description: 'Description',
+          imageUrl: 'http://image.url',
+          price: 1000,
+        }),
+      ).rejects.toThrowError(
+        new StripeError('Test error', HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+      expect(loggerSpy).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error creating product: Test error`,
+        expect.anything(),
+      );
+    });
+
+    it('should handle error when an exception occurs creating a price', async () => {
+      jest
+        .spyOn(stripe.products, 'create')
+        .mockResolvedValue(
+          mockProductResponse as Stripe.Response<Stripe.Product>,
+        );
+      jest
+        .spyOn(stripe.prices, 'create')
+        .mockRejectedValue(new Error('Test error'));
+
+      const loggerSpy = jest.spyOn(stripeService['logger'], 'error');
+
+      await expect(
+        stripeService.createProduct({
+          name: 'Test Product',
+          description: 'Description',
+          imageUrl: 'http://image.url',
+          price: 1000,
+        }),
+      ).rejects.toThrowError(
+        new StripeError('Test error', HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+      expect(loggerSpy).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error creating product: Test error`,
+        expect.anything(),
+      );
     });
   });
 
@@ -244,6 +316,59 @@ describe('StripeService', () => {
       });
       expect(stripe.prices.create).toHaveBeenCalled();
     });
+
+    it('should handle error when an exception occurs updating a product', async () => {
+      jest
+        .spyOn(stripe.products, 'update')
+        .mockRejectedValue(new Error('Test error'));
+
+      const loggerSpy = jest.spyOn(stripeService['logger'], 'error');
+
+      await expect(
+        stripeService.updateProduct('prod_1', {
+          name: 'Updated Product',
+          description: 'Updated Description',
+          imageUrl: 'http://newimage.url',
+          price: 2000,
+        }),
+      ).rejects.toThrowError(
+        new StripeError('Test error', HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+      expect(loggerSpy).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error updating product: Test error`,
+        expect.anything(),
+      );
+    });
+
+    it('should handle error when an exception occurs creating a price', async () => {
+      jest
+        .spyOn(stripe.products, 'update')
+        .mockResolvedValue(
+          mockProductResponse as Stripe.Response<Stripe.Product>,
+        );
+      jest
+        .spyOn(stripe.prices, 'create')
+        .mockRejectedValue(new Error('Test error'));
+
+      const loggerSpy = jest.spyOn(stripeService['logger'], 'error');
+
+      await expect(
+        stripeService.updateProduct('prod_1', {
+          name: 'Updated Product',
+          description: 'Updated Description',
+          imageUrl: 'http://newimage.url',
+          price: 2000,
+        }),
+      ).rejects.toThrowError(
+        new StripeError('Test error', HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+      expect(loggerSpy).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error updating product: Test error`,
+        expect.anything(),
+      );
+    });
   });
 
   describe('deleteProduct', () => {
@@ -252,6 +377,23 @@ describe('StripeService', () => {
 
       await stripeService.deleteProduct('prod_1');
       expect(stripe.products.del).toHaveBeenCalledWith('prod_1');
+    });
+
+    it('should handle error when an exception occurs deleting a product', async () => {
+      jest
+        .spyOn(stripe.products, 'del')
+        .mockRejectedValue(new Error('Test error'));
+
+      const loggerSpy = jest.spyOn(stripeService['logger'], 'error');
+
+      await expect(stripeService.deleteProduct('prod_1')).rejects.toThrowError(
+        new StripeError('Test error', HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+      expect(loggerSpy).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error deleting product: Test error`,
+        expect.anything(),
+      );
     });
   });
 
@@ -270,6 +412,29 @@ describe('StripeService', () => {
       const sessionUrl = await stripeService.createCheckoutSession(checkoutDto);
       expect(sessionUrl).toEqual(mockSession.url);
       expect(stripe.checkout.sessions.create).toHaveBeenCalled();
+    });
+
+    it('should handle error when an exception occurs creating a checkout session', async () => {
+      jest
+        .spyOn(stripe.checkout.sessions, 'create')
+        .mockRejectedValue(new Error('Test error'));
+
+      const loggerSpy = jest.spyOn(stripeService['logger'], 'error');
+
+      const checkoutDto = {
+        orderedProducts: [{ productId: 'prod_1', amount: 2 }],
+      };
+
+      await expect(
+        stripeService.createCheckoutSession(checkoutDto),
+      ).rejects.toThrowError(
+        new StripeError('Test error', HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+      expect(loggerSpy).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `Error creating checkout session: Test error`,
+        expect.anything(),
+      );
     });
   });
 });
