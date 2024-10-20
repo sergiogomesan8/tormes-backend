@@ -23,11 +23,7 @@ export class StripeService implements IPaymentService {
       const products = await this.stripe.products.list();
       return products.data;
     } catch (error) {
-      this.logger.error(
-        `Error retrieving products: ${error.message}`,
-        error.stack,
-      );
-      throw new StripeError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.handleError('Error retrieving products', error);
     }
   }
 
@@ -46,11 +42,7 @@ export class StripeService implements IPaymentService {
       });
       return product;
     } catch (error) {
-      this.logger.error(
-        `Error creating product: ${error.message}`,
-        error.stack,
-      );
-      throw new StripeError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.handleError('Error creating product', error);
     }
   }
 
@@ -72,11 +64,7 @@ export class StripeService implements IPaymentService {
       });
       return product;
     } catch (error) {
-      this.logger.error(
-        `Error updating product: ${error.message}`,
-        error.stack,
-      );
-      throw new StripeError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.handleError('Error updating product', error);
     }
   }
 
@@ -84,11 +72,7 @@ export class StripeService implements IPaymentService {
     try {
       await this.stripe.products.del(productId);
     } catch (error) {
-      this.logger.error(
-        `Error deleting product: ${error.message}`,
-        error.stack,
-      );
-      throw new StripeError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.handleError('Error deleting product', error);
     }
   }
 
@@ -125,11 +109,12 @@ export class StripeService implements IPaymentService {
 
       return session.url;
     } catch (error) {
-      this.logger.error(
-        `Error creating checkout session: ${error.message}`,
-        error.stack,
-      );
-      throw new StripeError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.handleError('Error creating checkout session', error);
     }
+  }
+
+  private handleError(firstMessage: string, error: any): void {
+    this.logger.error(`${firstMessage}: ${error.message}`, error.stack);
+    throw new StripeError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
