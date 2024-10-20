@@ -11,8 +11,11 @@ export class CloudinaryService extends AbstractImageService {
     try {
       const result = await new Promise<UploadApiResponse>((resolve, reject) => {
         const upload = cloudinary.uploader.upload_stream((error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+          if (error) {
+            reject(new Error(error.message));
+          } else {
+            resolve(result);
+          }
         });
         streamifier.createReadStream(file.buffer).pipe(upload);
       });
