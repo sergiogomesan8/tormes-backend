@@ -10,7 +10,6 @@ import {
 } from 'cloudinary';
 import { HttpStatus } from '@nestjs/common';
 import { CloudinaryError } from './exceptions/cloudinary.errors';
-import * as streamifier from 'streamifier';
 
 jest.mock('@nestjs/config');
 jest.mock('cloudinary', () => ({
