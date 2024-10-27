@@ -1,19 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IImageService } from '../ports/inbound/image.service.interface';
 import { FileInterceptorSavePath } from '../../../infraestructure/api-rest/models/file-interceptor.model';
 import * as fs from 'fs';
+import { CloudinaryService } from 'src/infraestructure/cloudinary/cloudinary.service';
 
 @Injectable()
-export class ImageService {
+export class ImageService implements IImageService{
+  private readonly logger = new Logger(ImageService.name);
+
   constructor(
-    @Inject('IImageService')
-    private readonly imageService: IImageService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
+
   async uploadImage(file: Express.Multer.File): Promise<string> {
     if (process.env.NODE_ENV !== 'production') {
       return file.filename;
     }
-    return await this.imageService.uploadImage(file);
+    return await this.cloudinaryService.uploadImage(file);
   }
 
   async deleteImage(imageUrl: string): Promise<void> {
@@ -23,6 +26,6 @@ export class ImageService {
         fs.unlinkSync(imagePath);
       }
     }
-    await this.imageService.deleteImage(imageUrl);
+    await this.cloudinaryService.deleteImage(imageUrl);
   }
 }
