@@ -30,7 +30,6 @@ describe('PaymentService', () => {
     stripeService = module.get<StripeService>(StripeService);
   });
 
-
   const paymentProduct: PaymentProduct = {
     name: 'producto1',
     description: 'descripcionProducto1',
@@ -70,7 +69,9 @@ describe('PaymentService', () => {
         .spyOn(stripeService, 'createProduct')
         .mockResolvedValue(stripeProduct);
       const result = await paymentService.createProduct(paymentProduct);
-      expect(stripeService.createProduct).toHaveBeenLastCalledWith(expectedProduct);
+      expect(stripeService.createProduct).toHaveBeenLastCalledWith(
+        expectedProduct,
+      );
       expect(result).toEqual(stripeProduct);
     });
 
@@ -94,7 +95,10 @@ describe('PaymentService', () => {
         stripeProduct.id,
         paymentProduct,
       );
-      expect(stripeService.updateProduct).toHaveBeenLastCalledWith(stripeProduct.id, expectedProduct);
+      expect(stripeService.updateProduct).toHaveBeenLastCalledWith(
+        stripeProduct.id,
+        expectedProduct,
+      );
       expect(result).toEqual(stripeProduct);
     });
 
