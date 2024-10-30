@@ -34,7 +34,14 @@ describe('PaymentService', () => {
     name: 'producto1',
     description: 'descripcionProducto1',
     imageUrl: 'imageProducto1',
-    price: 100,
+    price: 10,
+  };
+
+  const expectedProduct: PaymentProduct = {
+    name: 'producto1',
+    description: 'descripcionProducto1',
+    imageUrl: 'imageProducto1',
+    price: 1000,
   };
 
   const stripeProduct: Stripe.Product = {
@@ -62,6 +69,9 @@ describe('PaymentService', () => {
         .spyOn(stripeService, 'createProduct')
         .mockResolvedValue(stripeProduct);
       const result = await paymentService.createProduct(paymentProduct);
+      expect(stripeService.createProduct).toHaveBeenLastCalledWith(
+        expectedProduct,
+      );
       expect(result).toEqual(stripeProduct);
     });
 
@@ -77,12 +87,17 @@ describe('PaymentService', () => {
 
   describe('updateProduct', () => {
     it('should update a product', async () => {
+      paymentProduct.price = 10;
       jest
         .spyOn(stripeService, 'updateProduct')
         .mockResolvedValue(stripeProduct);
       const result = await paymentService.updateProduct(
         stripeProduct.id,
         paymentProduct,
+      );
+      expect(stripeService.updateProduct).toHaveBeenLastCalledWith(
+        stripeProduct.id,
+        expectedProduct,
       );
       expect(result).toEqual(stripeProduct);
     });
