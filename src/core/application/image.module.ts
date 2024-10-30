@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { CloudinaryService } from 'src/infraestructure/cloudinary/cloudinary.service';
 import { CloudinaryModule } from '../../infraestructure/cloudinary/cloudinary.module';
+import { ImageService } from '../domain/services/image.service';
 
 @Module({
   imports: [CloudinaryModule],
   providers: [
     {
       provide: 'IImageService',
-      useClass: CloudinaryService,
+      useClass: ImageService,
     },
   ],
   exports: ['IImageService'],
