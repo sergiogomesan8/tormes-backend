@@ -9,8 +9,7 @@ export class PaymentService implements IPaymentService {
   constructor(private readonly stripeService: StripeService) {}
 
   async createProduct(paymentProduct: PaymentProduct): Promise<Stripe.Product> {
-    let unitAmount = paymentProduct.price * 100;
-    paymentProduct.price = unitAmount;
+    paymentProduct.price *= 100;
     return await this.stripeService.createProduct(paymentProduct);
   }
 
@@ -18,6 +17,9 @@ export class PaymentService implements IPaymentService {
     productId: string,
     paymentProduct: PaymentProduct,
   ): Promise<Stripe.Product> {
+    if(paymentProduct.price){
+      paymentProduct.price *= 100;
+    }
     return await this.stripeService.updateProduct(productId, paymentProduct);
   }
 
