@@ -38,7 +38,7 @@ describe('StripeService', () => {
             get: jest.fn((key: string) => {
               const config = {
                 STRIPE_API_VERSION: '2020-08-27',
-                STRIPE_PRICE_CURRENCY: 'usd',
+                STRIPE_PRICE_CURRENCY: 'eur',
                 STRIPE_CHECKOUT_SESSION_PAYMENT_METHOD_TYPE_CARD: 'card',
                 STRIPE_CHECKOUT_SESSION_MODE: 'payment',
                 STRIPE_CHECKOUT_SESSION_SUCCCES_URL: 'http://success.url',
