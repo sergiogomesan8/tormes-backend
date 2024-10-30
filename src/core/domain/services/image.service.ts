@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IImageService } from '../ports/inbound/image.service.interface';
 import { FileInterceptorSavePath } from '../../../infraestructure/api-rest/models/file-interceptor.model';
 import * as fs from 'fs';
-import { CloudinaryService } from 'src/infraestructure/cloudinary/cloudinary.service';
+import { CloudinaryService } from '../../../infraestructure/cloudinary/cloudinary.service';
 
 @Injectable()
 export class ImageService implements IImageService{
