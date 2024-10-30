@@ -5,12 +5,10 @@ import * as fs from 'fs';
 import { CloudinaryService } from '../../../infraestructure/cloudinary/cloudinary.service';
 
 @Injectable()
-export class ImageService implements IImageService{
+export class ImageService implements IImageService {
   private readonly logger = new Logger(ImageService.name);
 
-  constructor(
-    private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  constructor(private readonly cloudinaryService: CloudinaryService) {}
 
   async uploadImage(file: Express.Multer.File): Promise<string> {
     if (process.env.NODE_ENV !== 'production') {

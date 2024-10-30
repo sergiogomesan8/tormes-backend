@@ -41,14 +41,10 @@ describe('ImageService', () => {
   describe('uploadImage', () => {
     it('should upload image to cloudinary if in production', async () => {
       process.env.NODE_ENV = 'production';
-      jest
-        .spyOn(cloudinaryService, 'uploadImage')
-        .mockResolvedValue(image);
+      jest.spyOn(cloudinaryService, 'uploadImage').mockResolvedValue(image);
       const result = await imageService.uploadImage(file);
 
-      expect(cloudinaryService.uploadImage).toHaveBeenCalledWith(
-        file,
-      );
+      expect(cloudinaryService.uploadImage).toHaveBeenCalledWith(file);
       expect(result).toBe(image);
     });
 
