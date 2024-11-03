@@ -107,16 +107,13 @@ export class OrderController {
   async createOrder(
     @Req() req: Request,
     @Body() createOrderDto: CreateOrderDto,
-  ): Promise<SeralizedOrder> {
+  ): Promise<any> {
     const user = req.user;
-    const order = await this.orderService.createOrder(
+    const sessionUrl = await this.orderService.createOrder(
       user['id'],
       createOrderDto,
     );
-    if (order) {
-      const seralizedOrder = new SeralizedOrder(order);
-      return seralizedOrder;
-    }
+    return { sessionUrl: sessionUrl };
   }
 
   @ApiOperation({
