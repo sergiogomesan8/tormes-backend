@@ -8,7 +8,7 @@ export interface IOrderService {
   findAllOrders(): Promise<Order[]>;
   findOrderById(id: string): Promise<Order | null>;
   findAllOrdersByUser(userId: string): Promise<Order[]>;
-  createOrder(userId: string, createOrderDto: CreateOrderDto): Promise<Order>;
+  createOrder(userId: string, createOrderDto: CreateOrderDto): Promise<string>;
   updateOrderStatus(
     id: string,
     updateOrderStatusDto: UpdateOrderStatusDto,

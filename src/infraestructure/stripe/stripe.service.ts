@@ -5,7 +5,6 @@ import { IPaymentService } from '../../core/domain/ports/inbound/payment.service
 import { PaymentProduct } from 'src/core/domain/models/payment.model';
 import { StripeError } from './exceptions/stripe.errors';
 import { CheckoutDto } from '../api-rest/dtos/checkout.dto';
-import { PaymentDto } from '../api-rest/dtos/payment.dto';
 
 @Injectable()
 export class StripeService implements IPaymentService {
@@ -71,16 +70,16 @@ export class StripeService implements IPaymentService {
 
   async deleteProduct(productId: string): Promise<void> {
     try {
-      await this.stripe.products.del(productId);
+      await this.stripe.products.update(productId, { active: false });
     } catch (error) {
       this.handleError('Error deleting product', error);
     }
   }
 
-  async createCheckoutSession(paymentDto: PaymentDto): Promise<any> {
+  async createCheckout(checkoutDto: CheckoutDto): Promise<any> {
     try {
       const lineItems = await Promise.all(
-        paymentDto.orderedProducts.map(async (product) => {
+        checkoutDto.orderedProducts.map(async (product) => {
           return {
             price_data: {
               currency: this.configService.get<string>('STRIPE_PRICE_CURRENCY'),
@@ -102,15 +101,19 @@ export class StripeService implements IPaymentService {
         mode: this.configService.get('STRIPE_CHECKOUT_SESSION_MODE'),
         success_url: `${this.configService.get<string>(
           'TORMES_BACKEND_URL',
-        )}:${this.configService.get<string>(
+        )}${this.configService.get<string>(
           'TORMES_BACKEND_PORT',
+        )}${this.configService.get<string>(
+          'BASE_PATH',
         )}/${this.configService.get<string>(
           'STRIPE_CHECKOUT_SESSION_SUCCCES_URL',
         )}`,
         cancel_url: `${this.configService.get<string>(
           'TORMES_BACKEND_URL',
-        )}:${this.configService.get<string>(
+        )}${this.configService.get<string>(
           'TORMES_BACKEND_PORT',
+        )}${this.configService.get<string>(
+          'BASE_PATH',
         )}/${this.configService.get<string>(
           'STRIPE_CHECKOUT_SESSION_CANCEL_URL',
         )}`,
@@ -123,12 +126,15 @@ export class StripeService implements IPaymentService {
   }
 
   async successPayment(session_id: any): Promise<any> {
+    const session = await this.stripe.checkout.sessions.retrieve(session_id);
+    if (session.payment_status != 'paid') {
+      return { billing_detail: undefined, sessionId: session.id };
+    }
     const billing_detail =
       await this.stripe.checkout.sessions.listLineItems(session_id);
-
-    const session = await this.stripe.checkout.sessions.retrieve(session_id);
-    return { billing_detail, session };
+    return { billing_detail: billing_detail, session: session.id };
   }
+
   private handleError(firstMessage: string, error: any): void {
     this.logger.error(`${firstMessage}: ${error.message}`, error.stack);
     throw new StripeError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
