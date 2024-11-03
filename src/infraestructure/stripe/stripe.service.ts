@@ -100,21 +100,17 @@ export class StripeService implements IPaymentService {
         line_items: lineItems,
         mode: this.configService.get('STRIPE_CHECKOUT_SESSION_MODE'),
         success_url: `${this.configService.get<string>(
-          'TORMES_BACKEND_URL',
+          'TORMES_FRONTEND_URL',
         )}${this.configService.get<string>(
-          'TORMES_BACKEND_PORT',
+          'TORMES_FRONTEND_PORT',
         )}${this.configService.get<string>(
-          'BASE_PATH',
-        )}/${this.configService.get<string>(
           'STRIPE_CHECKOUT_SESSION_SUCCCES_URL',
         )}`,
         cancel_url: `${this.configService.get<string>(
-          'TORMES_BACKEND_URL',
+          'TORMES_FRONTEND_URL',
         )}${this.configService.get<string>(
-          'TORMES_BACKEND_PORT',
+          'TORMES_FRONTEND_PORT',
         )}${this.configService.get<string>(
-          'BASE_PATH',
-        )}/${this.configService.get<string>(
           'STRIPE_CHECKOUT_SESSION_CANCEL_URL',
         )}`,
       });
@@ -133,6 +129,19 @@ export class StripeService implements IPaymentService {
     const billing_detail =
       await this.stripe.checkout.sessions.listLineItems(session_id);
     return { billing_detail: billing_detail, session: session.id };
+  }
+
+  async verifyWebhookSignature(event: any, signature: string): Promise<any> {
+    try {
+      const verifiedEvent = this.stripe.webhooks.constructEvent(
+        event,
+        signature,
+        this.configService.get<string>('STRIPE_WEBHOOK_SECRET'),
+      );
+      return verifiedEvent;
+    } catch (error) {
+      this.handleError('Error verifying webhook signature', error);
+    }
   }
 
   private handleError(firstMessage: string, error: any): void {
