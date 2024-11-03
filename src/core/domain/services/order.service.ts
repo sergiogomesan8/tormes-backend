@@ -2,6 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IOrderService } from '../ports/inbound/order.service.interface';
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,6 +20,12 @@ import {
 } from '../../../infraestructure/api-rest/dtos/order.dto';
 import { ProductService } from './product.service';
 import { UserService } from './user.service';
+import { PaymentService } from './payment.service';
+import {
+  CheckoutDto,
+  CheckoutProductDto,
+} from 'src/infraestructure/api-rest/dtos/checkout.dto';
+import { IPaymentService } from '../ports/inbound/payment.service.interface';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -27,6 +34,8 @@ export class OrderService implements IOrderService {
     private orderRepository: Repository<OrderEntity>,
     private readonly productService: ProductService,
     private readonly userService: UserService,
+    @Inject('IPaymentService')
+    private readonly paymentService: IPaymentService,
   ) {}
 
   async findAllOrders(): Promise<Order[]> {
@@ -57,23 +66,39 @@ export class OrderService implements IOrderService {
   async createOrder(
     userId: string,
     createOrderDto: CreateOrderDto,
-  ): Promise<Order> {
+  ): Promise<string> {
     try {
       const user = await this.userService.findUserById(userId);
 
       const orderedProducts: OrderedProduct[] = await this.findOrderedProducts(
         createOrderDto.orderedProducts,
       );
+
+      const checkoutDto = new CheckoutDto(
+        await Promise.all(
+          orderedProducts.map(async (product) => {
+            return new CheckoutProductDto(
+              product.product.paymentId,
+              product.amount,
+              product.product.price * 100,
+            );
+          }),
+        ),
+      );
+
+      const { checkout, sessionUrl } =
+        await this.paymentService.createCheckout(checkoutDto);
+
       const order = this.orderRepository.create({
         ...createOrderDto,
         orderedProducts: orderedProducts,
+        checkout: checkout,
+        customer: user,
+        status: OrderStatus.processing,
+        total: await this.calculateOrderTotal(orderedProducts),
       });
-
-      order.customer = user;
-      order.total = await this.calculateOrderTotal(order.orderedProducts);
-      order.status = OrderStatus.processing;
       await this.orderRepository.save(order);
-      return order;
+      return sessionUrl;
     } catch (error) {
       if (error instanceof QueryFailedError) {
         throw new ConflictException(error.message);
