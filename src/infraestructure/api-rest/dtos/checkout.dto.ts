@@ -1,24 +1,61 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ShoppingOrderedProduct } from '../../../core/domain/models/order.model';
-import { IsNotEmpty, ValidateNested } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderedProductDto } from './order.dto';
+import { CheckoutOrderedProduct } from 'src/core/domain/models/checkout.model';
+
+export class CheckoutProductDto {
+  @ApiProperty({
+    description: 'Product payment ID',
+    example: 'paymentId',
+  })
+  @IsString()
+  @IsNotEmpty()
+  paymentId: string;
+
+  @ApiProperty({
+    description: 'Amount of products',
+    example: 2,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
+
+  @ApiProperty({
+    description: 'Product price',
+    example: 10.6,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+
+  constructor(paymentId: string, amount: number, price: number) {
+    this.paymentId = paymentId;
+    this.amount = amount;
+    this.price = price;
+  }
+}
 
 export class CheckoutDto {
   @ApiProperty({
     description: 'Ordered Products',
     example: [
-      { productId: 'productId1', amount: 2 },
-      { productId: 'productId2', amount: 3 },
+      { paymentId: 'productId1', amount: 2, price: 10.6 },
+      { paymentId: 'productId2', amount: 3, price: 10.6 },
     ],
-    type: [OrderedProductDto],
+    type: [CheckoutProductDto],
   })
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => OrderedProductDto)
-  orderedProducts: ShoppingOrderedProduct[];
+  @Type(() => CheckoutProductDto)
+  orderedProducts: CheckoutOrderedProduct[];
 
-  constructor(orderedProducts: ShoppingOrderedProduct[]) {
+  constructor(orderedProducts: CheckoutOrderedProduct[]) {
     this.orderedProducts = orderedProducts;
   }
 }
