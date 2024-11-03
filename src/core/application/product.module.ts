@@ -10,7 +10,7 @@ import { ImageModule } from './image.module';
   imports: [
     TypeOrmModule.forFeature([ProductEntity]),
     ImageModule,
-    forwardRef(() => PaymentModule),
+    PaymentModule,
   ],
   controllers: [ProductController],
   providers: [ProductService],
