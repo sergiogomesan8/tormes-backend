@@ -6,7 +6,7 @@ import {
   OrderStatus,
   SeralizedOrder,
 } from '../../../core/domain/models/order.model';
-import { CreateOrderDto, UpdateOrderStatusDto } from '../dtos/order.dto';
+import { UpdateOrderStatusDto } from '../dtos/order.dto';
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -73,10 +73,10 @@ describe('OrderController', () => {
   const status = OrderStatus.processing;
   const user = { id: 'userId', name: 'Test User', email } as User;
 
-  const shoppingOrderedProducts = [
-    { productId: 'productId1', amount: 2 },
-    { productId: 'productId2', amount: 3 },
-  ];
+  // const shoppingOrderedProducts = [
+  //   { productId: 'productId1', amount: 2 },
+  //   { productId: 'productId2', amount: 3 },
+  // ];
 
   const order: Order = {
     id: 'id-123',
