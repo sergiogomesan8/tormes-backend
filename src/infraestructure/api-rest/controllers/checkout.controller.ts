@@ -14,10 +14,7 @@ import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
 import {
   Controller,
   UseFilters,
-  Get,
-  Res,
   Req,
-  RawBodyRequest,
   Post,
   Body,
   Headers,
