@@ -5,16 +5,11 @@ import { OrderEntity } from '../../infraestructure/postgres/entities/order.entit
 import { OrderService } from '../domain/services/order.service';
 import { ProductModule } from './product.module';
 import { UserModule } from './user.module';
-import { PaymentModule } from './payment.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([OrderEntity]),
-    ProductModule,
-    UserModule,
-    PaymentModule,
-  ],
+  imports: [TypeOrmModule.forFeature([OrderEntity]), ProductModule, UserModule],
   controllers: [OrderController],
   providers: [OrderService],
+  exports: [OrderService],
 })
 export class OrderModule {}

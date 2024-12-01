@@ -15,6 +15,7 @@ import { PostgreConfigService } from './infraestructure/postgres/adapters/postgr
 import { CashRegisterModule } from './core/application/cash-register.module';
 import { PaymentModule } from './core/application/payment.module';
 import { ImageModule } from './core/application/image.module';
+import { CheckoutModule } from './core/application/checkout.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { ImageModule } from './core/application/image.module';
     CashRegisterModule,
     ImageModule,
     PaymentModule,
+    CheckoutModule,
   ],
   controllers: [AppController],
   providers: [AppService],
