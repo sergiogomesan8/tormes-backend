@@ -1,16 +1,18 @@
 import { Type } from 'class-transformer';
 import { Product } from './product.model';
 import { SerializedUser, User } from './user.model';
+import { Checkout } from './checkout.model';
 
 export interface Order {
   id: string;
   orderId: string; //P123456789
 
+  checkout: Checkout;
+
   status: OrderStatus;
 
   date: number;
   total: number;
-  trackingNumber?: string;
 
   customer: User;
   customerName?: string;
@@ -30,7 +32,6 @@ export class SeralizedOrder {
 
   date: number;
   total: number;
-  trackingNumber?: string;
 
   @Type(() => SerializedUser)
   customer: SerializedUser;
@@ -58,6 +59,7 @@ export interface ShoppingOrderedProduct {
 }
 
 export enum OrderStatus {
+  payment_pending = 'payment_pending',
   processing = 'processing',
   shipped = 'shipped',
   delayed = 'delayed',
