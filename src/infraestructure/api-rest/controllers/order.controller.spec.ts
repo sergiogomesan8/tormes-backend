@@ -95,14 +95,14 @@ describe('OrderController', () => {
   };
   const expectedResponse = new SeralizedOrder(order);
 
-  const createOrderDto = new CreateOrderDto(
-    customerName,
-    customerContact,
-    deliveryAddress,
-    billingAddress,
-    paymentMethod,
-    shoppingOrderedProducts,
-  );
+  // const createOrderDto = new CreateOrderDto(
+  //   customerName,
+  //   customerContact,
+  //   deliveryAddress,
+  //   billingAddress,
+  //   paymentMethod,
+  //   shoppingOrderedProducts,
+  // );
 
   const updateOrderStatusDto = new UpdateOrderStatusDto(OrderStatus.delivered);
 

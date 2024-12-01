@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.model';
-import { Order, OrderStatus, ShoppingOrderedProduct } from '../models/order.model';
+import { Order, OrderStatus } from '../models/order.model';
 import {
   CreateOrderDto,
   UpdateOrderStatusDto,
@@ -16,7 +16,7 @@ import { UserEntity } from '../../../infraestructure/postgres/entities/user.enti
 import { ProductEntity } from '../../../infraestructure/postgres/entities/product.entity';
 import { Product } from '../models/product.model';
 import { Checkout, CheckoutStatus } from '../models/checkout.model';
-import { CheckoutEntity } from 'src/infraestructure/postgres/entities/checkout.entity';
+import { CheckoutEntity } from '../../../infraestructure/postgres/entities/checkout.entity';
 
 describe('OrderService', () => {
   let orderService: OrderService;
@@ -132,7 +132,7 @@ describe('OrderService', () => {
     date: 0,
     total: 200,
     customer: user,
-    generateOrderId: () => { },
+    generateOrderId: () => {},
     checkout: checkout as CheckoutEntity,
   };
 
@@ -274,7 +274,11 @@ describe('OrderService', () => {
         .mockResolvedValue(mockProduct);
       jest.spyOn(orderRepository, 'save').mockResolvedValue(order);
 
-      const result = await orderService.createOrder(userId, createOrderDto, checkout);
+      const result = await orderService.createOrder(
+        userId,
+        createOrderDto,
+        checkout,
+      );
       expect(result).toEqual(order);
     });
 

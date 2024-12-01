@@ -415,7 +415,7 @@ describe('StripeService', () => {
 
       const session = await stripeService.createCheckout(checkoutDto);
       expect(session).toEqual(mockSession);
-      expect(session.url).toEqual(mockSession.url)
+      expect(session.url).toEqual(mockSession.url);
       expect(stripe.checkout.sessions.create).toHaveBeenCalled();
     });
 
