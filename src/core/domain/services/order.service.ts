@@ -2,9 +2,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IOrderService } from '../ports/inbound/order.service.interface';
 import {
   ConflictException,
-  Inject,
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { OrderEntity } from '../../../infraestructure/postgres/entities/order.entity';
 import { QueryFailedError, Repository } from 'typeorm';
@@ -20,22 +20,17 @@ import {
 } from '../../../infraestructure/api-rest/dtos/order.dto';
 import { ProductService } from './product.service';
 import { UserService } from './user.service';
-import { PaymentService } from './payment.service';
-import {
-  CheckoutDto,
-  CheckoutProductDto,
-} from 'src/infraestructure/api-rest/dtos/checkout.dto';
-import { IPaymentService } from '../ports/inbound/payment.service.interface';
+import { Checkout } from '../models/checkout.model';
 
 @Injectable()
 export class OrderService implements IOrderService {
+  private readonly logger = new Logger(OrderService.name);
+
   constructor(
     @InjectRepository(OrderEntity)
     private orderRepository: Repository<OrderEntity>,
     private readonly productService: ProductService,
     private readonly userService: UserService,
-    @Inject('IPaymentService')
-    private readonly paymentService: IPaymentService,
   ) {}
 
   async findAllOrders(): Promise<Order[]> {
@@ -66,7 +61,8 @@ export class OrderService implements IOrderService {
   async createOrder(
     userId: string,
     createOrderDto: CreateOrderDto,
-  ): Promise<string> {
+    checkout: Checkout,
+  ): Promise<Order> {
     try {
       const user = await this.userService.findUserById(userId);
 
@@ -74,31 +70,17 @@ export class OrderService implements IOrderService {
         createOrderDto.orderedProducts,
       );
 
-      const checkoutDto = new CheckoutDto(
-        await Promise.all(
-          orderedProducts.map(async (product) => {
-            return new CheckoutProductDto(
-              product.product.paymentId,
-              product.amount,
-              product.product.price * 100,
-            );
-          }),
-        ),
-      );
-
-      const { checkout, sessionUrl } =
-        await this.paymentService.createCheckout(checkoutDto);
-
       const order = this.orderRepository.create({
         ...createOrderDto,
-        orderedProducts: orderedProducts,
         checkout: checkout,
+        orderedProducts: orderedProducts,
         customer: user,
         status: OrderStatus.processing,
         total: await this.calculateOrderTotal(orderedProducts),
       });
       await this.orderRepository.save(order);
-      return sessionUrl;
+
+      return order;
     } catch (error) {
       if (error instanceof QueryFailedError) {
         throw new ConflictException(error.message);

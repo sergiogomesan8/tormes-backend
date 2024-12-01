@@ -94,27 +94,27 @@ export class OrderController {
     return orders.map((order) => new SeralizedOrder(order));
   }
 
-  @ApiOperation({
-    summary: 'Create an order',
-    description: 'Endpoint to create an order',
-  })
-  @ApiCreatedResponse({
-    description: 'Order created successfully',
-  })
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Post()
-  async createOrder(
-    @Req() req: Request,
-    @Body() createOrderDto: CreateOrderDto,
-  ): Promise<any> {
-    const user = req.user;
-    const sessionUrl = await this.orderService.createOrder(
-      user['id'],
-      createOrderDto,
-    );
-    return { sessionUrl: sessionUrl };
-  }
+  // @ApiOperation({
+  //   summary: 'Create an order',
+  //   description: 'Endpoint to create an order',
+  // })
+  // @ApiCreatedResponse({
+  //   description: 'Order created successfully',
+  // })
+  // @UseGuards(JwtAuthGuard)
+  // @UseInterceptors(ClassSerializerInterceptor)
+  // @Post()
+  // async createOrder(
+  //   @Req() req: Request,
+  //   @Body() createOrderDto: CreateOrderDto,
+  // ): Promise<any> {
+  //   const user = req.user;
+  //   const sessionUrl = await this.orderService.createOrder(
+  //     user['id'],
+  //     createOrderDto,
+  //   );
+  //   return { sessionUrl: sessionUrl };
+  // }
 
   @ApiOperation({
     summary: 'Update an order status by ID',
