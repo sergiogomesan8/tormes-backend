@@ -1,17 +1,12 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
-  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { OrderEntity } from './order.entity';
 import { CheckoutStatus } from 'src/core/domain/models/checkout.model';
-import {
-  OrderedProduct,
-  ShoppingOrderedProduct,
-} from 'src/core/domain/models/order.model';
+import { ShoppingOrderedProduct } from 'src/core/domain/models/order.model';
 
 @Entity({ name: 'checkouts' })
 export class CheckoutEntity {

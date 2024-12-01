@@ -1,7 +1,6 @@
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
@@ -21,7 +20,6 @@ import {
   ParseUUIDPipe,
   UseGuards,
   Body,
-  Post,
   Patch,
   Delete,
   ClassSerializerInterceptor,
@@ -31,7 +29,7 @@ import { OrderService } from '../../../core/domain/services/order.service';
 import { SeralizedOrder } from '../../../core/domain/models/order.model';
 import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
 import { Request } from 'express';
-import { CreateOrderDto, UpdateOrderStatusDto } from '../dtos/order.dto';
+import { UpdateOrderStatusDto } from '../dtos/order.dto';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { UserType } from '../../../core/domain/models/user.model';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';

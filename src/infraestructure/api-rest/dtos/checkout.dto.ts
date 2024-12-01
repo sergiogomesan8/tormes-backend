@@ -6,7 +6,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OrderedProductDto } from './order.dto';
 import { CheckoutOrderedProduct } from 'src/core/domain/models/checkout.model';
 
 export class CheckoutProductDto {
