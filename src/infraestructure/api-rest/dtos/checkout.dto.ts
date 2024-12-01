@@ -6,7 +6,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CheckoutOrderedProduct } from 'src/core/domain/models/checkout.model';
+import { CheckoutOrderedProduct } from '../../../core/domain/models/checkout.model';
 
 export class CheckoutProductDto {
   @ApiProperty({

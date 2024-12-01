@@ -1,7 +1,7 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { OrderEntity } from './order.entity';
-import { CheckoutStatus } from 'src/core/domain/models/checkout.model';
-import { ShoppingOrderedProduct } from 'src/core/domain/models/order.model';
+import { CheckoutStatus } from '../../../core/domain/models/checkout.model';
+import { ShoppingOrderedProduct } from '../../../core/domain/models/order.model';
 
 @Entity({ name: 'checkouts' })
 export class CheckoutEntity {

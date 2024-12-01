@@ -23,10 +23,10 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
+import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
 import { Request } from 'express';
 import { CreateOrderDto } from '../dtos/order.dto';
-import { CheckoutService } from 'src/core/domain/services/checkout.service';
+import { CheckoutService } from '../../../core/domain/services/checkout.service';
 
 @ApiTags('checkout')
 @ApiBearerAuth()

@@ -1,10 +1,10 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
-import { PaymentProduct } from 'src/core/domain/models/payment.model';
+import { PaymentProduct } from '../../core/domain/models/payment.model';
 import { StripeError } from './exceptions/stripe.errors';
 import { CheckoutDto } from '../api-rest/dtos/checkout.dto';
-import { IStripeService } from 'src/core/domain/ports/outbound/stripe.service.interface';
+import { IStripeService } from '../../core/domain/ports/outbound/stripe.service.interface';
 
 @Injectable()
 export class StripeService implements IStripeService {
