@@ -1,13 +1,13 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
-import { IPaymentService } from '../../core/domain/ports/inbound/payment.service.interface';
 import { PaymentProduct } from 'src/core/domain/models/payment.model';
 import { StripeError } from './exceptions/stripe.errors';
 import { CheckoutDto } from '../api-rest/dtos/checkout.dto';
+import { IStripeService } from 'src/core/domain/ports/outbound/stripe.service.interface';
 
 @Injectable()
-export class StripeService implements IPaymentService {
+export class StripeService implements IStripeService {
   private readonly logger = new Logger(StripeService.name);
   private stripe: Stripe;
 
@@ -114,31 +114,44 @@ export class StripeService implements IPaymentService {
           'STRIPE_CHECKOUT_SESSION_CANCEL_URL',
         )}`,
       });
-
       return session;
     } catch (error) {
       this.handleError('Error creating checkout session', error);
     }
   }
 
-  async successPayment(session_id: any): Promise<any> {
-    const session = await this.stripe.checkout.sessions.retrieve(session_id);
-    if (session.payment_status != 'paid') {
-      return { billing_detail: undefined, sessionId: session.id };
+  async successPayment(sessionId: any): Promise<any> {
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+      const billingDetail =
+        await this.stripe.checkout.sessions.listLineItems(sessionId);
+
+      return { session: session, billingDetail: billingDetail };
+    } catch (error) {
+      this.handleError('Error retrieving success payment details', error);
     }
-    const billing_detail =
-      await this.stripe.checkout.sessions.listLineItems(session_id);
-    return { billing_detail: billing_detail, session: session.id };
   }
 
-  async verifyWebhookSignature(event: any, signature: string): Promise<any> {
+  async failedPayment(sessionId: any): Promise<any> {
     try {
-      const verifiedEvent = this.stripe.webhooks.constructEvent(
-        event,
+      const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+      const billingDetail =
+        await this.stripe.checkout.sessions.listLineItems(sessionId);
+
+      return { session: session, billingDetail: billingDetail };
+    } catch (error) {
+      this.handleError('Error retrieving failed payment details', error);
+    }
+  }
+
+  async verifyWebhookSignature(payload: any, signature: string): Promise<any> {
+    try {
+      const event = this.stripe.webhooks.constructEvent(
+        payload,
         signature,
         this.configService.get<string>('STRIPE_WEBHOOK_SECRET'),
       );
-      return verifiedEvent;
+      return event;
     } catch (error) {
       this.handleError('Error verifying webhook signature', error);
     }
