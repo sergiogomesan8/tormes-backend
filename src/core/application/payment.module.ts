@@ -14,4 +14,4 @@ import { StripeModule } from '../../infraestructure/stripe/stripe.module';
   controllers: [],
   exports: ['IPaymentService'],
 })
-export class PaymentModule { }
+export class PaymentModule {}

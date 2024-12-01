@@ -1,9 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { OrderEntity } from './order.entity';
 import { CheckoutStatus } from 'src/core/domain/models/checkout.model';
 import { ShoppingOrderedProduct } from 'src/core/domain/models/order.model';

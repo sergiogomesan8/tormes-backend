@@ -48,7 +48,7 @@ import { CheckoutService } from 'src/core/domain/services/checkout.service';
 export class CheckoutController {
   private readonly logger = new Logger(CheckoutController.name);
 
-  constructor(private readonly checkoutService: CheckoutService) { }
+  constructor(private readonly checkoutService: CheckoutService) {}
 
   @ApiOperation({
     summary: 'Create an order, creating first a checkout',

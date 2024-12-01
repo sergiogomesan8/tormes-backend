@@ -49,7 +49,7 @@ import { UserTypes } from '../../../core/domain/services/roles-authorization/rol
 @UseFilters(new HttpExceptionFilter())
 @Controller('order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) { }
+  constructor(private readonly orderService: OrderService) {}
 
   @ApiOperation({
     summary: 'Retrieve all orders',
