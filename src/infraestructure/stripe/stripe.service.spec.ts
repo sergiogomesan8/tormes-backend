@@ -377,12 +377,14 @@ describe('StripeService', () => {
       jest.spyOn(stripe.products, 'del').mockResolvedValue(undefined);
 
       await stripeService.deleteProduct('prod_1');
-      expect(stripe.products.del).toHaveBeenCalledWith('prod_1');
+      expect(stripe.products.update).toHaveBeenCalledWith('prod_1', {
+        active: false,
+      });
     });
 
     it('should handle error when an exception occurs deleting a product', async () => {
       jest
-        .spyOn(stripe.products, 'del')
+        .spyOn(stripe.products, 'update')
         .mockRejectedValue(new Error('Test error'));
 
       const loggerSpy = jest.spyOn(stripeService['logger'], 'error');
@@ -411,8 +413,9 @@ describe('StripeService', () => {
         { paymentId: 'prod_2', amount: 3, price: 10.6 },
       ]);
 
-      const sessionUrl = await stripeService.createCheckout(checkoutDto);
-      expect(sessionUrl).toEqual(mockSession.url);
+      const session = await stripeService.createCheckout(checkoutDto);
+      expect(session).toEqual(mockSession);
+      expect(session.url).toEqual(mockSession.url)
       expect(stripe.checkout.sessions.create).toHaveBeenCalled();
     });
 
