@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { PaymentService } from '../domain/services/payment.service';
 import { StripeModule } from '../../infraestructure/stripe/stripe.module';
-import { CheckoutEntity } from 'src/infraestructure/postgres/entities/checkout.entity';
 
 @Module({
   imports: [StripeModule.forRootAsync()],
@@ -16,4 +14,4 @@ import { CheckoutEntity } from 'src/infraestructure/postgres/entities/checkout.e
   controllers: [],
   exports: ['IPaymentService'],
 })
-export class PaymentModule {}
+export class PaymentModule { }

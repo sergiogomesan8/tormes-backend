@@ -23,7 +23,7 @@ export class CheckoutService implements ICheckoutService {
     private readonly stripeService: StripeService,
     private readonly productService: ProductService,
     private readonly orderService: OrderService,
-  ) {}
+  ) { }
 
   async createCheckout(
     userId: string,
