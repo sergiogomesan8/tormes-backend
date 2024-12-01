@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.model';
-import { OrderStatus } from '../models/order.model';
+import { Order, OrderStatus } from '../models/order.model';
 import {
   CreateOrderDto,
   UpdateOrderStatusDto,
@@ -15,6 +15,8 @@ import { UserService } from './user.service';
 import { UserEntity } from '../../../infraestructure/postgres/entities/user.entity';
 import { ProductEntity } from '../../../infraestructure/postgres/entities/product.entity';
 import { Product } from '../models/product.model';
+import { Checkout, CheckoutStatus } from '../models/checkout.model';
+import { CheckoutEntity } from '../../../infraestructure/postgres/entities/checkout.entity';
 
 describe('OrderService', () => {
   let orderService: OrderService;
@@ -98,6 +100,25 @@ describe('OrderService', () => {
 
   const user = { id: 'userId', name: 'Test User', email } as User;
 
+  const shoppingOrderedProducts = [
+    { productId: 'productId1', amount: 2 },
+    { productId: 'productId2', amount: 3 },
+  ];
+
+  const checkout: Checkout = {
+    id: 'checkoutId',
+    total: 200,
+    currency: 'USD',
+    createdAt: 0,
+    status: CheckoutStatus.pending,
+    userId: 'userId',
+    billingDetail: {},
+    sessionId: 'sessionId',
+    session: {},
+    orderedProducts: shoppingOrderedProducts,
+    order: { id: 'id-123', orderId: 'P987654321' } as Order,
+  };
+
   const order = {
     id: 'id-123',
     customerName,
@@ -112,6 +133,7 @@ describe('OrderService', () => {
     total: 200,
     customer: user,
     generateOrderId: () => {},
+    checkout: checkout as CheckoutEntity,
   };
 
   const mockProduct = {
@@ -122,11 +144,6 @@ describe('OrderService', () => {
     section: 'Product Section',
     price: 100,
   };
-
-  const shoppingOrderedProducts = [
-    { productId: 'productId1', amount: 2 },
-    { productId: 'productId2', amount: 3 },
-  ];
 
   const createOrderDto = new CreateOrderDto(
     customerName,
@@ -257,7 +274,11 @@ describe('OrderService', () => {
         .mockResolvedValue(mockProduct);
       jest.spyOn(orderRepository, 'save').mockResolvedValue(order);
 
-      const result = await orderService.createOrder(userId, createOrderDto);
+      const result = await orderService.createOrder(
+        userId,
+        createOrderDto,
+        checkout,
+      );
       expect(result).toEqual(order);
     });
 
@@ -268,7 +289,7 @@ describe('OrderService', () => {
       });
 
       await expect(
-        orderService.createOrder(userId, createOrderDto),
+        orderService.createOrder(userId, createOrderDto, checkout),
       ).rejects.toThrow(new NotFoundException('User Not Found'));
     });
 
@@ -284,7 +305,7 @@ describe('OrderService', () => {
         throw new QueryFailedError('query', [], new Error(errorMessage));
       });
       await expect(
-        orderService.createOrder(userId, createOrderDto),
+        orderService.createOrder(userId, createOrderDto, checkout),
       ).rejects.toThrow(new ConflictException(errorMessage));
     });
 
@@ -300,7 +321,7 @@ describe('OrderService', () => {
       });
 
       try {
-        await orderService.createOrder(userId, createOrderDto);
+        await orderService.createOrder(userId, createOrderDto, checkout);
       } catch (e) {
         expect(e).toBeInstanceOf(Error);
         expect(e).toHaveProperty('message', 'Save error');

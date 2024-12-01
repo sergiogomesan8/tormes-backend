@@ -4,6 +4,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { OrderEntity } from '../../../infraestructure/postgres/entities/order.entity';
 import { QueryFailedError, Repository } from 'typeorm';
@@ -19,9 +20,12 @@ import {
 } from '../../../infraestructure/api-rest/dtos/order.dto';
 import { ProductService } from './product.service';
 import { UserService } from './user.service';
+import { Checkout } from '../models/checkout.model';
 
 @Injectable()
 export class OrderService implements IOrderService {
+  private readonly logger = new Logger(OrderService.name);
+
   constructor(
     @InjectRepository(OrderEntity)
     private orderRepository: Repository<OrderEntity>,
@@ -57,6 +61,7 @@ export class OrderService implements IOrderService {
   async createOrder(
     userId: string,
     createOrderDto: CreateOrderDto,
+    checkout: Checkout,
   ): Promise<Order> {
     try {
       const user = await this.userService.findUserById(userId);
@@ -64,15 +69,17 @@ export class OrderService implements IOrderService {
       const orderedProducts: OrderedProduct[] = await this.findOrderedProducts(
         createOrderDto.orderedProducts,
       );
+
       const order = this.orderRepository.create({
         ...createOrderDto,
+        checkout: checkout,
         orderedProducts: orderedProducts,
+        customer: user,
+        status: OrderStatus.processing,
+        total: await this.calculateOrderTotal(orderedProducts),
       });
-
-      order.customer = user;
-      order.total = await this.calculateOrderTotal(order.orderedProducts);
-      order.status = OrderStatus.processing;
       await this.orderRepository.save(order);
+
       return order;
     } catch (error) {
       if (error instanceof QueryFailedError) {

@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IPaymentService } from '../ports/inbound/payment.service.interface';
 import { StripeService } from '../../../infraestructure/stripe/stripe.service';
 import Stripe from 'stripe';
-import { PaymentProduct } from '../models/payment.module';
+import { PaymentProduct } from '../models/payment.model';
 
 @Injectable()
 export class PaymentService implements IPaymentService {
+  private readonly logger = new Logger(PaymentService.name);
+
   constructor(private readonly stripeService: StripeService) {}
 
   async createProduct(paymentProduct: PaymentProduct): Promise<Stripe.Product> {

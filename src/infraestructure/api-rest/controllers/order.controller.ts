@@ -1,7 +1,6 @@
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
@@ -21,7 +20,6 @@ import {
   ParseUUIDPipe,
   UseGuards,
   Body,
-  Post,
   Patch,
   Delete,
   ClassSerializerInterceptor,
@@ -31,7 +29,7 @@ import { OrderService } from '../../../core/domain/services/order.service';
 import { SeralizedOrder } from '../../../core/domain/models/order.model';
 import { JwtAuthGuard } from '../../../core/domain/services/jwt-config/access-token/access-jwt-auth.guard';
 import { Request } from 'express';
-import { CreateOrderDto, UpdateOrderStatusDto } from '../dtos/order.dto';
+import { UpdateOrderStatusDto } from '../dtos/order.dto';
 import { RolesGuard } from '../../../core/domain/services/roles-authorization/roles.guard';
 import { UserType } from '../../../core/domain/models/user.model';
 import { UserTypes } from '../../../core/domain/services/roles-authorization/roles.decorator';
@@ -94,30 +92,27 @@ export class OrderController {
     return orders.map((order) => new SeralizedOrder(order));
   }
 
-  @ApiOperation({
-    summary: 'Create an order',
-    description: 'Endpoint to create an order',
-  })
-  @ApiCreatedResponse({
-    description: 'Order created successfully',
-  })
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Post()
-  async createOrder(
-    @Req() req: Request,
-    @Body() createOrderDto: CreateOrderDto,
-  ): Promise<SeralizedOrder> {
-    const user = req.user;
-    const order = await this.orderService.createOrder(
-      user['id'],
-      createOrderDto,
-    );
-    if (order) {
-      const seralizedOrder = new SeralizedOrder(order);
-      return seralizedOrder;
-    }
-  }
+  // @ApiOperation({
+  //   summary: 'Create an order',
+  //   description: 'Endpoint to create an order',
+  // })
+  // @ApiCreatedResponse({
+  //   description: 'Order created successfully',
+  // })
+  // @UseGuards(JwtAuthGuard)
+  // @UseInterceptors(ClassSerializerInterceptor)
+  // @Post()
+  // async createOrder(
+  //   @Req() req: Request,
+  //   @Body() createOrderDto: CreateOrderDto,
+  // ): Promise<any> {
+  //   const user = req.user;
+  //   const sessionUrl = await this.orderService.createOrder(
+  //     user['id'],
+  //     createOrderDto,
+  //   );
+  //   return { sessionUrl: sessionUrl };
+  // }
 
   @ApiOperation({
     summary: 'Update an order status by ID',

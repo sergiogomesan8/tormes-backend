@@ -13,6 +13,9 @@ import { OrderModule } from './core/application/order.module';
 import { PostgresConfigModule } from './infraestructure/postgres/adapters/postgres-config/postgres-config.module';
 import { PostgreConfigService } from './infraestructure/postgres/adapters/postgres-config/postgres-config.service';
 import { CashRegisterModule } from './core/application/cash-register.module';
+import { PaymentModule } from './core/application/payment.module';
+import { ImageModule } from './core/application/image.module';
+import { CheckoutModule } from './core/application/checkout.module';
 
 @Module({
   imports: [
@@ -40,6 +43,9 @@ import { CashRegisterModule } from './core/application/cash-register.module';
     SectionModule,
     OrderModule,
     CashRegisterModule,
+    ImageModule,
+    PaymentModule,
+    CheckoutModule,
   ],
   controllers: [AppController],
   providers: [AppService],

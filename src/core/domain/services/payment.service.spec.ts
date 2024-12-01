@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaymentService } from './payment.service';
 import { StripeService } from '../../../infraestructure/stripe/stripe.service';
-import { PaymentProduct } from '../models/payment.module';
+import { PaymentProduct } from '../models/payment.model';
 import Stripe from 'stripe';
 
 describe('PaymentService', () => {

@@ -18,7 +18,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "e2e": "nx e2e",
     "lint:all": "eslint 'src/**/*.{ts,tsx}'",
-    "lint:changes": "eslint ."
+    "lint:changes": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
